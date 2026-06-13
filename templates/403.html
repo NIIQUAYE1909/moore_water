@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>403 — Access Forbidden</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex">
+  <link rel="icon" type="image/svg+xml" href="/static/icon.svg">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Outfit', sans-serif; }
+    body {
+      background: linear-gradient(135deg, #002270 0%, #0A3894 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .card {
+      background: white;
+      border-radius: 20px;
+      padding: 48px 36px;
+      text-align: center;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.2);
+    }
+    .icon {
+      width: 72px;
+      height: 72px;
+      background: rgba(227, 6, 19, 0.08);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+    }
+    .icon svg { width: 36px; height: 36px; fill: #E30613; }
+    h1 { font-size: 1.6rem; font-weight: 800; color: #0F172A; margin-bottom: 8px; }
+    p { font-size: 0.9rem; color: #64748B; line-height: 1.5; margin-bottom: 28px; }
+    a {
+      display: inline-block;
+      background: #0A3894;
+      color: white;
+      padding: 12px 28px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.9rem;
+      transition: background 0.2s;
+    }
+    a:hover { background: #1A4EB5; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon">
+      <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 11.9l-3.5-3.5 1.41-1.41L12 10.08l5.09-5.09 1.41 1.41L12 12.9z"/></svg>
+    </div>
+    <h1>Access Forbidden</h1>
+    <p>You do not have permission to access this area. This section is restricted to Administrators only.</p>
+    <a href="/">← Return to Home</a>
+  </div>
+</body>
+</html>

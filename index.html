@@ -1,0 +1,1853 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Moor Natural Mineral Water - Daily Ledger</title>
+  
+  <!-- PWA Meta Tags for iOS & Android Standalone Apps -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Moor Ledger">
+  <meta name="theme-color" content="#0A3894">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="application-name" content="Moor Ledger">
+  
+  <!-- Manifest link -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+  <link rel="apple-touch-icon" href="icon.svg">
+  
+  <!-- Fonts (Google Fonts Outfit) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --primary: #0A3894;
+      --primary-rgb: 10, 56, 148;
+      --accent: #00B5EF;
+      --accent-rgb: 0, 181, 239;
+      --white: #FFFFFF;
+      --dark: #0F172A;
+      --dark-light: #1E293B;
+      --bg-gradient: linear-gradient(135deg, #F0F4FA 0%, #E6EFFD 100%);
+      --red: #E30613;
+      --red-rgb: 227, 6, 19;
+      --gold: #FFC20E;
+      --gold-rgb: 255, 194, 14;
+      --green: #128C7E;
+      --green-rgb: 18, 140, 126;
+      --card-bg: rgba(255, 255, 255, 0.9);
+      --border-radius: 16px;
+      --border-radius-sm: 8px;
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      --shadow: 0 10px 30px rgba(10, 56, 148, 0.05);
+      --shadow-hover: 0 15px 35px rgba(10, 56, 148, 0.1);
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Outfit', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background: var(--bg-gradient);
+      color: var(--dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding-top: var(--safe-top);
+      padding-bottom: calc(30px + var(--safe-bottom));
+      overflow-x: hidden;
+    }
+
+    /* Brand Header with Flyer Styling */
+    header {
+      background: linear-gradient(135deg, var(--primary) 0%, #002270 100%);
+      color: var(--white);
+      padding: calc(25px + var(--safe-top)) 20px 35px 20px;
+      position: relative;
+      overflow: hidden;
+      border-bottom-left-radius: 30px;
+      border-bottom-right-radius: 30px;
+      box-shadow: 0 10px 25px rgba(10, 56, 200, 0.15);
+      text-align: center;
+    }
+
+    header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -20%;
+      width: 140%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(0, 181, 239, 0.15) 0%, transparent 60%);
+      pointer-events: none;
+      animation: waterWave 15s infinite alternate linear;
+    }
+
+    @keyframes waterWave {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Floating Bubbles in Header */
+    .bubble {
+      position: absolute;
+      bottom: -20px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      pointer-events: none;
+      animation: bubbleRise 8s infinite ease-in;
+    }
+
+    @keyframes bubbleRise {
+      0% {
+        transform: translateY(0) scale(1);
+        opacity: 0.8;
+      }
+      100% {
+        transform: translateY(-200px) scale(1.5);
+        opacity: 0;
+      }
+    }
+
+    .header-content {
+      max-width: 600px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* Inline Recreated Logo from Flyer */
+    .logo-container {
+      background: var(--white);
+      border-radius: 50%;
+      padding: 6px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.5s ease;
+    }
+
+    .logo-container:hover {
+      transform: rotate(360deg);
+    }
+
+    .logo-container svg {
+      width: 90px;
+      height: 90px;
+    }
+
+    .brand-title {
+      font-size: 1.8rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      line-height: 1.2;
+    }
+
+    .brand-subtitle {
+      font-size: 0.9rem;
+      font-weight: 500;
+      letter-spacing: 2px;
+      color: var(--accent);
+      text-transform: uppercase;
+    }
+
+    .slogan-box {
+      margin-top: 5px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .slogan-red {
+      color: var(--red);
+      font-weight: 900;
+      font-style: italic;
+      font-size: 1.2rem;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+      letter-spacing: 1px;
+    }
+
+    .slogan-sub {
+      font-size: 0.75rem;
+      font-weight: 400;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    /* Offline Status Pill */
+    .status-badge {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(5px);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      z-index: 3;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: #4ADE80;
+    }
+
+    .status-dot.offline {
+      background-color: var(--red);
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 0.5; }
+      50% { opacity: 1; }
+      100% { opacity: 0.5; }
+    }
+
+    /* Main Container layout */
+    main {
+      flex: 1;
+      max-width: 650px;
+      width: 100%;
+      margin: -20px auto 0 auto;
+      padding: 0 16px;
+      position: relative;
+      z-index: 3;
+    }
+
+    /* Live Summary Dashboard Card (Sticky/Float) */
+    .dashboard-card {
+      background: linear-gradient(135deg, var(--white) 0%, #F5F9FF 100%);
+      border-radius: var(--border-radius);
+      padding: 20px;
+      box-shadow: 0 12px 35px rgba(10, 56, 148, 0.12);
+      margin-bottom: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      position: sticky;
+      top: 15px;
+      z-index: 10;
+      transition: var(--transition);
+    }
+
+    .dashboard-card:hover {
+      box-shadow: 0 16px 40px rgba(10, 56, 148, 0.16);
+    }
+
+    .dash-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+    }
+
+    .dash-item {
+      display: flex;
+      flex-direction: column;
+      padding: 10px 15px;
+      border-radius: var(--border-radius-sm);
+      background: rgba(255, 255, 255, 0.6);
+      border: 1px solid rgba(10, 56, 148, 0.05);
+    }
+
+    .dash-item.full-width {
+      grid-column: span 2;
+    }
+
+    .dash-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--gray-500);
+      margin-bottom: 4px;
+    }
+
+    .dash-val {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .dash-val.highlight {
+      color: var(--dark);
+    }
+
+    .dash-val.variance-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1.15rem;
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-weight: 700;
+      width: fit-content;
+    }
+
+    .variance-balanced {
+      background-color: rgba(74, 222, 128, 0.15);
+      color: #16A34A;
+      border: 1px solid rgba(74, 222, 128, 0.3);
+    }
+
+    .variance-shortage {
+      background-color: rgba(239, 68, 68, 0.12);
+      color: #DC2626;
+      border: 1px solid rgba(239, 68, 68, 0.25);
+    }
+
+    .variance-surplus {
+      background-color: rgba(245, 158, 11, 0.12);
+      color: #D97706;
+      border: 1px solid rgba(245, 158, 11, 0.25);
+    }
+
+    /* Cards Styling for Form sections */
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      border-radius: var(--border-radius);
+      padding: 24px;
+      margin-bottom: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      box-shadow: var(--shadow);
+      transition: var(--transition);
+    }
+
+    .card:hover {
+      box-shadow: var(--shadow-hover);
+      transform: translateY(-2px);
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1.5px solid rgba(10, 56, 148, 0.08);
+      padding-bottom: 8px;
+    }
+
+    .card-title svg {
+      width: 20px;
+      height: 20px;
+      fill: var(--primary);
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group:last-child {
+      margin-bottom: 0;
+    }
+
+    label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--dark-light);
+      margin-bottom: 6px;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 12px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--primary);
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+    }
+
+    .input-icon svg {
+      width: 16px;
+      height: 16px;
+      fill: var(--primary);
+    }
+
+    input[type="number"],
+    input[type="text"],
+    input[type="date"] {
+      width: 100%;
+      padding: 12px 14px 12px 38px;
+      border-radius: var(--border-radius-sm);
+      border: 1.5px solid var(--gray-200);
+      background-color: var(--white);
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--dark);
+      outline: none;
+      transition: var(--transition);
+    }
+
+    input[type="date"] {
+      padding-left: 38px;
+    }
+
+    input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(10, 56, 148, 0.1);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+    }
+
+    /* Dynamic Expenses Section Styles */
+    .expenses-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .expense-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      animation: slideIn 0.25s ease-out;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .expense-row input[type="text"] {
+      flex: 2;
+      padding-left: 14px; /* No icon prefix for desc */
+    }
+
+    .expense-row .amount-wrapper {
+      flex: 1;
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .expense-row .amount-wrapper input {
+      padding-left: 30px;
+    }
+
+    .expense-row .amount-wrapper .input-icon {
+      left: 10px;
+    }
+
+    .btn-delete {
+      background: none;
+      border: none;
+      color: var(--red);
+      cursor: pointer;
+      padding: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      transition: var(--transition);
+    }
+
+    .btn-delete:hover {
+      background-color: var(--red-light);
+    }
+
+    .btn-delete svg {
+      width: 18px;
+      height: 18px;
+      fill: var(--red);
+    }
+
+    .btn-add {
+      background: transparent;
+      border: 1.5px dashed var(--primary);
+      color: var(--primary);
+      width: 100%;
+      padding: 10px;
+      border-radius: var(--border-radius-sm);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: var(--transition);
+    }
+
+    .btn-add:hover {
+      background-color: rgba(10, 56, 148, 0.05);
+    }
+
+    .btn-add svg {
+      width: 16px;
+      height: 16px;
+      fill: var(--primary);
+    }
+
+    /* Bottom Button Actions Area */
+    .actions-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: var(--border-radius-sm);
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      border: none;
+      transition: var(--transition);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: var(--white);
+    }
+
+    .btn-primary:hover {
+      background-color: #082d78;
+      box-shadow: 0 6px 15px rgba(10, 56, 148, 0.2);
+    }
+
+    .btn-share {
+      background: var(--green);
+      color: var(--white);
+    }
+
+    .btn-share:hover {
+      background-color: #0e6f64;
+      box-shadow: 0 6px 15px rgba(18, 140, 126, 0.2);
+    }
+
+    .btn-share svg,
+    .btn-primary svg {
+      width: 20px;
+      height: 20px;
+      fill: var(--white);
+    }
+
+    /* Backup Utility Actions */
+    .backup-row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+
+    .btn-outline {
+      background: var(--white);
+      color: var(--primary);
+      border: 1.5px solid var(--primary);
+      padding: 10px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border-radius: var(--border-radius-sm);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: var(--transition);
+    }
+
+    .btn-outline:hover {
+      background-color: rgba(10, 56, 148, 0.04);
+    }
+
+    .btn-outline svg {
+      width: 16px;
+      height: 16px;
+      fill: var(--primary);
+    }
+
+    /* Ledger History Section */
+    .history-card {
+      margin-bottom: 30px;
+    }
+
+    .history-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .history-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .history-title svg {
+      width: 20px;
+      height: 20px;
+      fill: var(--primary);
+    }
+
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-height: 400px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    /* Custom Scrollbar for history list */
+    .history-list::-webkit-scrollbar {
+      width: 5px;
+    }
+    .history-list::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.02);
+      border-radius: 10px;
+    }
+    .history-list::-webkit-scrollbar-thumb {
+      background: rgba(10, 56, 148, 0.15);
+      border-radius: 10px;
+    }
+
+    .history-item {
+      background: var(--white);
+      border-radius: var(--border-radius-sm);
+      padding: 14px 16px;
+      border: 1px solid var(--gray-200);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .history-item::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background-color: var(--primary);
+    }
+
+    .history-item.balanced::before { background-color: #16A34A; }
+    .history-item.shortage::before { background-color: #DC2626; }
+    .history-item.surplus::before { background-color: #D97706; }
+
+    .history-item:hover {
+      box-shadow: 0 4px 12px rgba(10, 56, 148, 0.08);
+      border-color: rgba(10, 56, 148, 0.2);
+      transform: translateX(2px);
+    }
+
+    .hist-left {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .hist-date {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--dark);
+    }
+
+    .hist-sub {
+      font-size: 0.75rem;
+      color: var(--gray-500);
+      font-weight: 500;
+    }
+
+    .hist-right {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .hist-money {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 2px;
+    }
+
+    .hist-cash {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .hist-variance-text {
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .variance-balanced-text {
+      background-color: rgba(74, 222, 128, 0.12);
+      color: #16A34A;
+    }
+
+    .variance-shortage-text {
+      background-color: rgba(239, 68, 68, 0.1);
+      color: #DC2626;
+    }
+
+    .variance-surplus-text {
+      background-color: rgba(245, 158, 11, 0.1);
+      color: #D97706;
+    }
+
+    .no-history {
+      text-align: center;
+      padding: 30px;
+      color: var(--gray-500);
+      font-size: 0.9rem;
+      font-weight: 500;
+      border: 1.5px dashed var(--gray-200);
+      border-radius: var(--border-radius-sm);
+    }
+
+    /* Modal Styling for confirmations */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+      padding: 20px;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal {
+      background: var(--white);
+      border-radius: var(--border-radius);
+      max-width: 400px;
+      width: 100%;
+      padding: 24px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+      transform: scale(0.9);
+      transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .modal-overlay.active .modal {
+      transform: scale(1);
+    }
+
+    .modal-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 10px;
+    }
+
+    .modal-body {
+      font-size: 0.9rem;
+      color: var(--gray-500);
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .btn-modal {
+      padding: 8px 16px;
+      border-radius: var(--border-radius-sm);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: var(--transition);
+    }
+
+    .btn-modal-cancel {
+      background-color: var(--gray-100);
+      color: var(--dark-light);
+    }
+
+    .btn-modal-cancel:hover {
+      background-color: var(--gray-200);
+    }
+
+    .btn-modal-confirm {
+      background-color: var(--red);
+      color: var(--white);
+    }
+
+    .btn-modal-confirm:hover {
+      background-color: #be050f;
+    }
+
+    /* Toast Notification */
+    #toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background-color: var(--dark);
+      color: var(--white);
+      padding: 12px 24px;
+      border-radius: 30px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+      z-index: 1000;
+      font-size: 0.9rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      opacity: 0;
+      transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.25s ease;
+    }
+
+    #toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    #toast svg {
+      width: 18px;
+      height: 18px;
+      fill: #4ADE80;
+    }
+
+    /* Footer styled with contacts */
+    footer {
+      max-width: 600px;
+      width: 100%;
+      margin: 20px auto 0 auto;
+      padding: 0 20px;
+      text-align: center;
+    }
+
+    .footer-divider {
+      height: 1px;
+      background: var(--gray-200);
+      margin-bottom: 20px;
+    }
+
+    .footer-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .footer-desc {
+      font-size: 0.75rem;
+      color: var(--gray-500);
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+
+    .contact-badge-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 15px;
+    }
+
+    .contact-badge {
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--dark-light);
+    }
+
+    .contact-badge svg {
+      width: 12px;
+      height: 12px;
+      fill: var(--primary);
+    }
+
+    .copyright {
+      font-size: 0.7rem;
+      color: var(--gray-500);
+    }
+
+    /* Large screen media query styling */
+    @media (min-width: 768px) {
+      .grid-md-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Offline Status Badge -->
+  <div class="status-badge">
+    <div class="status-dot" id="statusDot"></div>
+    <span id="statusText">Online</span>
+  </div>
+
+  <header>
+    <!-- Header floating decorative bubbles -->
+    <div class="bubble" style="width: 25px; height: 25px; left: 10%; animation-delay: 0s; animation-duration: 6s;"></div>
+    <div class="bubble" style="width: 15px; height: 15px; left: 25%; animation-delay: 2s; animation-duration: 9s;"></div>
+    <div class="bubble" style="width: 35px; height: 35px; left: 80%; animation-delay: 1s; animation-duration: 8s;"></div>
+    <div class="bubble" style="width: 20px; height: 20px; left: 65%; animation-delay: 4s; animation-duration: 7s;"></div>
+
+    <div class="header-content">
+      <!-- Moor Water Recreated SVG Logo -->
+      <div class="logo-container">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <!-- Text Path definition -->
+          <path id="circlePath" d="M 50 14 A 36 36 0 1 1 49.9 14" fill="none" />
+          <text fill="#E30613" font-size="8.8" font-weight="900" letter-spacing="4.5">
+            <textPath href="#circlePath" startOffset="0%">• MOOR • MOOR • MOOR • MOOR </textPath>
+          </text>
+          
+          <!-- Outer circular frame of drop -->
+          <circle cx="50" cy="53" r="23" fill="none" stroke="#00B5EF" stroke-width="1.5" opacity="0.4"/>
+          
+          <!-- Left leaf/petal in cyan -->
+          <path d="M 50 67 C 32 67, 26 50, 41 48 C 40 57, 45 63, 50 67 Z" fill="#00B5EF" />
+          <!-- Right leaf/petal in deep navy -->
+          <path d="M 50 67 C 68 67, 74 50, 59 48 C 60 57, 55 63, 50 67 Z" fill="#0A3894" />
+          <!-- Central Water Droplet -->
+          <path d="M 50 25 C 62 42, 65 58, 50 67 C 35 58, 38 42, 50 25 Z" fill="url(#dropletGrad)" />
+          
+          <defs>
+            <linearGradient id="dropletGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#00B5EF" />
+              <stop offset="100%" stop-color="#0A3894" />
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <div>
+        <h1 class="brand-title" id="mainHeader">Moor Natural Mineral Water</h1>
+        <p class="brand-subtitle">Daily Ledger</p>
+      </div>
+      <div class="slogan-box">
+        <span class="slogan-red">nom dodo!!!</span>
+        <span class="slogan-sub">Stay Refreshed. Stay Healthy. Choose Moor!</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Live Summary dashboard card -->
+    <div class="dashboard-card">
+      <div class="dash-grid">
+        <div class="dash-item">
+          <span class="dash-label">Bags Sold</span>
+          <span class="dash-val" id="dashTotalSold">0 bags</span>
+        </div>
+        <div class="dash-item">
+          <span class="dash-label">Total Revenue</span>
+          <span class="dash-val" id="dashRevenue">GH₵ 0.00</span>
+        </div>
+        <div class="dash-item">
+          <span class="dash-label">Net Daily Cash</span>
+          <span class="dash-val highlight" id="dashNetCash">GH₵ 0.00</span>
+        </div>
+        <div class="dash-item">
+          <span class="dash-label">Cash Variance</span>
+          <span class="dash-val variance-badge variance-balanced" id="dashVariance">Balanced (GH₵ 0.00)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ledger Entry Form -->
+    <section>
+      <!-- Date and Price Settings -->
+      <div class="card">
+        <div class="card-title">
+          <svg viewBox="0 0 24 24"><path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/></svg>
+          Ledger Configuration
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label for="ledgerDate">Ledger Date</label>
+            <div class="input-wrapper">
+              <span class="input-icon">
+                <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>
+              </span>
+              <input type="date" id="ledgerDate" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="pricePerBag">Price per Bag</label>
+            <div class="input-wrapper">
+              <span class="input-icon" style="font-size: 0.8rem; font-weight: 800;">GH₵</span>
+              <input type="number" id="pricePerBag" step="0.1" value="6.0" style="padding-left: 45px;" required>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Production Statistics -->
+      <div class="grid-md-2">
+        <div class="card">
+          <div class="card-title">
+            <svg viewBox="0 0 24 24"><path d="M19 13H5v-2h14v2z M19 17H5v-2h14v2z M19 9H5V7h14v2z M19 5H5V3h14v2z"/></svg>
+            Production & Stock
+          </div>
+          <div class="form-group">
+            <label for="bagsProduced">Bags Produced</label>
+            <div class="input-wrapper">
+              <span class="input-icon">
+                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/></svg>
+              </span>
+              <input type="number" id="bagsProduced" min="0" placeholder="0">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="bagsInStorage">Bags in Storage (Stock)</label>
+            <div class="input-wrapper">
+              <span class="input-icon">
+                <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-5 14H4v-4h11v4zm0-5H4V9h11v4zm5 5h-4V9h4v9z"/></svg>
+              </span>
+              <input type="number" id="bagsInStorage" min="0" placeholder="0">
+            </div>
+          </div>
+        </div>
+
+        <!-- Sales Distribution Channels -->
+        <div class="card">
+          <div class="card-title">
+            <svg viewBox="0 0 24 24"><path d="M20 8H4V6h16v2zm-2 9H6v-2h12v2zm2-5H4v-2h16v2zM4 18h16v2H4v-2z"/></svg>
+            Distribution Channels
+          </div>
+          <div class="form-group">
+            <label for="salesAboboyaa">Bags sold by Aboboyaa</label>
+            <div class="input-wrapper">
+              <span class="input-icon">
+                <!-- Tricycle/Vehicle SVG Icon representing Aboboyaa -->
+                <svg viewBox="0 0 24 24"><path d="M19 13c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-14 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12.35-7.58c-.1-.08-.22-.12-.35-.12H5c-.55 0-1 .45-1 1v6c0 .55.45 1 1 1h1v-4h11.24l-2.89-3.88zM20 4H4c-1.1 0-2 .9-2 2v9c0 1.1.9 2 2 2h2c0 1.66 1.34 3 3 3s3-1.34 3-3h4c0 1.66 1.34 3 3 3s3-1.34 3-3h2c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2z"/></svg>
+              </span>
+              <input type="number" id="salesAboboyaa" min="0" placeholder="0">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="salesFactory">Bags sold at Factory</label>
+            <div class="input-wrapper">
+              <span class="input-icon">
+                <svg viewBox="0 0 24 24"><path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm6 12h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V9h2v2zm0-4h-2V5h2v2zm8 12h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V9h2v2z"/></svg>
+              </span>
+              <input type="number" id="salesFactory" min="0" placeholder="0">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-md-2">
+        <!-- Leakages and losses -->
+        <div class="card">
+          <div class="card-title">
+            <svg viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+            Losses & Leakages
+          </div>
+          <div class="form-group">
+            <label for="leakages">Bags for Leakages</label>
+            <div class="input-wrapper">
+              <span class="input-icon">
+                <svg viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+              </span>
+              <input type="number" id="leakages" min="0" placeholder="0">
+            </div>
+          </div>
+        </div>
+
+        <!-- Cash Count -->
+        <div class="card">
+          <div class="card-title">
+            <svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+            Cash Reconciliation
+          </div>
+          <div class="form-group">
+            <label for="actualCash">Actual Cash at Hand (Physical Count)</label>
+            <div class="input-wrapper">
+              <span class="input-icon" style="font-size: 0.8rem; font-weight: 800;">GH₵</span>
+              <input type="number" id="actualCash" step="0.01" min="0" placeholder="0.00" style="padding-left: 45px;">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dynamic Expenses Section -->
+      <div class="card">
+        <div class="card-title">
+          <svg viewBox="0 0 24 24"><path d="M19 14V6c0-1.1-.9-2-2-2H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zm-2 0H3V6h14v8zm-2.5-4c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm6 2h1v4c0 1.1-.9 2-2 2H5v-2h14v-4z"/></svg>
+          Dynamic Business Expenses
+        </div>
+        
+        <div class="expenses-list" id="expensesList">
+          <!-- Row instances will be generated here by Javascript -->
+        </div>
+        
+        <button type="button" class="btn-add" id="btnAddExpense">
+          <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+          Add Expense
+        </button>
+      </div>
+
+      <!-- Action Panel Buttons -->
+      <div class="actions-grid">
+        <button type="button" class="btn btn-primary" id="btnSave">
+          <svg viewBox="0 0 24 24"><path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>
+          Save Day to Storage
+        </button>
+        <button type="button" class="btn btn-share" id="btnShare">
+          <!-- WhatsApp Icon in SVG -->
+          <svg viewBox="0 0 24 24"><path d="M12.031 2c-5.516 0-9.99 4.474-9.99 9.99 0 1.764.46 3.42 1.266 4.872L2 22l5.284-1.385c1.402.766 3 1.206 4.747 1.206 5.516 0 9.99-4.474 9.99-9.99C22.02 6.474 17.547 2 12.03 2zm6.347 14.195c-.276.776-1.42 1.417-1.966 1.503-.49.077-1.13.14-3.23-.728-2.684-1.11-4.417-3.856-4.55-4.037-.134-.18-1.09-1.455-1.09-2.775 0-1.32.693-1.965.94-2.227.247-.26.545-.327.728-.327.18 0 .362.003.52.012.164.01.385-.037.6.48.22.53.754 1.838.82 1.97.065.13.11.285.02.464-.09.18-.135.293-.27.452-.136.16-.286.355-.41.476-.135.13-.277.27-.12.54.156.27.694 1.137 1.49 1.848.973.868 1.792 1.14 2.05 1.277.26.136.41.113.565-.064.156-.18.667-.775.845-1.037.18-.263.36-.217.606-.128.247.09 1.56.735 1.828.87.268.13.447.2.512.312.065.113.065.652-.21 1.43z"/></svg>
+          Share Daily Summary via WhatsApp
+        </button>
+      </div>
+
+      <!-- Backup Export/Import Buttons -->
+      <div class="backup-row">
+        <button type="button" class="btn-outline" id="btnExport">
+          <svg viewBox="0 0 24 24"><path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2z"/></svg>
+          Export Backup
+        </button>
+        <button type="button" class="btn-outline" id="btnImport">
+          <svg viewBox="0 0 24 24"><path d="M9 16h6v-6h4l-7-7-7 7h4v6zm-4 2h14v2H5v-2z"/></svg>
+          Import Backup
+        </button>
+      </div>
+      <input type="file" id="fileImport" accept=".json" style="display: none;">
+    </section>
+
+    <!-- Ledger History Section -->
+    <section class="card history-card">
+      <div class="history-header">
+        <div class="history-title">
+          <svg viewBox="0 0 24 24"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
+          Ledger History
+        </div>
+        <input type="date" id="filterDate" style="width: auto; padding: 6px 10px 6px 30px; font-size: 0.85rem;" placeholder="Filter by date">
+      </div>
+
+      <div class="history-list" id="historyList">
+        <!-- History Items loaded here dynamiclly -->
+        <div class="no-history">No history records found in this device.</div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal for Confirmation Prompts -->
+  <div class="modal-overlay" id="confirmModal">
+    <div class="modal">
+      <h3 class="modal-title" id="modalTitle">Confirm Action</h3>
+      <p class="modal-body" id="modalBody">Are you sure you want to perform this action?</p>
+      <div class="modal-actions">
+        <button class="btn-modal btn-modal-cancel" id="btnModalCancel">Cancel</button>
+        <button class="btn-modal btn-modal-confirm" id="btnModalConfirm">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Message Element -->
+  <div id="toast">
+    <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+    <span id="toastMsg">Day Saved Successfully!</span>
+  </div>
+
+  <footer>
+    <div class="footer-divider"></div>
+    <div class="footer-title">Kenamos Big Brothers Ltd.</div>
+    <div class="footer-desc">
+      Produced under hygienic conditions in Ghana.<br>
+      Yamfo, Ahafo Region • GPS: B2-2245-3345
+    </div>
+    <div class="contact-badge-container">
+      <div class="contact-badge">
+        <svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+        0545 105903
+      </div>
+      <div class="contact-badge">
+        <svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+        0542501521
+      </div>
+      <div class="contact-badge">
+        <svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+        0240910004
+      </div>
+    </div>
+    <div class="copyright">&copy; 2026 Kenamos Big Brothers Ltd. All rights reserved.</div>
+  </footer>
+
+  <!-- Script for Business Logic and IndexedDB storage -->
+  <script>
+    // State of the application
+    const state = {
+      activeDate: '',
+      expenses: [], // Array of { id, desc, amount }
+      logs: [] // Sorted logs loaded from DB
+    };
+
+    // IndexedDB constants and wrapper
+    const DB_NAME = 'MoorWaterDB';
+    const DB_VERSION = 1;
+    const STORE_NAME = 'ledger';
+    let db;
+
+    // Elements
+    const elLedgerDate = document.getElementById('ledgerDate');
+    const elPricePerBag = document.getElementById('pricePerBag');
+    const elBagsProduced = document.getElementById('bagsProduced');
+    const elBagsInStorage = document.getElementById('bagsInStorage');
+    const elSalesAboboyaa = document.getElementById('salesAboboyaa');
+    const elSalesFactory = document.getElementById('salesFactory');
+    const elLeakages = document.getElementById('leakages');
+    const elActualCash = document.getElementById('actualCash');
+    const elExpensesList = document.getElementById('expensesList');
+    const elBtnAddExpense = document.getElementById('btnAddExpense');
+    const elBtnSave = document.getElementById('btnSave');
+    const elBtnShare = document.getElementById('btnShare');
+    const elBtnExport = document.getElementById('btnExport');
+    const elBtnImport = document.getElementById('btnImport');
+    const elFileImport = document.getElementById('fileImport');
+    const elHistoryList = document.getElementById('historyList');
+    const elFilterDate = document.getElementById('filterDate');
+    const elStatusDot = document.getElementById('statusDot');
+    const elStatusText = document.getElementById('statusText');
+    const elToast = document.getElementById('toast');
+    const elToastMsg = document.getElementById('toastMsg');
+    
+    // Dashboard elements
+    const elDashTotalSold = document.getElementById('dashTotalSold');
+    const elDashRevenue = document.getElementById('dashRevenue');
+    const elDashNetCash = document.getElementById('dashNetCash');
+    const elDashVariance = document.getElementById('dashVariance');
+
+    // Modal elements
+    const elConfirmModal = document.getElementById('confirmModal');
+    const elModalTitle = document.getElementById('modalTitle');
+    const elModalBody = document.getElementById('modalBody');
+    const elBtnModalCancel = document.getElementById('btnModalCancel');
+    const elBtnModalConfirm = document.getElementById('btnModalConfirm');
+    let modalCallback = null;
+
+    // Lifecycle events
+    window.addEventListener('DOMContentLoaded', async () => {
+      // Set default date to local today
+      const today = new Date();
+      const localDate = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+      elLedgerDate.value = localDate;
+      state.activeDate = localDate;
+
+      // Handle Online/Offline Status
+      updateOnlineStatus();
+      window.addEventListener('online', updateOnlineStatus);
+      window.addEventListener('offline', updateOnlineStatus);
+
+      // Initialize DB & load logs
+      try {
+        await initDB();
+        await loadHistory();
+        
+        // Check if there is data for today in IndexedDB. If so, load it!
+        const existingToday = state.logs.find(log => log.date === localDate);
+        if (existingToday) {
+          loadEntryIntoForm(existingToday);
+          showToast('Loaded today\'s saved record.');
+        }
+      } catch (err) {
+        console.error('Failed to initialize database:', err);
+        showToast('Error opening local database.');
+      }
+
+      // Initial computations
+      calculateAll();
+
+      // Service Worker registration
+      if ('serviceWorker' in navigator) {
+        try {
+          const reg = await navigator.serviceWorker.register('sw.js');
+          console.log('Service Worker registered:', reg.scope);
+        } catch (e) {
+          console.log('Service Worker registration failed:', e);
+        }
+      }
+    });
+
+    function updateOnlineStatus() {
+      if (navigator.onLine) {
+        elStatusDot.classList.remove('offline');
+        elStatusText.textContent = 'Online';
+      } else {
+        elStatusDot.classList.add('offline');
+        elStatusText.textContent = 'Offline';
+      }
+    }
+
+    // Interactive element listeners
+    const inputElements = [
+      elPricePerBag, elBagsProduced, elBagsInStorage,
+      elSalesAboboyaa, elSalesFactory, elLeakages, elActualCash
+    ];
+    inputElements.forEach(el => el.addEventListener('input', calculateAll));
+    elLedgerDate.addEventListener('change', async (e) => {
+      state.activeDate = e.target.value;
+      // When date changes, see if a log already exists for that date
+      const existing = state.logs.find(log => log.date === state.activeDate);
+      if (existing) {
+        loadEntryIntoForm(existing);
+        showToast(`Loaded saved record for ${state.activeDate}`);
+      } else {
+        // Reset dynamic values, keep default pricing of 6
+        resetFormExceptDateAndPrice();
+        showToast(`Created new ledger sheet for ${state.activeDate}`);
+      }
+      calculateAll();
+    });
+
+    elFilterDate.addEventListener('input', (e) => {
+      renderHistoryList(e.target.value);
+    });
+
+    // Expenses logic
+    elBtnAddExpense.addEventListener('click', () => {
+      addExpenseRow('', 0);
+      calculateAll();
+    });
+
+    function addExpenseRow(desc = '', amount = 0) {
+      const id = 'exp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+      const row = document.createElement('div');
+      row.className = 'expense-row';
+      row.id = id;
+      row.innerHTML = `
+        <input type="text" placeholder="Expense description (e.g., Chop money)" value="${desc}" class="expense-desc">
+        <div class="amount-wrapper">
+          <span class="input-icon" style="font-size: 0.75rem; font-weight: 700;">GH₵</span>
+          <input type="number" step="0.1" placeholder="0.00" value="${amount || ''}" class="expense-amount" style="padding-left: 30px;">
+        </div>
+        <button type="button" class="btn-delete" title="Delete Expense">
+          <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+        </button>
+      `;
+
+      // Event listeners for recalculating
+      row.querySelector('.expense-desc').addEventListener('input', () => syncExpensesState());
+      const elAmt = row.querySelector('.expense-amount');
+      elAmt.addEventListener('input', () => {
+        syncExpensesState();
+        calculateAll();
+      });
+      row.querySelector('.btn-delete').addEventListener('click', () => {
+        row.remove();
+        syncExpensesState();
+        calculateAll();
+      });
+
+      elExpensesList.appendChild(row);
+      syncExpensesState();
+    }
+
+    function syncExpensesState() {
+      const rows = elExpensesList.querySelectorAll('.expense-row');
+      state.expenses = [];
+      rows.forEach(row => {
+        const desc = row.querySelector('.expense-desc').value;
+        const amtVal = parseFloat(row.querySelector('.expense-amount').value) || 0;
+        state.expenses.push({
+          id: row.id,
+          desc: desc,
+          amount: amtVal
+        });
+      });
+    }
+
+    function resetFormExceptDateAndPrice() {
+      elBagsProduced.value = '';
+      elBagsInStorage.value = '';
+      elSalesAboboyaa.value = '';
+      elSalesFactory.value = '';
+      elLeakages.value = '';
+      elActualCash.value = '';
+      elExpensesList.innerHTML = '';
+      state.expenses = [];
+    }
+
+    // Load an existing record into the active form inputs
+    function loadEntryIntoForm(log) {
+      elLedgerDate.value = log.date;
+      state.activeDate = log.date;
+      elPricePerBag.value = log.pricePerBag;
+      elBagsProduced.value = log.bagsProduced || '';
+      elBagsInStorage.value = log.bagsInStorage || '';
+      elSalesAboboyaa.value = log.salesAboboyaa || '';
+      elSalesFactory.value = log.salesFactory || '';
+      elLeakages.value = log.leakages || '';
+      elActualCash.value = log.actualCash !== undefined ? log.actualCash : '';
+
+      elExpensesList.innerHTML = '';
+      state.expenses = [];
+      if (log.expenses && log.expenses.length > 0) {
+        log.expenses.forEach(exp => {
+          addExpenseRow(exp.desc, exp.amount);
+        });
+      }
+      calculateAll();
+    }
+
+    // Mathematical calculations
+    function calculateAll() {
+      const price = parseFloat(elPricePerBag.value) || 6.0;
+      const bagsProduced = parseInt(elBagsProduced.value) || 0;
+      const bagsInStorage = parseInt(elBagsInStorage.value) || 0;
+      const salesAboboyaa = parseInt(elSalesAboboyaa.value) || 0;
+      const salesFactory = parseInt(elSalesFactory.value) || 0;
+      const leakages = parseInt(elLeakages.value) || 0;
+      const actualCash = parseFloat(elActualCash.value) || 0.0;
+
+      // Expense total sum
+      let totalExpenses = 0;
+      const expenseAmounts = elExpensesList.querySelectorAll('.expense-amount');
+      expenseAmounts.forEach(input => {
+        totalExpenses += parseFloat(input.value) || 0;
+      });
+
+      // Business Formulas
+      const totalBagsSold = salesAboboyaa + salesFactory;
+      const totalRevenue = totalBagsSold * price;
+      const netDailyCash = totalRevenue - totalExpenses;
+      const variance = actualCash - netDailyCash;
+
+      // Update Dashboard Display
+      elDashTotalSold.textContent = `${totalBagsSold.toLocaleString()} bags`;
+      elDashRevenue.textContent = `GH₵ ${totalRevenue.toFixed(2)}`;
+      elDashNetCash.textContent = `GH₵ ${netDailyCash.toFixed(2)}`;
+
+      // Style Variance Badges
+      elDashVariance.className = 'dash-val variance-badge';
+      if (Math.abs(variance) < 0.01) {
+        elDashVariance.textContent = 'Balanced (GH₵ 0.00)';
+        elDashVariance.classList.add('variance-balanced');
+      } else if (variance > 0) {
+        elDashVariance.textContent = `Surplus (+GH₵ ${variance.toFixed(2)})`;
+        elDashVariance.classList.add('variance-surplus');
+      } else {
+        elDashVariance.textContent = `Shortage (-GH₵ ${Math.abs(variance).toFixed(2)})`;
+        elDashVariance.classList.add('variance-shortage');
+      }
+    }
+
+    // Modal Manager
+    function showConfirmModal(title, body, onConfirm) {
+      elModalTitle.textContent = title;
+      elModalBody.textContent = body;
+      modalCallback = onConfirm;
+      elConfirmModal.classList.add('active');
+    }
+
+    elBtnModalCancel.addEventListener('click', () => {
+      elConfirmModal.classList.remove('active');
+      modalCallback = null;
+    });
+
+    elBtnModalConfirm.addEventListener('click', () => {
+      if (modalCallback) modalCallback();
+      elConfirmModal.classList.remove('active');
+      modalCallback = null;
+    });
+
+    // Toast Manager
+    let toastTimeout;
+    function showToast(message, isSuccess = true) {
+      clearTimeout(toastTimeout);
+      elToastMsg.textContent = message;
+      const toastSvg = elToast.querySelector('svg');
+      if (isSuccess) {
+        toastSvg.style.fill = '#4ADE80';
+        toastSvg.style.display = 'block';
+      } else {
+        toastSvg.style.fill = '#F87171';
+        toastSvg.style.display = 'block';
+      }
+      elToast.classList.add('show');
+      toastTimeout = setTimeout(() => {
+        elToast.classList.remove('show');
+      }, 3000);
+    }
+
+    // Save entry to IndexedDB
+    elBtnSave.addEventListener('click', async () => {
+      const data = {
+        date: state.activeDate,
+        pricePerBag: parseFloat(elPricePerBag.value) || 6.0,
+        bagsProduced: parseInt(elBagsProduced.value) || 0,
+        bagsInStorage: parseInt(elBagsInStorage.value) || 0,
+        salesAboboyaa: parseInt(elSalesAboboyaa.value) || 0,
+        salesFactory: parseInt(elSalesFactory.value) || 0,
+        leakages: parseInt(elLeakages.value) || 0,
+        actualCash: parseFloat(elActualCash.value) || 0.0,
+        expenses: [...state.expenses] // Copy items
+      };
+
+      try {
+        await saveLog(data);
+        await loadHistory();
+        showToast('Day Saved to Local Storage!');
+      } catch (err) {
+        console.error(err);
+        showToast('Failed to save data.', false);
+      }
+    });
+
+    // WhatsApp Sharing Handler
+    elBtnShare.addEventListener('click', () => {
+      const dateVal = elLedgerDate.value;
+      const bagsProduced = parseInt(elBagsProduced.value) || 0;
+      const salesAboboyaa = parseInt(elSalesAboboyaa.value) || 0;
+      const salesFactory = parseInt(elSalesFactory.value) || 0;
+      const leakages = parseInt(elLeakages.value) || 0;
+      const price = parseFloat(elPricePerBag.value) || 6.0;
+      const actualCash = parseFloat(elActualCash.value) || 0.0;
+
+      let totalExpenses = 0;
+      state.expenses.forEach(e => {
+        totalExpenses += e.amount;
+      });
+
+      const totalBagsSold = salesAboboyaa + salesFactory;
+      const totalRevenue = totalBagsSold * price;
+
+      // Build formatted text based on customer specification
+      const message = `*🎯 Moor Natural Mineral Water Daily Report - ${dateVal}*
+• Bags Produced: ${bagsProduced}
+• Bags Sold: ${totalBagsSold} (Aboboyaa: ${salesAboboyaa}, Factory: ${salesFactory})
+• Leakages: ${leakages}
+• Total Revenue: GH₵ ${totalRevenue.toFixed(2)}
+• Total Expenses: GH₵ ${totalExpenses.toFixed(2)}
+• Cash at Hand: GH₵ ${actualCash.toFixed(2)}`;
+
+      const universalWhatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
+      window.open(universalWhatsappUrl, '_blank');
+      showToast('Redirected to WhatsApp!');
+    });
+
+    // Backup & Restore handlers
+    elBtnExport.addEventListener('click', () => {
+      if (state.logs.length === 0) {
+        showToast('No records available to export.', false);
+        return;
+      }
+      try {
+        const dataStr = JSON.stringify(state.logs, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(dataBlob);
+        
+        const link = document.createElement('a');
+        link.download = `moor_water_ledger_backup_${new Date().toISOString().slice(0,10)}.json`;
+        link.href = url;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        showToast('Backup Exported successfully!');
+      } catch (err) {
+        showToast('Export failed.', false);
+      }
+    });
+
+    elBtnImport.addEventListener('click', () => {
+      elFileImport.click();
+    });
+
+    elFileImport.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = async (evt) => {
+        try {
+          const importedData = JSON.parse(evt.target.result);
+          if (!Array.isArray(importedData)) {
+            throw new Error('Data should be an array of daily logs.');
+          }
+
+          // Validation of keys
+          const isValid = importedData.every(item => item.date && typeof item.pricePerBag === 'number');
+          if (!isValid) {
+            throw new Error('Some logs have invalid structure.');
+          }
+
+          showConfirmModal(
+            'Confirm Restore Database',
+            `This will merge ${importedData.length} records into your existing local storage database. Do you want to proceed?`,
+            async () => {
+              try {
+                for (const record of importedData) {
+                  await saveLog(record);
+                }
+                await loadHistory();
+                elFileImport.value = ''; // Reset input file
+                // If today is now imported, refresh current form fields
+                const checkToday = state.logs.find(log => log.date === state.activeDate);
+                if (checkToday) {
+                  loadEntryIntoForm(checkToday);
+                }
+                showToast('Import Complete! Logs restored.');
+              } catch (e) {
+                showToast('Failed saving imported data.', false);
+              }
+            }
+          );
+
+        } catch (err) {
+          showToast('Invalid file format. Must be JSON ledger backup.', false);
+          console.error(err);
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    // IndexedDB wrapper operations
+    function initDB() {
+      return new Promise((resolve, reject) => {
+        const request = indexedDB.open(DB_NAME, DB_VERSION);
+        
+        request.onupgradeneeded = (event) => {
+          const dbInstance = event.target.result;
+          if (!dbInstance.objectStoreNames.contains(STORE_NAME)) {
+            dbInstance.createObjectStore(STORE_NAME, { keyPath: 'date' });
+          }
+        };
+
+        request.onsuccess = (event) => {
+          db = event.target.result;
+          resolve();
+        };
+
+        request.onerror = (event) => {
+          reject(event.target.error);
+        };
+      });
+    }
+
+    function saveLog(record) {
+      return new Promise((resolve, reject) => {
+        const transaction = db.transaction([STORE_NAME], 'readwrite');
+        const store = transaction.objectStore(STORE_NAME);
+        const request = store.put(record);
+
+        request.onsuccess = () => resolve();
+        request.onerror = (e) => reject(e.target.error);
+      });
+    }
+
+    function getLogs() {
+      return new Promise((resolve, reject) => {
+        const transaction = db.transaction([STORE_NAME], 'readonly');
+        const store = transaction.objectStore(STORE_NAME);
+        const request = store.getAll();
+
+        request.onsuccess = (e) => resolve(e.target.result);
+        request.onerror = (e) => reject(e.target.error);
+      });
+    }
+
+    function deleteLog(date) {
+      return new Promise((resolve, reject) => {
+        const transaction = db.transaction([STORE_NAME], 'readwrite');
+        const store = transaction.objectStore(STORE_NAME);
+        const request = store.delete(date);
+
+        request.onsuccess = () => resolve();
+        request.onerror = (e) => reject(e.target.error);
+      });
+    }
+
+    async function loadHistory() {
+      const records = await getLogs();
+      // Sort records by date descending
+      records.sort((a, b) => b.date.localeCompare(a.date));
+      state.logs = records;
+      renderHistoryList();
+    }
+
+    function renderHistoryList(filterDateVal = '') {
+      elHistoryList.innerHTML = '';
+      
+      const filtered = state.logs.filter(log => {
+        if (!filterDateVal) return true;
+        return log.date === filterDateVal;
+      });
+
+      if (filtered.length === 0) {
+        elHistoryList.innerHTML = `<div class="no-history">No matching history records found.</div>`;
+        return;
+      }
+
+      filtered.forEach(log => {
+        const item = document.createElement('div');
+        
+        // Calculations for history item
+        const salesAboboyaa = log.salesAboboyaa || 0;
+        const salesFactory = log.salesFactory || 0;
+        const totalBagsSold = salesAboboyaa + salesFactory;
+        const price = log.pricePerBag || 6.0;
+        const totalRevenue = totalBagsSold * price;
+        
+        let totalExpenses = 0;
+        if (log.expenses) {
+          log.expenses.forEach(e => {
+            totalExpenses += e.amount;
+          });
+        }
+        const netDailyCash = totalRevenue - totalExpenses;
+        const variance = (log.actualCash || 0.0) - netDailyCash;
+
+        let varianceClass = 'balanced';
+        let varianceText = 'Balanced';
+        let badgeClass = 'variance-balanced-text';
+
+        if (Math.abs(variance) >= 0.01) {
+          if (variance > 0) {
+            varianceClass = 'surplus';
+            varianceText = `Surplus (+GH₵ ${variance.toFixed(2)})`;
+            badgeClass = 'variance-surplus-text';
+          } else {
+            varianceClass = 'shortage';
+            varianceText = `Shortage (-GH₵ ${Math.abs(variance).toFixed(2)})`;
+            badgeClass = 'variance-shortage-text';
+          }
+        }
+
+        item.className = `history-item ${varianceClass}`;
+        
+        // Formatting date
+        const dateObj = new Date(log.date);
+        let dateFormatted = log.date;
+        if (!isNaN(dateObj.getTime())) {
+          // Format as: 29 Jun 2026
+          const options = { day: 'numeric', month: 'short', year: 'numeric' };
+          dateFormatted = dateObj.toLocaleDateString('en-GB', options);
+        }
+
+        item.innerHTML = `
+          <div class="hist-left">
+            <span class="hist-date">${dateFormatted}</span>
+            <span class="hist-sub">Sold: ${totalBagsSold} bags | Produced: ${log.bagsProduced || 0}</span>
+          </div>
+          <div class="hist-right">
+            <div class="hist-money">
+              <span class="hist-cash">GH₵ ${netDailyCash.toFixed(2)}</span>
+              <span class="hist-variance-text ${badgeClass}">${varianceText}</span>
+            </div>
+            <!-- Delete action icon inside history row -->
+            <button class="btn-delete btn-delete-history" data-date="${log.date}" title="Delete Record">
+              <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+            </button>
+          </div>
+        `;
+
+        // Click on row to load it
+        item.addEventListener('click', (e) => {
+          // Avoid trigger when clicking delete button
+          if (e.target.closest('.btn-delete-history')) return;
+          loadEntryIntoForm(log);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          showToast(`Loaded ledger for ${log.date}`);
+        });
+
+        // Click delete
+        const delBtn = item.querySelector('.btn-delete-history');
+        delBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const targetDate = delBtn.getAttribute('data-date');
+          showConfirmModal(
+            'Delete Ledger Record',
+            `Are you sure you want to delete the daily ledger record for ${targetDate}? This action cannot be undone.`,
+            async () => {
+              try {
+                await deleteLog(targetDate);
+                await loadHistory();
+                // If we deleted the currently active record, reset form
+                if (state.activeDate === targetDate) {
+                  resetFormExceptDateAndPrice();
+                  calculateAll();
+                }
+                showToast('Record deleted.');
+              } catch (e) {
+                showToast('Failed to delete record.', false);
+              }
+            }
+          );
+        });
+
+        elHistoryList.appendChild(item);
+      });
+    }
+  </script>
+</body>
+</html>

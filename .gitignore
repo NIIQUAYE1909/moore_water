@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+database.db
+moore_water.zip
+.env
+instance/
+.vscode/

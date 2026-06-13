@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Create Account — Moor Water Ledger</title>
+  <meta name="description" content="Create your employee account for Moor Natural Mineral Water Daily Ledger">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0A3894">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/svg+xml" href="/static/icon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+  <style>
+    body {
+      background: linear-gradient(135deg, #002270 0%, #0A3894 50%, #1A4EB5 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .register-wrap { width: 100%; max-width: 460px; }
+
+    .register-card {
+      background: rgba(255,255,255,0.97);
+      backdrop-filter: blur(20px);
+      border-radius: 24px;
+      padding: 36px 28px 28px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.25);
+      border: 1px solid rgba(255,255,255,0.6);
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .page-header .icon-ring {
+      width: 64px;
+      height: 64px;
+      background: linear-gradient(135deg, #0A3894, #00B5EF);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 14px;
+      box-shadow: 0 8px 20px rgba(10,56,148,0.25);
+    }
+    .page-header .icon-ring svg { width: 32px; height: 32px; fill: white; }
+    .page-header h1 {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #0A3894;
+      margin-bottom: 4px;
+    }
+    .page-header p {
+      font-size: 0.82rem;
+      color: #64748B;
+      font-weight: 500;
+    }
+
+    /* Password strength meter */
+    .strength-bar {
+      height: 4px;
+      border-radius: 2px;
+      background: #E2E8F0;
+      margin-top: 6px;
+      overflow: hidden;
+    }
+    .strength-fill {
+      height: 100%;
+      border-radius: 2px;
+      width: 0%;
+      transition: width 0.3s ease, background 0.3s ease;
+    }
+    .strength-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      margin-top: 3px;
+      color: #94A3B8;
+      display: block;
+    }
+
+    /* Match indicator */
+    .match-indicator {
+      font-size: 0.72rem;
+      font-weight: 600;
+      margin-top: 4px;
+      display: none;
+    }
+    .match-ok   { color: #16A34A; }
+    .match-fail { color: #DC2626; }
+
+    /* Error / Success alerts */
+    .alert {
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-top: 14px;
+      display: none;
+    }
+    .alert-error   { background: rgba(220,38,38,0.08); border: 1px solid rgba(220,38,38,0.2); color: #DC2626; }
+    .alert-success { background: rgba(22,163,74,0.08); border: 1px solid rgba(22,163,74,0.2); color: #15803D; }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 22px 0 18px;
+      color: #CBD5E1;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #E2E8F0;
+    }
+
+    .footer-links {
+      text-align: center;
+      margin-top: 16px;
+      font-size: 0.78rem;
+      color: #64748B;
+      font-weight: 500;
+    }
+    .footer-links a {
+      color: #0A3894;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .footer-links a:hover { text-decoration: underline; }
+
+    /* Loading button state */
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner {
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: none;
+    }
+    .btn-primary.loading .spinner { display: inline-block; }
+    .btn-primary.loading .btn-text { display: none; }
+
+    .bg-bubble { position:fixed; border-radius:50%; background:rgba(255,255,255,0.04); pointer-events:none; }
+    .bg-bubble:nth-child(1) { width:280px; height:280px; top:-60px; right:-60px; }
+    .bg-bubble:nth-child(2) { width:180px; height:180px; bottom:30px; left:-50px; }
+  </style>
+</head>
+<body>
+  <div class="bg-bubble"></div>
+  <div class="bg-bubble"></div>
+
+  <div class="register-wrap">
+    <div class="register-card">
+
+      <!-- Header -->
+      <div class="page-header">
+        <div class="icon-ring">
+          <svg viewBox="0 0 24 24"><path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        </div>
+        <h1>Create Your Account</h1>
+        <p>Register to start submitting daily records for Moor Water</p>
+      </div>
+
+      <!-- Registration Form -->
+      <form id="registerForm" autocomplete="off" novalidate>
+
+        <div class="form-group">
+          <label for="regName">Full Name</label>
+          <div class="input-wrapper">
+            <span class="input-icon">
+              <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            </span>
+            <input type="text" id="regName" name="name"
+                   placeholder="e.g. Kofi Mensah"
+                   autocomplete="name" required minlength="2" maxlength="80">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="regEmail">Email Address</label>
+          <div class="input-wrapper">
+            <span class="input-icon">
+              <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+            </span>
+            <input type="email" id="regEmail" name="email"
+                   placeholder="name@moorwater.com"
+                   autocomplete="email" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="regPassword">Password</label>
+          <div class="input-wrapper">
+            <span class="input-icon">
+              <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+            </span>
+            <input type="password" id="regPassword" name="password"
+                   placeholder="Minimum 6 characters"
+                   required minlength="6" oninput="checkStrength(this.value)">
+          </div>
+          <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
+          <span class="strength-label" id="strengthLabel"></span>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 22px;">
+          <label for="regConfirm">Confirm Password</label>
+          <div class="input-wrapper">
+            <span class="input-icon">
+              <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+            </span>
+            <input type="password" id="regConfirm" name="confirm_password"
+                   placeholder="Re-enter password"
+                   required oninput="checkMatch()">
+          </div>
+          <span class="match-indicator" id="matchIndicator"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="btnRegister">
+          <div class="spinner"></div>
+          <span class="btn-text">Create My Account</span>
+        </button>
+
+        <div class="alert alert-error" id="regError"></div>
+        <div class="alert alert-success" id="regSuccess"></div>
+      </form>
+
+      <div class="divider">or</div>
+
+      <div class="footer-links">
+        Already have an account? <a href="/login">Sign In</a>
+        &nbsp;·&nbsp;
+        <a href="/preview">Try Preview First</a>
+      </div>
+
+    </div>
+
+    <div style="text-align:center; margin-top:18px; color:rgba(255,255,255,0.45); font-size:0.7rem; font-weight:500;">
+      © 2026 Kenamos Big Brothers Ltd. · Yamfo, Ahafo Region
+    </div>
+  </div>
+
+  <script>
+    // ── Password strength checker ──────────────
+    function checkStrength(password) {
+      const fill  = document.getElementById('strengthFill');
+      const label = document.getElementById('strengthLabel');
+
+      let score = 0;
+      if (password.length >= 6)  score++;
+      if (password.length >= 10) score++;
+      if (/[A-Z]/.test(password)) score++;
+      if (/[0-9]/.test(password)) score++;
+      if (/[^A-Za-z0-9]/.test(password)) score++;
+
+      const levels = [
+        { pct: '20%', color: '#EF4444', text: 'Very weak' },
+        { pct: '40%', color: '#F97316', text: 'Weak' },
+        { pct: '60%', color: '#EAB308', text: 'Fair' },
+        { pct: '80%', color: '#22C55E', text: 'Strong' },
+        { pct: '100%', color: '#16A34A', text: 'Very strong' },
+      ];
+
+      if (password.length === 0) {
+        fill.style.width = '0%';
+        label.textContent = '';
+        return;
+      }
+
+      const level = levels[Math.min(score - 1, 4)] || levels[0];
+      fill.style.width = level.pct;
+      fill.style.background = level.color;
+      label.textContent = level.text;
+      label.style.color = level.color;
+    }
+
+    // ── Password match checker ─────────────────
+    function checkMatch() {
+      const p1  = document.getElementById('regPassword').value;
+      const p2  = document.getElementById('regConfirm').value;
+      const ind = document.getElementById('matchIndicator');
+
+      if (p2.length === 0) { ind.style.display = 'none'; return; }
+      ind.style.display = 'block';
+      if (p1 === p2) {
+        ind.textContent = '✓ Passwords match';
+        ind.className = 'match-indicator match-ok';
+      } else {
+        ind.textContent = '✗ Passwords do not match';
+        ind.className = 'match-indicator match-fail';
+      }
+    }
+
+    // ── Form submission ────────────────────────
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const name     = document.getElementById('regName').value.trim();
+      const email    = document.getElementById('regEmail').value.trim();
+      const password = document.getElementById('regPassword').value;
+      const confirm  = document.getElementById('regConfirm').value;
+      const btn      = document.getElementById('btnRegister');
+      const errDiv   = document.getElementById('regError');
+      const sucDiv   = document.getElementById('regSuccess');
+
+      errDiv.style.display = 'none';
+      sucDiv.style.display = 'none';
+
+      // Client-side checks
+      if (!name || !email || !password || !confirm) {
+        return showError('Please fill in all fields.');
+      }
+      if (password.length < 6) {
+        return showError('Password must be at least 6 characters.');
+      }
+      if (password !== confirm) {
+        return showError('Passwords do not match.');
+      }
+
+      btn.classList.add('loading');
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('/api/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin',
+          body: JSON.stringify({ name, email, password, confirm_password: confirm })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          sucDiv.textContent = data.success || 'Account created! Redirecting...';
+          sucDiv.style.display = 'block';
+
+          // Brief delay then redirect based on role
+          setTimeout(() => {
+            if (data.role === 'admin') {
+              window.location.href = '/admin';
+            } else {
+              window.location.href = '/';
+            }
+          }, 1200);
+        } else {
+          showError(data.error || 'Registration failed. Please try again.');
+          btn.classList.remove('loading');
+          btn.disabled = false;
+        }
+
+      } catch (err) {
+        showError('Network error. Please check your connection.');
+        btn.classList.remove('loading');
+        btn.disabled = false;
+      }
+    });
+
+    function showError(msg) {
+      const el = document.getElementById('regError');
+      el.textContent = msg;
+      el.style.display = 'block';
+    }
+  </script>
+</body>
+</html>
