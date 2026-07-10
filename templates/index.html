@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Moor Water Daily Ledger</title>
-  <meta name="description" content="Moor Natural Mineral Water — Daily Work Ledger for production, sales, and financial reconciliation.">
-
+  
   <!-- PWA Headers -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -12,217 +11,60 @@
   <meta name="apple-mobile-web-app-title" content="Moor Ledger">
   <meta name="theme-color" content="#0A3894">
   <meta name="mobile-web-app-capable" content="yes">
-
+  
   <link rel="manifest" href="/static/manifest.json">
   <link rel="icon" type="image/svg+xml" href="/static/icon.svg">
   <link rel="apple-touch-icon" href="/static/icon.svg">
-
+  
   <!-- Typography & CSS -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/css/style.css">
-
-  <style>
-    /* ── Guest Preview Banner ─────────── */
-    .guest-banner {
-      background: linear-gradient(135deg, #0A3894, #00B5EF);
-      color: white;
-      padding: 10px 18px;
-      font-size: 0.80rem;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      flex-wrap: wrap;
-      box-shadow: 0 3px 12px rgba(10,56,148,0.22);
-    }
-    .guest-banner svg { width: 15px; height: 15px; fill: white; flex-shrink: 0; }
-    .guest-actions { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
-    .guest-btn-primary {
-      background: white;
-      color: #0A3894;
-      padding: 5px 14px;
-      border-radius: 7px;
-      text-decoration: none;
-      font-weight: 800;
-      font-size: 0.76rem;
-      transition: all 0.2s;
-      white-space: nowrap;
-    }
-    .guest-btn-primary:hover { background: #EEF4FF; }
-    .guest-btn-secondary {
-      background: rgba(255,255,255,0.15);
-      color: white;
-      padding: 5px 14px;
-      border-radius: 7px;
-      text-decoration: none;
-      font-weight: 700;
-      font-size: 0.76rem;
-      border: 1px solid rgba(255,255,255,0.32);
-      transition: all 0.2s;
-      white-space: nowrap;
-    }
-    .guest-btn-secondary:hover { background: rgba(255,255,255,0.22); }
-
-    /* ── Offline banner ─────────── */
-    #offlineBanner {
-      display: none;
-      background: linear-gradient(135deg, #92400E, #B45309);
-      color: white;
-      font-size: 0.78rem;
-      font-weight: 600;
-      padding: 9px 16px;
-      border-radius: 10px;
-      margin-bottom: 14px;
-      align-items: center;
-      gap: 8px;
-    }
-    #offlineBanner.show { display: flex; animation: slideUp 0.3s ease; }
-    #offlineBanner svg { width: 15px; height: 15px; fill: white; flex-shrink: 0; }
-
-    /* ── Action row ─────────── */
-    .action-row {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-bottom: 24px;
-    }
-  </style>
 </head>
-<body class="has-topnav">
+<body>
 
-  <!-- ══════════════════════════════════════
-       TOP NAVIGATION BAR
-       ══════════════════════════════════════ -->
-  <nav class="topnav" id="topnav">
-    <div class="topnav-inner">
+  <!-- Worker active session bar -->
+  <div class="user-badge">
+    <svg viewBox="0 0 24 24" style="width: 12px; height: 12px; fill: white;"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+    <span>{{ user_name }}</span>
+  </div>
 
-      <!-- Brand -->
-      <a href="/" class="topnav-brand">
-        <div class="topnav-brand-icon">
-          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" fill="#00B5EF"/>
-          </svg>
-        </div>
-        <div>
-          <div class="topnav-brand-text">Moor Ledger</div>
-          <div class="topnav-brand-sub">Daily Records</div>
-        </div>
-      </a>
-
-      <!-- Center: network status -->
-      <div class="topnav-center">
-        <div class="topnav-status">
-          <div class="status-dot" id="statusDot"></div>
-          <span id="statusText">Online</span>
-          <span id="pendingSyncCount" style="display:none;"></span>
-        </div>
-      </div>
-
-      <!-- Right: user chip + desktop links + hamburger -->
-      <div class="topnav-right">
-        <div class="topnav-user-chip">
-          <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-          {{ user_name }}
-        </div>
-
-        <!-- Desktop nav links -->
-        <div class="topnav-links">
-          {% if user_role == 'admin' %}
-          <a href="/admin" class="topnav-link admin-link">
-            <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
-            Admin
-          </a>
-          {% endif %}
-          <a href="/api/logout" class="topnav-link danger">
-            <svg viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
-            Sign Out
-          </a>
-        </div>
-
-        <!-- Hamburger (mobile only) -->
-        <button class="topnav-hamburger" id="hamburgerBtn" aria-label="Open menu" aria-expanded="false">
-          <div class="hamburger-lines">
-            <span></span><span></span><span></span>
-          </div>
-        </button>
-      </div>
-    </div>
-  </nav>
-
-  <!-- ══════════════════════════════════════
-       MOBILE NAV DRAWER
-       ══════════════════════════════════════ -->
-  <div class="nav-backdrop" id="navBackdrop"></div>
-  <div class="nav-drawer" id="navDrawer" aria-hidden="true">
-    <div class="drawer-header">
-      <button class="drawer-close" id="drawerClose" aria-label="Close menu">✕</button>
-      <div class="drawer-user-avatar">
-        {% if user_role == 'admin' %}
-        <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
-        {% else %}
-        <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-        {% endif %}
-      </div>
-      <div class="drawer-user-name">{{ user_name }}</div>
-      <div class="drawer-user-role">
-        {% if user_role == 'admin' %}🛡 Administrator{% else %}👤 Employee{% endif %}
-      </div>
-    </div>
-
-    <div class="drawer-status">
-      <div class="status-dot" id="drawerStatusDot"></div>
-      <span id="drawerStatusText">Online</span>
-    </div>
-
-    <nav class="drawer-nav">
-      <a href="/" class="drawer-nav-item">
-        <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-        Daily Ledger Form
-      </a>
-      {% if user_role == 'admin' %}
-      <a href="/admin" class="drawer-nav-item admin-item">
-        <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
-        Admin Dashboard
-      </a>
-      {% endif %}
-      {% if is_guest %}
-      <a href="/register" class="drawer-nav-item" style="color:rgba(52,211,153,0.85);">
-        <svg viewBox="0 0 24 24"><path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-        Create Account
-      </a>
-      <a href="/login" class="drawer-nav-item">
-        <svg viewBox="0 0 24 24"><path d="M11 7L9.6 8.4l2.6 2.6H2v2h10.2l-2.6 2.6L11 17l5-5-5-5zm9 12h-8v2h8c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-8v2h8v14z"/></svg>
-        Sign In
-      </a>
-      {% else %}
-      <a href="/api/logout" class="drawer-nav-item danger-item">
-        <svg viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
-        Sign Out
-      </a>
-      {% endif %}
-    </nav>
-
-    <div class="drawer-footer">© 2026 Kenamos Big Brothers Ltd. · Yamfo</div>
+  <!-- Offline Status Badge -->
+  <div class="status-badge">
+    <div class="status-dot" id="statusDot"></div>
+    <span id="statusText">Online</span>
+    <span id="pendingSyncCount" style="color: var(--gold); font-weight: 700; display: none;"></span>
   </div>
 
   {% if is_guest %}
   <!-- Guest Preview Banner -->
-  <div class="guest-banner">
-    <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
-    <span>👀 <strong>Preview Mode</strong> — Explore the app freely. Records won't be saved.</span>
-    <div class="guest-actions">
-      <a href="/register" class="guest-btn-primary">Create Account</a>
-      <a href="/login" class="guest-btn-secondary">Sign In</a>
-    </div>
+  <div id="guestBanner" style="
+    background: linear-gradient(135deg, #0A3894, #00B5EF);
+    color: white;
+    padding: 12px 16px;
+    text-align: center;
+    font-size: 0.82rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 4px 12px rgba(10,56,148,0.2);
+  ">
+    <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:white;flex-shrink:0;"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+    <span>👀 <strong>Preview Mode</strong> — You can explore the full app but records won\'t be saved.</span>
+    <span style="display:flex;gap:6px;">
+      <a href="/register" style="background:white;color:#0A3894;padding:4px 12px;border-radius:6px;text-decoration:none;font-weight:800;font-size:0.78rem;">Create Account</a>
+      <a href="/login" style="background:rgba(255,255,255,0.2);color:white;padding:4px 12px;border-radius:6px;text-decoration:none;font-weight:700;font-size:0.78rem;border:1px solid rgba(255,255,255,0.4);">Sign In</a>
+    </span>
   </div>
   {% endif %}
 
-  <!-- ══════════════════════════════════════
-       HEADER
-       ══════════════════════════════════════ -->
   <header>
     <div class="header-content">
       <div class="logo-container">
@@ -254,56 +96,35 @@
   </header>
 
   <main>
-
-    <!-- Live Metrics Dashboard — 4 columns -->
+    <!-- Live Dashboard bar -->
     <div class="dashboard-card">
-      <div class="dash-title">
-        <svg viewBox="0 0 24 24" style="width:13px;height:13px;fill:#0A3894;flex-shrink:0;"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/></svg>
-        Live Daily Summary
-      </div>
-      <div class="dash-grid-4">
+      <div class="dash-grid">
         <div class="dash-item">
           <span class="dash-label">Bags Sold</span>
           <span class="dash-val" id="dashBagsSold">0 bags</span>
         </div>
         <div class="dash-item">
           <span class="dash-label">Total Revenue</span>
-          <span class="dash-val" id="dashRevenue" style="color:#059669;">GH₵ 0.00</span>
+          <span class="dash-val highlight" id="dashRevenue">GH₵ 0.00</span>
         </div>
         <div class="dash-item">
           <span class="dash-label">Total Expenses</span>
-          <span class="dash-val" id="dashExpenses" style="color:#DC2626;">GH₵ 0.00</span>
+          <span class="dash-val" id="dashExpenses" style="color: var(--red);">GH₵ 0.00</span>
         </div>
         <div class="dash-item">
           <span class="dash-label">Net Daily Cash</span>
-          <span class="dash-val" id="dashNetCash" style="color:#0A3894;">GH₵ 0.00</span>
+          <span class="dash-val highlight" id="dashNetCash" style="color: var(--green);">GH₵ 0.00</span>
         </div>
       </div>
-    </div>
-
-    <!-- Offline Banner -->
-    <div id="offlineBanner">
-      <svg viewBox="0 0 24 24"><path d="M24 8.98C20.93 5.9 16.69 4 12 4 7.31 4 3.07 5.9.01 8.98L12 21 24 8.98z"/></svg>
-      You're offline — data will sync automatically when connection returns.
     </div>
 
     <!-- Daily Form Entry -->
     <form id="ledgerForm">
-
-      <!-- ── SECTION: Configuration ── -->
-      <div class="section-label">
-        <div class="section-label-badge" style="background:linear-gradient(135deg,#0A3894,#1A52C8);">
-          <svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/></svg>
-        </div>
-        Configuration
-      </div>
-
+      
       <!-- Date and Status Card -->
       <div class="card">
         <div class="card-title">
-          <div class="card-title-icon">
-            <svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/></svg>
-          </div>
+          <svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/></svg>
           Ledger Configuration
         </div>
         <div class="grid-2">
@@ -320,39 +141,29 @@
             <label for="factoryStatus">Factory Status</label>
             <div class="input-wrapper">
               <span class="input-icon">
-                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
               </span>
               <select id="factoryStatus">
-                <option value="Open" selected>🟢 Open</option>
-                <option value="Closed">🔴 Closed</option>
+                <option value="Open" selected>Open</option>
+                <option value="Closed">Closed</option>
               </select>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- ── SECTION: Production ── -->
-      <div class="section-label">
-        <div class="section-label-badge" style="background:linear-gradient(135deg,#0E52C1,#00B5EF);">
-          <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-5 14H4v-4h11v4zm0-5H4V9h11v4zm5 5h-4V9h4v9z"/></svg>
-        </div>
-        Production
-      </div>
-
-      <!-- Production and Truck Sales side by side on desktop -->
+      <!-- Production statistics -->
       <div class="grid-md-2">
         <div class="card">
           <div class="card-title">
-            <div class="card-title-icon">
-              <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-5 14H4v-4h11v4zm0-5H4V9h11v4zm5 5h-4V9h4v9z"/></svg>
-            </div>
-            Production &amp; Storage
+            <svg viewBox="0 0 24 24"><path d="M19 13H5v-2h14v2z M19 17H5v-2h14v2z M19 9H5V7h14v2z M19 5H5V3h14v2z"/></svg>
+            Production & Storage
           </div>
           <div class="form-group">
             <label for="produced">Total Bags Produced</label>
             <div class="input-wrapper">
               <span class="input-icon">
-                <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/></svg>
+                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/></svg>
               </span>
               <input type="number" id="produced" min="0" placeholder="0" required>
             </div>
@@ -368,19 +179,17 @@
           </div>
         </div>
 
-        <!-- Truck Sales -->
+        <!-- Truck Sales statistics -->
         <div class="card">
           <div class="card-title">
-            <div class="card-title-icon">
-              <svg viewBox="0 0 24 24"><path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm12 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1.5-7.5H17V9h2.5v2z"/></svg>
-            </div>
+            <svg viewBox="0 0 24 24"><path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm12 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1.5-7.5H17V9h2.5v2z"/></svg>
             Truck Sales
           </div>
           <div class="form-group">
             <label for="truckSent">Bags Sent Out by Truck</label>
             <div class="input-wrapper">
               <span class="input-icon">
-                <svg viewBox="0 0 24 24"><path d="M21 3L3 10.53v.98l6.84 2.65L12.48 21h.98L21 3z"/></svg>
+                <svg viewBox="0 0 24 24"><path d="M19 15h-2v2h2v-2zm0-4h-2v2h2v-2zm0-4h-2v2h2V7zm-4 8h-2v2h2v-2zm0-4h-2v2h2v-2zm0-4h-2v2h2V7zm-4 8H9v2h2v-2zm0-4H9v2h2v-2zm0-4H9v2h2V7z"/></svg>
               </span>
               <input type="number" id="truckSent" min="0" placeholder="0" required>
             </div>
@@ -389,7 +198,7 @@
             <label for="truckSold">Bags Sold by Truck</label>
             <div class="input-wrapper">
               <span class="input-icon">
-                <svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
+                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
               </span>
               <input type="number" id="truckSold" min="0" placeholder="0" required>
             </div>
@@ -397,22 +206,12 @@
         </div>
       </div>
 
-      <!-- ── SECTION: Sales Channels ── -->
-      <div class="section-label">
-        <div class="section-label-badge" style="background:linear-gradient(135deg,#059669,#047857);">
-          <svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
-        </div>
-        Sales Channels
-      </div>
-
+      <!-- Other sales channels and leakages -->
       <div class="grid-md-2">
-        <!-- Aboboya & Factory -->
         <div class="card">
           <div class="card-title">
-            <div class="card-title-icon" style="background:linear-gradient(135deg,#059669,#047857);">
-              <svg viewBox="0 0 24 24"><path d="M20 8H4V6h16v2zm-2 9H6v-2h12v2zm2-5H4v-2h16v2z"/></svg>
-            </div>
-            Aboboya &amp; Factory Sales
+            <svg viewBox="0 0 24 24"><path d="M20 8H4V6h16v2zm-2 9H6v-2h12v2zm2-5H4v-2h16v2zM4 18h16v2H4v-2z"/></svg>
+            Aboboya & Factory Sales
           </div>
           <div class="grid-2">
             <div class="form-group">
@@ -436,27 +235,24 @@
           </div>
         </div>
 
-        <!-- Pricing & Leakage -->
         <div class="card">
           <div class="card-title">
-            <div class="card-title-icon" style="background:linear-gradient(135deg,#DC2626,#B91C1C);">
-              <svg viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
-            </div>
-            Pricing &amp; Leakage
+            <svg viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+            Pricing & Leakage
           </div>
           <div class="grid-2">
             <div class="form-group">
               <label for="pricePerBag">Price per Bag</label>
               <div class="input-wrapper">
-                <span class="input-icon" style="font-size:0.72rem;font-weight:800;color:#5E7898;">GH₵</span>
-                <input type="number" id="pricePerBag" step="0.1" value="6.0" style="padding-left: 44px;" required>
+                <span class="input-icon" style="font-size: 0.75rem;">GH₵</span>
+                <input type="number" id="pricePerBag" step="0.1" value="6.0" style="padding-left: 42px;" required>
               </div>
             </div>
             <div class="form-group">
               <label for="leakages">Bags Leakage</label>
               <div class="input-wrapper">
                 <span class="input-icon">
-                  <svg viewBox="0 0 24 24" style="fill:#DC2626;"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
                 </span>
                 <input type="number" id="leakages" min="0" placeholder="0" required>
               </div>
@@ -465,96 +261,82 @@
         </div>
       </div>
 
-      <!-- ── SECTION: Financial Reconciliation ── -->
-      <div class="section-label">
-        <div class="section-label-badge" style="background:linear-gradient(135deg,#D97706,#B45309);">
-          <svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8z"/></svg>
-        </div>
-        Financial Reconciliation
-      </div>
-
-      <!-- Financial Card -->
+      <!-- Financial Reconciliation Card -->
       <div class="card">
         <div class="card-title">
-          <div class="card-title-icon" style="background:linear-gradient(135deg,#D97706,#B45309);">
-            <svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8z"/></svg>
-          </div>
-          Expenses &amp; Cash Reconciliation
+          <svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8z"/></svg>
+          Financial Reconciliation & Expenses
         </div>
-
+        
         <div class="grid-3">
           <div class="form-group">
             <label for="fuelExpenses">Fuel Expenses</label>
             <div class="input-wrapper">
-              <span class="input-icon" style="font-size:0.72rem;font-weight:800;color:#5E7898;">GH₵</span>
-              <input type="number" step="0.01" id="fuelExpenses" placeholder="0.00" style="padding-left: 44px;" required>
+              <span class="input-icon" style="font-size: 0.75rem;">GH₵</span>
+              <input type="number" step="0.01" id="fuelExpenses" placeholder="0.00" style="padding-left: 42px;" required>
             </div>
           </div>
           <div class="form-group">
             <label for="otherExpenses">Other Expenses</label>
             <div class="input-wrapper">
-              <span class="input-icon" style="font-size:0.72rem;font-weight:800;color:#5E7898;">GH₵</span>
-              <input type="number" step="0.01" id="otherExpenses" placeholder="0.00" style="padding-left: 44px;" required>
+              <span class="input-icon" style="font-size: 0.75rem;">GH₵</span>
+              <input type="number" step="0.01" id="otherExpenses" placeholder="0.00" style="padding-left: 42px;" required>
             </div>
           </div>
           <div class="form-group">
-            <label for="withdrawBank">Bank Withdrawal</label>
+            <label for="withdrawBank">Bank Withdraw</label>
             <div class="input-wrapper">
-              <span class="input-icon" style="font-size:0.72rem;font-weight:800;color:#5E7898;">GH₵</span>
-              <input type="number" step="0.01" id="withdrawBank" placeholder="0.00" style="padding-left: 44px;" required>
+              <span class="input-icon" style="font-size: 0.75rem;">GH₵</span>
+              <input type="number" step="0.01" id="withdrawBank" placeholder="0.00" style="padding-left: 42px;" required>
             </div>
           </div>
         </div>
 
-        <div class="grid-2" style="margin-top: 12px;">
+        <div class="grid-2" style="margin-top: 10px;">
           <div class="form-group">
             <label for="cashHand">Cash at Hand (Counted)</label>
             <div class="input-wrapper">
-              <span class="input-icon" style="font-size:0.72rem;font-weight:800;color:#059669;">GH₵</span>
-              <input type="number" step="0.01" id="cashHand" placeholder="0.00" style="padding-left: 44px;" required>
+              <span class="input-icon" style="font-size: 0.75rem;">GH₵</span>
+              <input type="number" step="0.01" id="cashHand" placeholder="0.00" style="padding-left: 42px;" required>
             </div>
           </div>
           <div class="form-group">
             <label for="cashBank">Cash at Bank</label>
             <div class="input-wrapper">
-              <span class="input-icon" style="font-size:0.72rem;font-weight:800;color:#0A3894;">GH₵</span>
-              <input type="number" step="0.01" id="cashBank" placeholder="0.00" style="padding-left: 44px;" required>
+              <span class="input-icon" style="font-size: 0.75rem;">GH₵</span>
+              <input type="number" step="0.01" id="cashBank" placeholder="0.00" style="padding-left: 42px;" required>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- ── Notes & Comments ── -->
+      <!-- Comments Card -->
       <div class="card">
         <div class="card-title">
-          <div class="card-title-icon" style="background:linear-gradient(135deg,#5E7898,#3D5A80);">
-            <svg viewBox="0 0 24 24"><path d="M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18zM18 14H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg>
-          </div>
-          Notes &amp; Comments
+          <svg viewBox="0 0 24 24"><path d="M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18zM18 14H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg>
+          Ledger Comments & Notes
         </div>
         <div class="form-group">
-          <textarea id="comments" rows="3" placeholder="Enter any notes, observations, or leakage details for today..."></textarea>
+          <textarea id="comments" rows="3" placeholder="Enter comments or leakages details..."></textarea>
         </div>
       </div>
 
-      <!-- Action Buttons -->
-      <div class="action-row">
-        <button type="submit" class="btn btn-primary pulse-ready" id="submitBtn" style="padding: 15px; font-size: 1rem;">
-          <svg viewBox="0 0 24 24"><path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>
+      <!-- User Role Button Gates -->
+      <div style="margin-bottom: 20px; display: flex; flex-direction: column; gap: 10px;">
+        <button type="submit" class="btn btn-primary" style="padding: 14px;">
           Submit Daily Record
         </button>
-        <div class="action-row-secondary">
-          {% if user_role == 'admin' %}
-          <a href="/admin" class="btn btn-green" style="text-decoration: none;">
-            <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
-            Admin Dashboard
-          </a>
-          {% endif %}
-          <a href="/api/logout" class="btn btn-secondary" style="text-decoration: none;">
-            <svg viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
-            Sign Out
-          </a>
-        </div>
+
+        {% if user_role == 'admin' %}
+        <a href="/admin" target="_blank" class="btn btn-green" style="text-decoration: none;">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/></svg>
+          Open Admin Panel (New Tab)
+        </a>
+        {% endif %}
+        
+        <a href="/api/logout" class="btn btn-secondary" style="text-decoration: none;">
+          Sign Out of Session
+        </a>
       </div>
 
     </form>
@@ -568,12 +350,7 @@
 
   <footer>
     <div class="footer-divider"></div>
-    <div style="text-align:center;margin-bottom:10px;">
-      <div class="footer-brand-badge">
-        <svg viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" fill="#0A3894"/></svg>
-        <span>Kenamos Big Brothers Ltd.</span>
-      </div>
-    </div>
+    <div class="footer-title">Kenamos Big Brothers Ltd.</div>
     <div class="footer-desc">
       Produced under hygienic conditions in Ghana.<br>
       Yamfo, Ahafo Region • GPS: B2-2245-3345
@@ -581,95 +358,19 @@
     <div class="copyright">&copy; 2026 Kenamos Big Brothers Ltd. All rights reserved.</div>
   </footer>
 
+  <!-- Link static logic app -->
   <script>const IS_GUEST = {{ 'true' if is_guest else 'false' }};</script>
   <script src="/static/js/app.js"></script>
-
+  
   <script>
-    // ── Hamburger / Drawer ──────────────────────────
-    const hamburgerBtn  = document.getElementById('hamburgerBtn');
-    const navDrawer     = document.getElementById('navDrawer');
-    const navBackdrop   = document.getElementById('navBackdrop');
-    const drawerClose   = document.getElementById('drawerClose');
-
-    function openDrawer() {
-      navDrawer.classList.add('open');
-      navBackdrop.classList.add('open');
-      hamburgerBtn.classList.add('open');
-      hamburgerBtn.setAttribute('aria-expanded', 'true');
-      navDrawer.setAttribute('aria-hidden', 'false');
-      document.body.style.overflow = 'hidden';
-    }
-    function closeDrawer() {
-      navDrawer.classList.remove('open');
-      navBackdrop.classList.remove('open');
-      hamburgerBtn.classList.remove('open');
-      hamburgerBtn.setAttribute('aria-expanded', 'false');
-      navDrawer.setAttribute('aria-hidden', 'true');
-      document.body.style.overflow = '';
-    }
-
-    hamburgerBtn.addEventListener('click', () => {
-      navDrawer.classList.contains('open') ? closeDrawer() : openDrawer();
-    });
-    drawerClose.addEventListener('click', closeDrawer);
-    navBackdrop.addEventListener('click', closeDrawer);
-
-    // Keyboard close
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && navDrawer.classList.contains('open')) closeDrawer();
-    });
-
-    // Sync drawer status dot with topnav
-    const topStatusDot  = document.getElementById('statusDot');
-    const topStatusText = document.getElementById('statusText');
-    const draStatusDot  = document.getElementById('drawerStatusDot');
-    const draStatusText = document.getElementById('drawerStatusText');
-
-    function syncDrawerStatus() {
-      if (!draStatusDot || !draStatusText) return;
-      const isOffline = topStatusDot?.classList.contains('offline');
-      if (isOffline) {
-        draStatusDot.classList.add('offline');
-        draStatusText.textContent = 'Offline Mode';
-      } else {
-        draStatusDot.classList.remove('offline');
-        draStatusText.textContent = 'Online';
-      }
-    }
-    // Observe topnav status dot changes
-    if (topStatusDot) {
-      const mo = new MutationObserver(syncDrawerStatus);
-      mo.observe(topStatusDot, { attributes: true });
-    }
-    syncDrawerStatus();
-
-    // ── Submit button — remove pulse on first interaction ──
-    const submitBtn = document.getElementById('submitBtn');
-    if (submitBtn) {
-      document.getElementById('ledgerForm').addEventListener('input', () => {
-        submitBtn.classList.remove('pulse-ready');
-      }, { once: true });
-    }
-
-    // ── Service Worker Registration ────────────────
+    // Register Service Worker for PWA — must register from root path for full scope
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js', { scope: '/' })
-          .then(reg => console.log('[PWA] SW registered. Scope:', reg.scope))
-          .catch(err => console.warn('[PWA] SW registration failed:', err));
+          .then(reg => console.log('[PWA] Service Worker registered. Scope:', reg.scope))
+          .catch(err => console.warn('[PWA] Service worker registration failed:', err));
       });
     }
-
-    // ── Offline banner ─────────────────────────────
-    function updateOfflineBanner() {
-      const banner = document.getElementById('offlineBanner');
-      if (!banner) return;
-      if (!navigator.onLine) { banner.classList.add('show'); }
-      else { banner.classList.remove('show'); }
-    }
-    window.addEventListener('online', updateOfflineBanner);
-    window.addEventListener('offline', updateOfflineBanner);
-    updateOfflineBanner();
   </script>
 </body>
 </html>

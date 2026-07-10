@@ -12,372 +12,116 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/css/style.css">
-
-  <!-- Chart.js via CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js" defer></script>
   <style>
-    main { max-width: 1200px; }
+    main { max-width: 1100px; }
 
-    /* ── Page section headings ─────────────────── */
-    .section-heading {
-      font-size: 0.65rem;
-      font-weight: 800;
-      letter-spacing: 1.8px;
-      text-transform: uppercase;
-      color: var(--gray-500);
-      margin: 28px 0 14px;
-      display: flex;
+    /* Admin-only badge in header */
+    .admin-shield {
+      display: inline-flex;
       align-items: center;
-      gap: 10px;
-    }
-    .section-heading::after { content:''; flex:1; height:1px; background: linear-gradient(90deg, var(--gray-200), transparent); }
-    .section-heading-icon {
-      width: 22px; height: 22px;
-      border-radius: 6px;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-    }
-    .section-heading-icon svg { width: 12px; height: 12px; fill: white; }
-
-    /* ── Stats summary bar ─────────────────────── */
-    .stats-bar {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 14px;
-      margin-bottom: 6px;
-    }
-    .stat-card {
-      background: white;
-      border-radius: 18px;
-      padding: 20px 18px 16px;
-      text-align: center;
-      border: 1px solid rgba(10,56,148,0.07);
-      box-shadow: 0 4px 16px rgba(10,56,148,0.07);
-      transition: all 0.25s ease;
-      position: relative;
-      overflow: hidden;
-    }
-    .stat-card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, #0A3894, #00B5EF);
-      border-radius: 3px 3px 0 0;
-    }
-    .stat-card:hover { box-shadow: 0 10px 32px rgba(10,56,148,0.13); transform: translateY(-3px); }
-    .stat-val {
-      font-size: 1.65rem;
-      font-weight: 900;
-      color: #0A3894;
-      display: block;
-      letter-spacing: -1px;
-      line-height: 1.1;
-    }
-    .stat-lbl {
-      font-size: 0.65rem;
+      gap: 5px;
+      background: rgba(180, 83, 9, 0.15);
+      border: 1px solid rgba(180, 83, 9, 0.3);
+      color: #92400E;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 0.7rem;
       font-weight: 700;
-      color: #5E7898;
       text-transform: uppercase;
-      letter-spacing: 0.7px;
-      margin-top: 4px;
-      display: block;
+      letter-spacing: 0.5px;
     }
+    .admin-shield svg { width: 12px; height: 12px; fill: #92400E; }
 
-    /* ── Charts row ────────────────────────────── */
-    .charts-row {
-      display: grid;
-      grid-template-columns: 1.6fr 1fr;
-      gap: 16px;
-      margin-bottom: 6px;
-    }
-    .chart-card {
-      background: white;
-      border-radius: 18px;
-      padding: 20px;
-      border: 1px solid rgba(10,56,148,0.07);
-      box-shadow: 0 4px 16px rgba(10,56,148,0.07);
-      position: relative;
-    }
-    .chart-title {
-      font-size: 0.75rem;
-      font-weight: 800;
-      color: var(--primary);
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .chart-title-dot {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-    .chart-canvas-wrap {
-      position: relative;
-      width: 100%;
-    }
-    .chart-empty {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 180px;
-      color: #94A3B8;
-      font-size: 0.80rem;
-      font-weight: 600;
-      gap: 8px;
-    }
-    .chart-empty svg { width: 32px; height: 32px; fill: #C4D2E8; }
-
-    /* ── Filter/search bar ─────────────────────── */
-    .filter-bar {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      flex-wrap: wrap;
-      margin-bottom: 14px;
-    }
-    .filter-search {
-      flex: 1;
-      min-width: 180px;
-      position: relative;
-    }
-    .filter-search input {
-      width: 100%;
-      padding: 9px 12px 9px 36px;
-      border-radius: 10px;
-      border: 1.5px solid var(--gray-200);
-      font-size: 0.84rem;
-      font-weight: 500;
-      color: var(--dark);
-      background: white;
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-      min-height: 40px;
-      font-family: 'Outfit', sans-serif;
-    }
-    .filter-search input:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(10,56,148,0.10);
-    }
-    .filter-search-icon {
-      position: absolute;
-      left: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      pointer-events: none;
-    }
-    .filter-search-icon svg { width: 15px; height: 15px; fill: #94A3B8; }
-
-    .filter-select {
-      padding: 9px 32px 9px 12px;
-      border-radius: 10px;
-      border: 1.5px solid var(--gray-200);
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: var(--dark);
-      background: white;
-      outline: none;
-      cursor: pointer;
-      min-height: 40px;
-      font-family: 'Outfit', sans-serif;
-      appearance: none;
-      background-image: url("data:image/svg+xml;utf8,<svg fill='%235E7898' height='20' viewBox='0 0 24 24' width='20' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
-      background-repeat: no-repeat;
-      background-position: right 8px center;
-      background-size: 16px;
-      transition: border-color 0.2s;
-    }
-    .filter-select:focus { border-color: var(--primary); outline: none; }
-
-    .filter-count {
-      font-size: 0.72rem;
-      font-weight: 700;
-      color: var(--gray-500);
-      white-space: nowrap;
-      align-self: center;
-    }
-
-    /* ── Delete button ─────────────────────────── */
+    /* Delete button in table */
     .btn-del {
-      background: rgba(220, 38, 38, 0.08);
-      border: 1px solid rgba(220, 38, 38, 0.18);
+      background: rgba(220, 38, 38, 0.1);
+      border: 1px solid rgba(220, 38, 38, 0.2);
       color: #DC2626;
-      padding: 4px 10px;
+      padding: 4px 8px;
       border-radius: 6px;
-      font-size: 0.70rem;
+      font-size: 0.7rem;
       font-weight: 700;
       cursor: pointer;
       font-family: 'Outfit', sans-serif;
       transition: all 0.2s;
       white-space: nowrap;
     }
-    .btn-del:hover { background: #DC2626; color: white; border-color: #DC2626; }
+    .btn-del:hover {
+      background: #DC2626;
+      color: white;
+    }
 
-    .table-responsive { max-height: 480px; }
+    .table-responsive { max-height: 420px; }
 
-    /* ── Employee card ─────────────────────────── */
+    /* Employee card in directory */
     .employee-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: #F8FAFF;
-      padding: 13px 16px;
-      border-radius: 12px;
-      border: 1px solid rgba(10,56,148,0.07);
+      background: #F8FAFC;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid #E2E8F0;
       gap: 10px;
-      transition: all 0.22s;
-      min-height: var(--touch-target);
     }
-    .employee-item:hover { background: white; box-shadow: 0 4px 16px rgba(10,56,148,0.09); transform: translateX(3px); }
     .emp-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 
-    /* ── Employee search ───────────────────────── */
-    .emp-search-wrap { margin-bottom: 12px; }
+    /* Export section */
+    .export-bar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .export-bar .btn {
+      width: auto;
+      padding: 8px 16px;
+      font-size: 0.82rem;
+    }
 
-    /* ── Export bar ────────────────────────────── */
-    .export-bar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-    .export-bar .btn { width: auto; padding: 8px 16px; font-size: 0.80rem; }
-
-    /* ── Confirm modal ─────────────────────────── */
+    /* Confirm modal overlay */
     .modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(12, 26, 46, 0.62);
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
+      background: rgba(0,0,0,0.5);
       z-index: 900;
       display: none;
       align-items: center;
       justify-content: center;
       padding: 20px;
     }
-    .modal-overlay.show { display: flex; animation: fadeIn 0.2s ease; }
+    .modal-overlay.show { display: flex; }
     .modal-box {
       background: white;
-      border-radius: 24px;
-      padding: 32px 28px;
-      max-width: 380px;
+      border-radius: 16px;
+      padding: 28px 24px;
+      max-width: 360px;
       width: 100%;
-      box-shadow: 0 28px 70px rgba(0,0,0,0.22);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.2);
       text-align: center;
-      animation: slideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
-    .modal-icon {
-      width: 60px; height: 60px;
-      background: rgba(220,38,38,0.09);
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      margin: 0 auto 18px;
-    }
-    .modal-icon svg { width: 28px; height: 28px; fill: #DC2626; }
-    .modal-box h3 { font-size: 1.18rem; font-weight: 800; color: #0C1A2E; margin-bottom: 8px; }
-    .modal-box p  { font-size: 0.84rem; color: #5E7898; margin-bottom: 24px; line-height: 1.58; }
-    .modal-btns   { display: flex; gap: 10px; }
+    .modal-box h3 { font-size: 1.1rem; font-weight: 800; color: #0F172A; margin-bottom: 8px; }
+    .modal-box p { font-size: 0.85rem; color: #64748B; margin-bottom: 20px; line-height: 1.5; }
+    .modal-btns { display: flex; gap: 10px; }
     .modal-btns button { flex: 1; }
 
-    /* ── Admin layout grid ─────────────────────── */
-    .admin-grid { display: grid; grid-template-columns: 1fr 1.4fr; gap: 20px; }
-
-    /* ── Responsive ────────────────────────────── */
-    @media (max-width: 768px) {
-      .charts-row { grid-template-columns: 1fr; }
-    }
     @media (max-width: 640px) {
       .stats-bar { grid-template-columns: 1fr 1fr; }
       .stats-bar .stat-card:last-child { grid-column: 1 / -1; }
-      .filter-bar { flex-direction: column; align-items: stretch; }
-      .filter-search { min-width: 0; }
       .export-bar { flex-direction: column; }
       .export-bar .btn { width: 100%; }
-      .admin-grid { grid-template-columns: 1fr; }
     }
-
-    @keyframes fadeIn  { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes spin    { to { transform: rotate(360deg); } }
   </style>
 </head>
-<body class="has-topnav">
+<body>
 
-  <!-- ══════════════════════════════════════
-       TOP NAVIGATION BAR (Admin)
-       ══════════════════════════════════════ -->
-  <nav class="topnav" id="topnav">
-    <div class="topnav-inner">
-
-      <a href="/admin" class="topnav-brand">
-        <div class="topnav-brand-icon">
-          <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" fill="#FCD34D"/></svg>
-        </div>
-        <div>
-          <div class="topnav-brand-text">Admin Portal</div>
-          <div class="topnav-brand-sub">Moor Water</div>
-        </div>
-      </a>
-
-      <div class="topnav-center">
-        <div class="topnav-admin-badge">
-          <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
-          Restricted Access
-        </div>
-      </div>
-
-      <div class="topnav-right">
-        <div class="topnav-user-chip">
-          <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
-          Admin: {{ user_name }}
-        </div>
-        <div class="topnav-links">
-          <a href="/" class="topnav-link">
-            <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
-            Ledger Form
-          </a>
-          <a href="/api/logout" class="topnav-link danger">
-            <svg viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
-            Sign Out
-          </a>
-        </div>
-        <button class="topnav-hamburger" id="hamburgerBtn" aria-label="Open menu" aria-expanded="false">
-          <div class="hamburger-lines"><span></span><span></span><span></span></div>
-        </button>
-      </div>
-    </div>
-  </nav>
-
-  <!-- Mobile Drawer -->
-  <div class="nav-backdrop" id="navBackdrop"></div>
-  <div class="nav-drawer" id="navDrawer" aria-hidden="true">
-    <div class="drawer-header">
-      <button class="drawer-close" id="drawerClose" aria-label="Close menu">✕</button>
-      <div class="drawer-user-avatar">
-        <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
-      </div>
-      <div class="drawer-user-name">{{ user_name }}</div>
-      <div class="drawer-user-role" style="color:#FCD34D;">🛡 Administrator</div>
-    </div>
-    <nav class="drawer-nav">
-      <a href="/admin" class="drawer-nav-item admin-item">
-        <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
-        Dashboard
-      </a>
-      <a href="/" class="drawer-nav-item">
-        <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-        Ledger Form
-      </a>
-      <a href="/api/logout" class="drawer-nav-item danger-item">
-        <svg viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
-        Sign Out
-      </a>
-    </nav>
-    <div class="drawer-footer">© 2026 Kenamos Big Brothers Ltd.</div>
+  <!-- Admin session badge -->
+  <div class="user-badge">
+    <svg viewBox="0 0 24 24" style="width:12px;height:12px;fill:white;"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+    <span>Admin: {{ user_name }}</span>
   </div>
 
-  <!-- ══════════════════════════════════════
-       HEADER
-       ══════════════════════════════════════ -->
   <header>
     <div class="header-content">
       <div class="logo-container">
@@ -401,40 +145,36 @@
       <div>
         <h1 class="brand-title">Moor Natural Mineral Water</h1>
         <p class="brand-subtitle">Administrator Dashboard</p>
+        <div style="margin-top: 6px;">
+          <span class="admin-shield">
+            <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+            Restricted Admin Access
+          </span>
+        </div>
       </div>
     </div>
   </header>
 
   <main>
 
-    <!-- ══════════════════════════════════════
-         INSIGHTS DASHBOARD
-         ══════════════════════════════════════ -->
-    <div class="section-heading" style="margin-top:24px;">
-      <div class="section-heading-icon" style="background:linear-gradient(135deg,#0A3894,#1A52C8);">
-        <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/></svg>
-      </div>
-      Insights Dashboard
-    </div>
-
-    <!-- Stats Cards -->
-    <div class="stats-bar" id="statsBar">
+    <!-- Stats Summary -->
+    <div class="stats-bar" id="statsBar" style="margin-top: 20px;">
       <div class="stat-card">
-        <div class="stat-icon-ring stat-icon-primary">
+        <div class="stat-card-icon">
           <svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
         </div>
         <span class="stat-val" id="statTotalEntries">—</span>
         <span class="stat-lbl">Ledger Entries</span>
       </div>
       <div class="stat-card">
-        <div class="stat-icon-ring stat-icon-green">
+        <div class="stat-card-icon">
           <svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
         </div>
-        <span class="stat-val" id="statTotalRevenue" style="font-size:1.15rem;">—</span>
+        <span class="stat-val" id="statTotalRevenue">—</span>
         <span class="stat-lbl">Total Revenue</span>
       </div>
       <div class="stat-card">
-        <div class="stat-icon-ring stat-icon-amber">
+        <div class="stat-card-icon">
           <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
         </div>
         <span class="stat-val" id="statEmployees">—</span>
@@ -442,112 +182,131 @@
       </div>
     </div>
 
-    <!-- Charts Row -->
-    <div class="section-heading">
-      <div class="section-heading-icon" style="background:linear-gradient(135deg,#059669,#047857);">
-        <svg viewBox="0 0 24 24"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg>
-      </div>
-      Analytics &amp; Trends
-    </div>
-
-    <div class="charts-row">
-      <!-- Revenue Trend Line Chart -->
-      <div class="chart-card">
-        <div class="chart-title">
-          <div class="chart-title-dot" style="background:#059669;"></div>
-          Revenue Trend (Last 10 Records)
-        </div>
-        <div class="chart-canvas-wrap">
-          <div class="chart-empty" id="revenueChartEmpty">
-            <svg viewBox="0 0 24 24"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg>
-            Loading chart data...
-          </div>
-          <canvas id="revenueChart" style="display:none; max-height:220px;"></canvas>
-        </div>
-      </div>
-
-      <!-- Sales Distribution Doughnut -->
-      <div class="chart-card">
-        <div class="chart-title">
-          <div class="chart-title-dot" style="background:#0A3894;"></div>
-          Sales Distribution
-        </div>
-        <div class="chart-canvas-wrap">
-          <div class="chart-empty" id="salesChartEmpty">
-            <svg viewBox="0 0 24 24"><path d="M11 2v20c-5.07-.5-9-4.79-9-10s3.93-9.5 9-10zm2.03 0v8.99H22c-.47-4.74-4.24-8.52-8.97-8.99zm0 11.01V22c4.74-.47 8.5-4.25 8.97-8.99h-8.97z"/></svg>
-            Loading chart data...
-          </div>
-          <canvas id="salesChart" style="display:none; max-height:220px;"></canvas>
-        </div>
-      </div>
-    </div>
-
-    <!-- ══════════════════════════════════════
-         TABS
-         ══════════════════════════════════════ -->
-    <div class="section-heading">
-      <div class="section-heading-icon" style="background:linear-gradient(135deg,#5E7898,#3D5A80);">
-        <svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
-      </div>
-      Records &amp; Directory
-    </div>
-
+    <!-- Tab Navigation -->
     <div class="tabs-header">
-      <button class="tab-btn active" id="tabBtnLedger" onclick="switchTab('ledgerTab', this)">
-        <svg viewBox="0 0 24 24" style="width:15px;height:15px;fill:currentColor;"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
-        Master Ledger
+      <button class="tab-btn active" id="tabBtnDash" onclick="switchTab('dashboardTab', this)">
+        📈 Dashboard
+      </button>
+      <button class="tab-btn" id="tabBtnLedger" onclick="switchTab('ledgerTab', this)">
+        📊 Historical Records
       </button>
       <button class="tab-btn" id="tabBtnDir" onclick="switchTab('directoryTab', this)">
-        <svg viewBox="0 0 24 24" style="width:15px;height:15px;fill:currentColor;"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
-        Employee Directory
+        👥 Employee Directory
       </button>
     </div>
 
-    <!-- ═══ TAB 1 — MASTER LEDGER ═══ -->
-    <div id="ledgerTab" class="tab-content active">
-      <div class="card">
-        <!-- Filter Bar -->
-        <div class="filter-bar">
-          <div class="filter-search">
-            <div class="filter-search-icon">
-              <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-            </div>
-            <input type="search" id="ledgerSearch" placeholder="Search date, worker, comments…" autocomplete="off" oninput="filterLedger()">
+    <!-- ═══════════════════════════════════════
+         TAB 1 — DASHBOARD (Power BI–style overview)
+    ═══════════════════════════════════════ -->
+    <div id="dashboardTab" class="tab-content active">
+      <div class="charts-grid">
+        <div class="chart-card">
+          <div class="chart-card-title">
+            <span>📉 Production &amp; Revenue Trend</span>
+            <span style="font-size:0.7rem; color:#94A3B8; font-weight:600;">Last 14 entries</span>
           </div>
-          <select class="filter-select" id="statusFilter" onchange="filterLedger()">
-            <option value="">All Statuses</option>
-            <option value="Open">🟢 Open</option>
-            <option value="Closed">🔴 Closed</option>
-          </select>
-          <span class="filter-count" id="ledgerCount"></span>
+          <div class="chart-canvas-wrap">
+            <canvas id="trendChart"></canvas>
+          </div>
+          <p class="chart-empty-note" id="trendChartEmpty" style="display:none;">No ledger data yet to chart.</p>
+        </div>
+        <div class="chart-card">
+          <div class="chart-card-title">
+            <span>🥧 Sales Channel Distribution</span>
+          </div>
+          <div class="chart-canvas-wrap">
+            <canvas id="channelChart"></canvas>
+          </div>
+          <p class="chart-empty-note" id="channelChartEmpty" style="display:none;">No sales data yet to chart.</p>
+        </div>
+      </div>
+
+      <div class="card" style="text-align:center;">
+        <div class="card-title" style="justify-content:center; border:none; padding-bottom:0;">
+          Want to dig into the raw numbers?
+        </div>
+        <p style="color:#64748B; font-size:0.85rem; margin-bottom:14px;">
+          Every entry your team has ever submitted lives in Historical Records — searchable and filterable.
+        </p>
+        <button type="button" class="btn btn-primary" style="width:auto; padding:10px 22px; margin:0 auto;" onclick="switchTab('ledgerTab', document.getElementById('tabBtnLedger'))">
+          View Historical Records →
+        </button>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         TAB 2 — HISTORICAL RECORDS (search + accordion table)
+    ═══════════════════════════════════════ -->
+    <div id="ledgerTab" class="tab-content">
+      <div class="card">
+        <div class="card-title" style="justify-content: space-between; flex-wrap: wrap; gap: 10px; border: none; padding-bottom: 0;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
+            Historical Ledger Records
+          </div>
           <div class="export-bar">
-            <button type="button" class="btn btn-green btn-sm" id="btnExportCSV">
+            <button type="button" class="btn btn-green" id="btnExportCSV">
               <svg viewBox="0 0 24 24"><path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2z"/></svg>
-              Export CSV
+              Export CSV to Device
             </button>
-            <button type="button" class="btn btn-secondary btn-sm" id="btnRefreshLedger">
+            <button type="button" class="btn btn-primary" id="btnRefreshLedger" style="background: rgba(10,56,148,0.1); color: #0A3894;">
               <svg viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
               Refresh
             </button>
           </div>
         </div>
 
-        <!-- Table -->
-        <div class="table-scroll-wrap">
-          <div class="table-responsive">
+        <!-- Live search & filter -->
+        <div class="filter-bar">
+          <div class="search-wrapper">
+            <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+            <input type="search" id="ledgerSearch" placeholder="Search by date, worker, or comments...">
+          </div>
+          <select id="ledgerStatusFilter">
+            <option value="">All Statuses</option>
+            <option value="Open">Open</option>
+            <option value="Closed">Closed</option>
+          </select>
+        </div>
+
+        <p class="result-count" id="ledgerResultCount"></p>
+
+        <!-- Accordion: table stays tucked away until explicitly opened,
+             so the dashboard landing view stays spacious and uncluttered. -->
+        <button type="button" class="accordion-toggle open" id="ledgerAccordionToggle" onclick="toggleLedgerAccordion()">
+          <span>📁 View Historical Records Table</span>
+          <svg class="chevron" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+        </button>
+
+        <div class="accordion-body open" id="ledgerAccordionBody">
+          <div class="table-responsive" style="margin-top: 15px;">
             <table id="ledgerTable">
               <thead>
                 <tr>
-                  <th>#</th><th>Date</th><th>Status</th><th>Produced</th>
-                  <th>Storage</th><th>Truck Sent</th><th>Truck Sold</th>
-                  <th>Leakages</th><th>Aboboya</th><th>Factory</th>
-                  <th>Price</th><th>Revenue</th><th>Fuel Exp</th>
-                  <th>Other Exp</th><th>Withdrawal</th><th>Cash Hand</th>
-                  <th>Cash Bank</th><th>Worker</th><th>Comments</th><th>Action</th>
+                  <th>#</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                  <th>Produced</th>
+                  <th>Storage</th>
+                  <th>Truck Sent</th>
+                  <th>Truck Sold</th>
+                  <th>Leakages</th>
+                  <th>Aboboya</th>
+                  <th>Factory</th>
+                  <th>Price</th>
+                  <th>Revenue</th>
+                  <th>Fuel Exp</th>
+                  <th>Other Exp</th>
+                  <th>Withdrawal</th>
+                  <th>Cash Hand</th>
+                  <th>Cash Bank</th>
+                  <th>Worker</th>
+                  <th>Comments</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody id="ledgerTableBody">
-                <tr><td colspan="20" style="text-align:center;color:#94A3B8;padding:40px;">Loading ledger records...</td></tr>
+                <tr><td colspan="20" style="text-align:center; color:#94A3B8; padding:30px;">Loading ledger records...</td></tr>
               </tbody>
             </table>
           </div>
@@ -555,16 +314,16 @@
       </div>
     </div>
 
-    <!-- ═══ TAB 2 — EMPLOYEE DIRECTORY ═══ -->
+    <!-- ═══════════════════════════════════════
+         TAB 3 — EMPLOYEE DIRECTORY
+    ═══════════════════════════════════════ -->
     <div id="directoryTab" class="tab-content">
-      <div class="admin-grid">
+      <div style="display: grid; grid-template-columns: 1fr 1.3fr; gap: 20px;">
 
         <!-- Register Employee Form -->
         <div class="card">
           <div class="card-title">
-            <div class="card-title-icon">
-              <svg viewBox="0 0 24 24"><path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-            </div>
+            <svg viewBox="0 0 24 24"><path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
             Register New Employee
           </div>
           <form id="employeeForm">
@@ -582,59 +341,43 @@
                 <input type="email" id="empEmail" placeholder="ama@moorwater.com" required>
               </div>
             </div>
-            <div class="form-group" style="margin-bottom: 22px;">
-              <label for="empPassword">Password <small style="color:#94A3B8;font-weight:500;">(min. 6 chars)</small></label>
+            <div class="form-group" style="margin-bottom: 20px;">
+              <label for="empPassword">Password <small style="color:#94A3B8; font-weight:500;">(min. 6 chars)</small></label>
               <div class="input-wrapper">
                 <span class="input-icon"><svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg></span>
                 <input type="password" id="empPassword" placeholder="Minimum 6 characters" required minlength="6">
               </div>
             </div>
-            <button type="submit" class="btn btn-primary" id="btnRegEmployee">
-              <svg viewBox="0 0 24 24"><path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-              Register Worker
-            </button>
+            <button type="submit" class="btn btn-primary" id="btnRegEmployee">Register Worker</button>
           </form>
         </div>
 
-        <!-- Employee List with Search -->
+        <!-- Employee List -->
         <div class="card">
           <div class="card-title">
-            <div class="card-title-icon">
-              <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
-            </div>
+            <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
             All System Users
           </div>
-          <!-- Employee search -->
-          <div class="emp-search-wrap">
-            <div class="filter-search">
-              <div class="filter-search-icon">
-                <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-              </div>
-              <input type="search" id="empSearch" placeholder="Search name or email…" autocomplete="off" oninput="filterEmployees()">
-            </div>
-          </div>
           <div class="employee-list" id="employeeList">
-            <div style="text-align:center;color:#94A3B8;padding:24px;">Loading directory...</div>
+            <div style="text-align:center; color:#94A3B8; padding:20px;">Loading directory...</div>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Action Footer -->
-    <div style="margin-top: 22px; display: flex; gap: 10px; flex-wrap: wrap;">
-      <a href="/" class="btn btn-secondary btn-sm" style="text-decoration:none;">
-        <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
-        Back to Ledger Form
+    <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+      <a href="/" class="btn btn-secondary" style="text-decoration: none; width: auto; padding: 10px 20px;">
+        ← Back to Ledger Form
       </a>
-      <a href="/api/logout" class="btn btn-danger btn-sm" style="text-decoration:none;">
-        <svg viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
+      <a href="/api/logout" class="btn btn-danger" style="text-decoration: none; width: auto; padding: 10px 20px;">
         Sign Out
       </a>
     </div>
 
   </main>
 
-  <!-- Toast -->
+  <!-- Toast Notification -->
   <div id="toast">
     <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
     <span id="toastMsg">Action complete.</span>
@@ -643,9 +386,6 @@
   <!-- Confirm Delete Modal -->
   <div class="modal-overlay" id="confirmModal">
     <div class="modal-box">
-      <div class="modal-icon">
-        <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
-      </div>
       <h3 id="modalTitle">Confirm Delete</h3>
       <p id="modalMessage">Are you sure? This action cannot be undone.</p>
       <div class="modal-btns">
@@ -657,73 +397,35 @@
 
   <footer>
     <div class="footer-divider"></div>
-    <div style="text-align:center;margin-bottom:10px;">
-      <div class="footer-brand-badge">
-        <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" fill="#0A3894"/></svg>
-        <span>Kenamos Big Brothers Ltd. — Admin Portal</span>
-      </div>
-    </div>
+    <div class="footer-title">Kenamos Big Brothers Ltd. — Admin Portal</div>
     <div class="footer-desc">Yamfo, Ahafo Region • GPS: B2-2245-3345</div>
     <div class="copyright">© 2026 Kenamos Big Brothers Ltd. All rights reserved.</div>
   </footer>
 
   <script>
-    /* ════════════════════════════════════════════
-       STATE
-       ════════════════════════════════════════════ */
-    let ledgerRecords  = [];  // full dataset from API
-    let filteredLedger = [];  // currently displayed (after search/filter)
-    let allEmployees   = [];  // full employees list
+    // ──────────────────────────────────────────
+    //  State
+    // ──────────────────────────────────────────
+    let ledgerRecords = [];
     let pendingDeleteFn = null;
-    let revenueChartInstance = null;
-    let salesChartInstance   = null;
 
-    /* ════════════════════════════════════════════
-       HAMBURGER / DRAWER
-       ════════════════════════════════════════════ */
-    const hamburgerBtn = document.getElementById('hamburgerBtn');
-    const navDrawer    = document.getElementById('navDrawer');
-    const navBackdrop  = document.getElementById('navBackdrop');
-    const drawerClose  = document.getElementById('drawerClose');
-
-    function openDrawer() {
-      navDrawer.classList.add('open');
-      navBackdrop.classList.add('open');
-      hamburgerBtn.classList.add('open');
-      hamburgerBtn.setAttribute('aria-expanded', 'true');
-      navDrawer.setAttribute('aria-hidden', 'false');
-      document.body.style.overflow = 'hidden';
-    }
-    function closeDrawer() {
-      navDrawer.classList.remove('open');
-      navBackdrop.classList.remove('open');
-      hamburgerBtn.classList.remove('open');
-      hamburgerBtn.setAttribute('aria-expanded', 'false');
-      navDrawer.setAttribute('aria-hidden', 'true');
-      document.body.style.overflow = '';
-    }
-    hamburgerBtn.addEventListener('click', () => navDrawer.classList.contains('open') ? closeDrawer() : openDrawer());
-    drawerClose.addEventListener('click', closeDrawer);
-    navBackdrop.addEventListener('click', closeDrawer);
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
-
-    /* ════════════════════════════════════════════
-       TOAST
-       ════════════════════════════════════════════ */
+    // ──────────────────────────────────────────
+    //  Toast
+    // ──────────────────────────────────────────
     let toastTimer;
     function showToast(msg, ok = true) {
       clearTimeout(toastTimer);
       const el = document.getElementById('toast');
-      document.getElementById('toastMsg').textContent = msg;
       const svg = el.querySelector('svg');
-      if (svg) svg.style.fill = ok ? '#34D399' : '#F87171';
+      document.getElementById('toastMsg').textContent = msg;
+      if (svg) svg.style.fill = ok ? '#4ADE80' : '#F87171';
       el.classList.add('show');
       toastTimer = setTimeout(() => el.classList.remove('show'), 4000);
     }
 
-    /* ════════════════════════════════════════════
-       MODAL
-       ════════════════════════════════════════════ */
+    // ──────────────────────────────────────────
+    //  Confirm Modal
+    // ──────────────────────────────────────────
     function showModal(title, message, onConfirm) {
       document.getElementById('modalTitle').textContent = title;
       document.getElementById('modalMessage').textContent = message;
@@ -734,24 +436,30 @@
       document.getElementById('confirmModal').classList.remove('show');
       pendingDeleteFn = null;
     }
-    document.getElementById('modalConfirmBtn').addEventListener('click', () => { if (pendingDeleteFn) pendingDeleteFn(); closeModal(); });
-    document.getElementById('confirmModal').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
+    document.getElementById('modalConfirmBtn').addEventListener('click', () => {
+      if (pendingDeleteFn) pendingDeleteFn();
+      closeModal();
+    });
+    document.getElementById('confirmModal').addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) closeModal();
+    });
 
-    /* ════════════════════════════════════════════
-       TABS
-       ════════════════════════════════════════════ */
+    // ──────────────────────────────────────────
+    //  Tab Switching
+    // ──────────────────────────────────────────
     function switchTab(tabId, btn) {
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.getElementById(tabId).classList.add('active');
       btn.classList.add('active');
-      if (tabId === 'ledgerTab')    fetchLedger();
-      if (tabId === 'directoryTab') fetchEmployees();
+      if (tabId === 'dashboardTab')  fetchLedger();
+      if (tabId === 'ledgerTab')     fetchLedger();
+      if (tabId === 'directoryTab')  fetchEmployees();
     }
 
-    /* ════════════════════════════════════════════
-       STATS
-       ════════════════════════════════════════════ */
+    // ──────────────────────────────────────────
+    //  Stats Bar
+    // ──────────────────────────────────────────
     function updateStats(records, empCount) {
       document.getElementById('statTotalEntries').textContent = records.length;
       const totalRev = records.reduce((s, r) => s + (r.total_amount || 0), 0);
@@ -761,155 +469,12 @@
         document.getElementById('statEmployees').textContent = empCount;
     }
 
-    /* ════════════════════════════════════════════
-       CHARTS
-       ════════════════════════════════════════════ */
-    function renderCharts(records) {
-      renderRevenueChart(records);
-      renderSalesChart(records);
-    }
-
-    function renderRevenueChart(records) {
-      const canvas = document.getElementById('revenueChart');
-      const empty  = document.getElementById('revenueChartEmpty');
-
-      // Last 10 records sorted by date ascending
-      const slice = [...records]
-        .sort((a, b) => a.date.localeCompare(b.date))
-        .slice(-10);
-
-      if (slice.length === 0) {
-        empty.innerHTML = `<svg viewBox="0 0 24 24"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg><span>No data yet</span>`;
-        empty.style.display = 'flex';
-        canvas.style.display = 'none';
-        return;
-      }
-
-      empty.style.display = 'none';
-      canvas.style.display = 'block';
-
-      const labels = slice.map(r => r.date);
-      const data   = slice.map(r => +(r.total_amount || 0).toFixed(2));
-
-      if (revenueChartInstance) revenueChartInstance.destroy();
-
-      const ctx = canvas.getContext('2d');
-      const gradient = ctx.createLinearGradient(0, 0, 0, 220);
-      gradient.addColorStop(0, 'rgba(5,150,105,0.28)');
-      gradient.addColorStop(1, 'rgba(5,150,105,0.02)');
-
-      revenueChartInstance = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels,
-          datasets: [{
-            label: 'Revenue (GH₵)',
-            data,
-            borderColor: '#059669',
-            backgroundColor: gradient,
-            borderWidth: 2.5,
-            pointBackgroundColor: '#059669',
-            pointRadius: 4,
-            pointHoverRadius: 6,
-            fill: true,
-            tension: 0.4
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: true,
-          plugins: {
-            legend: { display: false },
-            tooltip: {
-              callbacks: {
-                label: ctx => ' GH₵ ' + ctx.parsed.y.toLocaleString('en-GH', { minimumFractionDigits: 2 })
-              }
-            }
-          },
-          scales: {
-            x: {
-              grid: { display: false },
-              ticks: { font: { family: 'Outfit', size: 11 }, color: '#5E7898', maxRotation: 45 }
-            },
-            y: {
-              grid: { color: 'rgba(10,56,148,0.06)' },
-              ticks: {
-                font: { family: 'Outfit', size: 11 }, color: '#5E7898',
-                callback: v => 'GH₵ ' + v.toLocaleString()
-              }
-            }
-          }
-        }
-      });
-    }
-
-    function renderSalesChart(records) {
-      const canvas = document.getElementById('salesChart');
-      const empty  = document.getElementById('salesChartEmpty');
-
-      const truckTotal   = records.reduce((s, r) => s + (r.truck_sold    || 0), 0);
-      const aboboyaTotal = records.reduce((s, r) => s + (r.aboboya_sold  || 0), 0);
-      const factoryTotal = records.reduce((s, r) => s + (r.factory_sold  || 0), 0);
-      const total        = truckTotal + aboboyaTotal + factoryTotal;
-
-      if (total === 0) {
-        empty.innerHTML = `<svg viewBox="0 0 24 24"><path d="M11 2v20c-5.07-.5-9-4.79-9-10s3.93-9.5 9-10zm2.03 0v8.99H22c-.47-4.74-4.24-8.52-8.97-8.99zm0 11.01V22c4.74-.47 8.5-4.25 8.97-8.99h-8.97z"/></svg><span>No sales data yet</span>`;
-        empty.style.display = 'flex';
-        canvas.style.display = 'none';
-        return;
-      }
-
-      empty.style.display = 'none';
-      canvas.style.display = 'block';
-
-      if (salesChartInstance) salesChartInstance.destroy();
-
-      salesChartInstance = new Chart(document.getElementById('salesChart').getContext('2d'), {
-        type: 'doughnut',
-        data: {
-          labels: ['Truck Sales', 'Aboboya Sales', 'Factory Sales'],
-          datasets: [{
-            data: [truckTotal, aboboyaTotal, factoryTotal],
-            backgroundColor: ['#0A3894', '#00B5EF', '#059669'],
-            borderColor: ['#fff', '#fff', '#fff'],
-            borderWidth: 3,
-            hoverOffset: 8
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: true,
-          cutout: '68%',
-          plugins: {
-            legend: {
-              position: 'bottom',
-              labels: {
-                font: { family: 'Outfit', size: 11 },
-                color: '#3D5A80',
-                padding: 14,
-                usePointStyle: true,
-                pointStyleWidth: 8
-              }
-            },
-            tooltip: {
-              callbacks: {
-                label: ctx => ` ${ctx.label}: ${ctx.parsed.toLocaleString()} bags (${((ctx.parsed/total)*100).toFixed(1)}%)`
-              }
-            }
-          }
-        }
-      });
-    }
-
-    /* ════════════════════════════════════════════
-       LEDGER — FETCH
-       ════════════════════════════════════════════ */
+    // ──────────────────────────────────────────
+    //  Fetch Ledger (source of truth for table + charts)
+    // ──────────────────────────────────────────
     async function fetchLedger() {
       const tbody = document.getElementById('ledgerTableBody');
-      tbody.innerHTML = `<tr><td colspan="20" style="text-align:center;color:#94A3B8;padding:40px;">
-        <svg viewBox="0 0 24 24" style="width:24px;height:24px;fill:#C4D2E8;animation:spin 1s linear infinite;display:inline-block;"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>
-        <br><span style="font-size:0.82rem;margin-top:8px;display:inline-block;">Loading records...</span>
-      </td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="20" style="text-align:center;color:#94A3B8;padding:30px;">Loading...</td></tr>`;
 
       try {
         const res = await fetch('/api/admin/ledger', { credentials: 'same-origin' });
@@ -917,164 +482,303 @@
         ledgerRecords = await res.json();
         updateStats(ledgerRecords);
         renderCharts(ledgerRecords);
-        filterLedger(); // apply any existing search term
+        applyLedgerFilters();
       } catch (err) {
-        tbody.innerHTML = `<tr><td colspan="20" style="text-align:center;color:#DC2626;padding:30px;font-size:0.85rem;font-weight:600;">Error loading ledger. Session may have expired.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="20" style="text-align:center;color:#DC2626;padding:30px;font-weight:600;">Error loading ledger. Access may be restricted or session expired.</td></tr>`;
       }
     }
 
-    /* ════════════════════════════════════════════
-       LEDGER — FILTER / SEARCH
-       ════════════════════════════════════════════ */
-    function filterLedger() {
-      const query  = (document.getElementById('ledgerSearch').value || '').toLowerCase().trim();
-      const status = document.getElementById('statusFilter').value;
-
-      filteredLedger = ledgerRecords.filter(r => {
-        const matchStatus = !status || r.factory_status === status;
-        const matchQuery  = !query ||
-          (r.date || '').toLowerCase().includes(query) ||
-          (r.workers_name || '').toLowerCase().includes(query) ||
-          (r.comments || '').toLowerCase().includes(query);
-        return matchStatus && matchQuery;
-      });
-
-      renderLedgerTable(filteredLedger);
-    }
-
+    // ──────────────────────────────────────────
+    //  Render Ledger Table (accepts a pre-filtered array)
+    // ──────────────────────────────────────────
     function renderLedgerTable(rows) {
       const tbody = document.getElementById('ledgerTableBody');
-      const count = document.getElementById('ledgerCount');
-      count.textContent = rows.length + ' record' + (rows.length !== 1 ? 's' : '');
+      const countEl = document.getElementById('ledgerResultCount');
 
-      if (rows.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="20" style="text-align:center;color:#94A3B8;padding:40px;font-size:0.85rem;">No records match your search.</td></tr>`;
+      if (ledgerRecords.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="20" style="text-align:center;color:#94A3B8;padding:30px;">No ledger records yet. Employees will submit data daily.</td></tr>`;
+        countEl.textContent = '';
         return;
       }
+
+      if (rows.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="20" style="text-align:center;color:#94A3B8;padding:30px;">No records match your search/filter.</td></tr>`;
+        countEl.textContent = `0 of ${ledgerRecords.length} records shown`;
+        return;
+      }
+
+      countEl.textContent = rows.length === ledgerRecords.length
+        ? `${ledgerRecords.length} records`
+        : `${rows.length} of ${ledgerRecords.length} records shown`;
 
       tbody.innerHTML = '';
       rows.forEach((row, i) => {
         const tr = document.createElement('tr');
         const statusClass = row.factory_status === 'Open' ? 'status-open' : 'status-closed';
         tr.innerHTML = `
-          <td style="color:#94A3B8;font-size:0.75rem;">${i + 1}</td>
-          <td style="font-weight:800;color:#0A3894;white-space:nowrap;">${row.date}</td>
+          <td style="color:#94A3B8; font-size:0.75rem;">${i + 1}</td>
+          <td style="font-weight:700; color:#0A3894; white-space:nowrap;">${row.date}</td>
           <td><span class="status-badge-table ${statusClass}">${row.factory_status}</span></td>
           <td>${(row.total_produced || 0).toLocaleString()}</td>
           <td>${(row.bags_in_storage || 0).toLocaleString()}</td>
           <td>${(row.truck_sent_out || 0).toLocaleString()}</td>
           <td>${(row.truck_sold || 0).toLocaleString()}</td>
-          <td style="color:#DC2626;font-weight:700;">${row.leakages || 0}</td>
+          <td style="color:#DC2626; font-weight:700;">${row.leakages || 0}</td>
           <td>${(row.aboboya_sold || 0).toLocaleString()}</td>
           <td>${(row.factory_sold || 0).toLocaleString()}</td>
           <td>GH₵ ${(row.price_per_bag || 0).toFixed(2)}</td>
-          <td style="font-weight:800;color:#059669;">GH₵ ${(row.total_amount || 0).toFixed(2)}</td>
+          <td style="font-weight:800; color:#128C7E;">GH₵ ${(row.total_amount || 0).toFixed(2)}</td>
           <td>GH₵ ${(row.fuel_expenses || 0).toFixed(2)}</td>
           <td>GH₵ ${(row.other_expenses || 0).toFixed(2)}</td>
           <td>GH₵ ${(row.cash_withdrawn || 0).toFixed(2)}</td>
           <td style="font-weight:700;">GH₵ ${(row.cash_at_hand || 0).toFixed(2)}</td>
           <td>GH₵ ${(row.cash_at_bank || 0).toFixed(2)}</td>
-          <td style="font-style:italic;font-weight:600;">${escHtml(row.workers_name || '')}</td>
-          <td style="max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${escHtml(row.comments || '')}">${escHtml(row.comments || '')}</td>
-          <td><button class="btn-del" onclick="confirmDeleteLedger(${row.id}, '${escHtml(row.date)}')">✕ Del</button></td>
+          <td style="font-style:italic; font-weight:600;">${escHtml(row.workers_name || '')}</td>
+          <td style="max-width:120px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${escHtml(row.comments || '')}">${escHtml(row.comments || '')}</td>
+          <td>
+            <button class="btn-del" onclick="confirmDeleteLedger(${row.id}, '${escHtml(row.date)}')">✕ Del</button>
+          </td>
         `;
         tbody.appendChild(tr);
       });
     }
 
-    /* ════════════════════════════════════════════
-       LEDGER — DELETE
-       ════════════════════════════════════════════ */
-    function confirmDeleteLedger(id, date) {
-      showModal('Delete Ledger Entry', `Permanently delete the record for ${date}? This cannot be undone.`, async () => {
-        try {
-          const res = await fetch(`/api/admin/ledger/${id}`, { method: 'DELETE', credentials: 'same-origin' });
-          const data = await res.json();
-          if (res.ok) { showToast(`Record for ${date} deleted.`); fetchLedger(); }
-          else { showToast(data.error || 'Delete failed.', false); }
-        } catch { showToast('Network error.', false); }
+    // ──────────────────────────────────────────
+    //  Live Search & Status Filter
+    // ──────────────────────────────────────────
+    function applyLedgerFilters() {
+      const q = (document.getElementById('ledgerSearch').value || '').trim().toLowerCase();
+      const status = document.getElementById('ledgerStatusFilter').value;
+
+      const filtered = ledgerRecords.filter(r => {
+        if (status && r.factory_status !== status) return false;
+        if (!q) return true;
+        const haystack = `${r.date} ${r.workers_name || ''} ${r.comments || ''}`.toLowerCase();
+        return haystack.includes(q);
       });
+
+      renderLedgerTable(filtered);
     }
 
-    /* ════════════════════════════════════════════
-       EMPLOYEES — FETCH
-       ════════════════════════════════════════════ */
+    document.getElementById('ledgerSearch').addEventListener('input', applyLedgerFilters);
+    document.getElementById('ledgerStatusFilter').addEventListener('change', applyLedgerFilters);
+
+    // ──────────────────────────────────────────
+    //  Accordion: tuck the heavy table away by default
+    // ──────────────────────────────────────────
+    function toggleLedgerAccordion() {
+      const toggle = document.getElementById('ledgerAccordionToggle');
+      const body   = document.getElementById('ledgerAccordionBody');
+      const isOpen = body.classList.toggle('open');
+      toggle.classList.toggle('open', isOpen);
+    }
+
+    // ──────────────────────────────────────────
+    //  Power BI–style Charts (Chart.js)
+    // ──────────────────────────────────────────
+    let trendChartInstance = null;
+    let channelChartInstance = null;
+
+    function renderCharts(records) {
+      if (typeof Chart === 'undefined') return; // CDN still loading / blocked
+
+      // Trend chart: last 14 entries by date, oldest → newest
+      const sorted = [...records].sort((a, b) => a.date.localeCompare(b.date));
+      const recent = sorted.slice(-14);
+
+      const trendCanvas = document.getElementById('trendChart');
+      const trendEmpty  = document.getElementById('trendChartEmpty');
+      if (recent.length === 0) {
+        trendCanvas.style.display = 'none';
+        trendEmpty.style.display = 'block';
+      } else {
+        trendCanvas.style.display = 'block';
+        trendEmpty.style.display = 'none';
+        const labels = recent.map(r => r.date);
+        const produced = recent.map(r => r.total_produced || 0);
+        const revenue = recent.map(r => r.total_amount || 0);
+
+        if (trendChartInstance) trendChartInstance.destroy();
+        trendChartInstance = new Chart(trendCanvas.getContext('2d'), {
+          type: 'line',
+          data: {
+            labels,
+            datasets: [
+              {
+                label: 'Bags Produced',
+                data: produced,
+                borderColor: '#0A3894',
+                backgroundColor: 'rgba(10,56,148,0.08)',
+                yAxisID: 'y',
+                tension: 0.3,
+                fill: true
+              },
+              {
+                label: 'Revenue (GH₵)',
+                data: revenue,
+                borderColor: '#128C7E',
+                backgroundColor: 'rgba(18,140,126,0.08)',
+                yAxisID: 'y1',
+                tension: 0.3,
+                fill: true
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            scales: {
+              y:  { type: 'linear', position: 'left',  title: { display: true, text: 'Bags' } },
+              y1: { type: 'linear', position: 'right', title: { display: true, text: 'GH₵' }, grid: { drawOnChartArea: false } }
+            },
+            plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } }
+          }
+        });
+      }
+
+      // Channel distribution chart: aggregate totals across all records
+      const totals = records.reduce((acc, r) => {
+        acc.truck += r.truck_sold || 0;
+        acc.aboboya += r.aboboya_sold || 0;
+        acc.factory += r.factory_sold || 0;
+        return acc;
+      }, { truck: 0, aboboya: 0, factory: 0 });
+
+      const channelCanvas = document.getElementById('channelChart');
+      const channelEmpty  = document.getElementById('channelChartEmpty');
+      const grandTotal = totals.truck + totals.aboboya + totals.factory;
+
+      if (grandTotal === 0) {
+        channelCanvas.style.display = 'none';
+        channelEmpty.style.display = 'block';
+      } else {
+        channelCanvas.style.display = 'block';
+        channelEmpty.style.display = 'none';
+
+        if (channelChartInstance) channelChartInstance.destroy();
+        channelChartInstance = new Chart(channelCanvas.getContext('2d'), {
+          type: 'doughnut',
+          data: {
+            labels: ['Truck Sold', 'Aboboya Sold', 'Factory Sold'],
+            datasets: [{
+              data: [totals.truck, totals.aboboya, totals.factory],
+              backgroundColor: ['#0A3894', '#00B5EF', '#FFC20E'],
+              borderWidth: 0
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } }
+          }
+        });
+      }
+    }
+
+    // ──────────────────────────────────────────
+    //  Delete Ledger Entry
+    // ──────────────────────────────────────────
+    function confirmDeleteLedger(id, date) {
+      showModal(
+        'Delete Ledger Entry',
+        `Are you sure you want to permanently delete the record for ${date}? This cannot be undone.`,
+        async () => {
+          try {
+            const res = await fetch(`/api/admin/ledger/${id}`, {
+              method: 'DELETE',
+              credentials: 'same-origin'
+            });
+            const data = await res.json();
+            if (res.ok) {
+              showToast(`Record for ${date} deleted.`);
+              fetchLedger();
+            } else {
+              showToast(data.error || 'Delete failed.', false);
+            }
+          } catch {
+            showToast('Network error. Could not delete.', false);
+          }
+        }
+      );
+    }
+
+    // ──────────────────────────────────────────
+    //  Fetch & Render Employee Directory
+    // ──────────────────────────────────────────
     async function fetchEmployees() {
       const listDiv = document.getElementById('employeeList');
-      listDiv.innerHTML = `<div style="text-align:center;color:#94A3B8;padding:24px;font-size:0.85rem;">Loading...</div>`;
+      listDiv.innerHTML = `<div style="text-align:center;color:#94A3B8;padding:20px;">Loading...</div>`;
 
       try {
         const res = await fetch('/api/admin/employees', { credentials: 'same-origin' });
         if (!res.ok) throw new Error('Access denied');
-        allEmployees = await res.json();
+        const users = await res.json();
 
         document.getElementById('statEmployees').textContent =
-          allEmployees.filter(u => u.role === 'employee').length;
+          users.filter(u => u.role === 'employee').length;
 
-        filterEmployees();
+        if (users.length === 0) {
+          listDiv.innerHTML = `<div style="text-align:center;color:#94A3B8;padding:20px;">No users in the system.</div>`;
+          return;
+        }
+
+        listDiv.innerHTML = '';
+        users.forEach(u => {
+          const isAdmin = u.role === 'admin';
+          const div = document.createElement('div');
+          div.className = 'employee-item';
+          div.innerHTML = `
+            <div class="emp-info">
+              <span class="emp-name">${escHtml(u.name)}</span>
+              <span class="emp-email">${escHtml(u.email)}</span>
+            </div>
+            <div class="emp-actions">
+              <span class="emp-role" style="${isAdmin ? 'background:rgba(180,83,9,0.12); color:#B45309;' : ''}">${u.role}</span>
+              ${!isAdmin ? `<button class="btn-del" onclick="confirmDeleteEmployee(${u.id}, '${escHtml(u.name)}')">✕</button>` : ''}
+            </div>
+          `;
+          listDiv.appendChild(div);
+        });
+
       } catch {
-        listDiv.innerHTML = `<div style="text-align:center;color:#DC2626;padding:24px;font-weight:600;">Access Denied.</div>`;
+        listDiv.innerHTML = `<div style="text-align:center;color:#DC2626;padding:20px;font-weight:600;">Access Denied.</div>`;
       }
     }
 
-    /* ════════════════════════════════════════════
-       EMPLOYEES — FILTER / SEARCH
-       ════════════════════════════════════════════ */
-    function filterEmployees() {
-      const q = (document.getElementById('empSearch')?.value || '').toLowerCase().trim();
-      const list = q
-        ? allEmployees.filter(u =>
-            (u.name || '').toLowerCase().includes(q) ||
-            (u.email || '').toLowerCase().includes(q))
-        : allEmployees;
-      renderEmployeeList(list);
-    }
-
-    function renderEmployeeList(users) {
-      const listDiv = document.getElementById('employeeList');
-      if (users.length === 0) {
-        listDiv.innerHTML = `<div style="text-align:center;color:#94A3B8;padding:24px;">No users match your search.</div>`;
-        return;
-      }
-      listDiv.innerHTML = '';
-      users.forEach(u => {
-        const isAdmin = u.role === 'admin';
-        const div = document.createElement('div');
-        div.className = 'employee-item';
-        div.innerHTML = `
-          <div class="emp-info">
-            <span class="emp-name">${escHtml(u.name)}</span>
-            <span class="emp-email">${escHtml(u.email)}</span>
-          </div>
-          <div class="emp-actions">
-            <span class="emp-role" style="${isAdmin ? 'background:rgba(245,158,11,0.12);color:#92400E;' : ''}">${u.role}</span>
-            ${!isAdmin ? `<button class="btn-del" onclick="confirmDeleteEmployee(${u.id}, '${escHtml(u.name)}')">✕</button>` : ''}
-          </div>
-        `;
-        listDiv.appendChild(div);
-      });
-    }
-
-    /* ════════════════════════════════════════════
-       EMPLOYEES — DELETE
-       ════════════════════════════════════════════ */
+    // ──────────────────────────────────────────
+    //  Delete Employee
+    // ──────────────────────────────────────────
     function confirmDeleteEmployee(id, name) {
-      showModal('Remove Employee', `Remove "${name}" from the system? They will no longer be able to log in.`, async () => {
-        try {
-          const res = await fetch(`/api/admin/employees/${id}`, { method: 'DELETE', credentials: 'same-origin' });
-          const data = await res.json();
-          if (res.ok) { showToast(`${name} removed successfully.`); fetchEmployees(); }
-          else { showToast(data.error || 'Could not remove employee.', false); }
-        } catch { showToast('Network error.', false); }
-      });
+      showModal(
+        'Remove Employee',
+        `Remove "${name}" from the system? They will no longer be able to log in. This cannot be undone.`,
+        async () => {
+          try {
+            const res = await fetch(`/api/admin/employees/${id}`, {
+              method: 'DELETE',
+              credentials: 'same-origin'
+            });
+            const data = await res.json();
+            if (res.ok) {
+              showToast(`${name} removed successfully.`);
+              fetchEmployees();
+            } else {
+              showToast(data.error || 'Could not remove employee.', false);
+            }
+          } catch {
+            showToast('Network error. Could not remove.', false);
+          }
+        }
+      );
     }
 
-    /* ════════════════════════════════════════════
-       EMPLOYEES — REGISTER
-       ════════════════════════════════════════════ */
+    // ──────────────────────────────────────────
+    //  Register New Employee
+    // ──────────────────────────────────────────
     document.getElementById('employeeForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const btn      = document.getElementById('btnRegEmployee');
+      const btn = document.getElementById('btnRegEmployee');
       const name     = document.getElementById('empName').value.trim();
       const email    = document.getElementById('empEmail').value.trim();
       const password = document.getElementById('empPassword').value;
@@ -1101,27 +805,29 @@
         showToast('Network error. Registration failed.', false);
       } finally {
         btn.disabled = false;
-        btn.innerHTML = `<svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:currentColor;"><path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg> Register Worker`;
+        btn.textContent = 'Register Worker';
       }
     });
 
-    /* ════════════════════════════════════════════
-       CSV EXPORT
-       ════════════════════════════════════════════ */
+    // ──────────────────────────────────────────
+    //  CSV Export (triggers browser download)
+    // ──────────────────────────────────────────
     document.getElementById('btnExportCSV').addEventListener('click', () => {
-      const exportData = filteredLedger.length > 0 ? filteredLedger : ledgerRecords;
-      if (exportData.length === 0) { showToast('No records to export yet.', false); return; }
+      if (ledgerRecords.length === 0) {
+        showToast('No records to export yet.', false);
+        return;
+      }
 
       const headers = [
-        'Date','Factory Status','Total Bags Produced','Bags in Storage',
-        'Bags Sent by Truck','Bags Sold by Truck','Bags Leakage',
-        'Aboboya Sold','Factory Sold','Price Per Bag (GH₵)',
-        'Total Revenue (GH₵)','Fuel Expenses (GH₵)','Other Expenses (GH₵)',
-        'Cash Withdrawal (GH₵)','Cash at Hand (GH₵)','Cash at Bank (GH₵)',
-        'Names of Workers','Comments','Recorded At'
+        'Date', 'Factory Status', 'Total Bags Produced', 'Bags in Storage',
+        'Bags Sent by Truck', 'Bags Sold by Truck', 'Bags Leakage',
+        'Aboboya Sold', 'Factory Sold', 'Price Per Bag (GH₵)',
+        'Total Revenue (GH₵)', 'Fuel Expenses (GH₵)', 'Other Expenses (GH₵)',
+        'Cash Withdrawal (GH₵)', 'Cash at Hand (GH₵)', 'Cash at Bank (GH₵)',
+        'Names of Workers', 'Comments', 'Recorded At'
       ];
 
-      const rows = exportData.map(r => [
+      const rows = ledgerRecords.map(r => [
         r.date, r.factory_status, r.total_produced, r.bags_in_storage,
         r.truck_sent_out, r.truck_sold, r.leakages, r.aboboya_sold,
         r.factory_sold, (r.price_per_bag || 0).toFixed(2),
@@ -1133,37 +839,42 @@
         r.created_at || ''
       ].join(','));
 
-      const csv  = '\uFEFF' + [headers.join(','), ...rows].join('\n');
+      const csv = '\uFEFF' + [headers.join(','), ...rows].join('\n'); // BOM for Excel compatibility
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const url  = URL.createObjectURL(blob);
       const a    = document.createElement('a');
+      const date = new Date().toISOString().slice(0, 10);
+
       a.href = url;
-      a.download = `moor_water_ledger_${new Date().toISOString().slice(0,10)}.csv`;
+      a.download = `moor_water_ledger_${date}.csv`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      showToast(`✓ Exported ${exportData.length} record(s) to CSV.`);
+      showToast(`✓ Ledger exported — ${ledgerRecords.length} records saved to your device.`);
     });
 
+    // Refresh button
     document.getElementById('btnRefreshLedger').addEventListener('click', fetchLedger);
 
-    /* ════════════════════════════════════════════
-       UTILITY
-       ════════════════════════════════════════════ */
+    // ──────────────────────────────────────────
+    //  Utility: escape HTML to prevent XSS
+    // ──────────────────────────────────────────
     function escHtml(str) {
       return String(str)
-        .replace(/&/g, '&amp;').replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
         .replace(/'/g, '&#39;');
     }
 
-    /* ════════════════════════════════════════════
-       INIT
-       ════════════════════════════════════════════ */
+    // ──────────────────────────────────────────
+    //  Initial Load
+    // ──────────────────────────────────────────
     window.addEventListener('DOMContentLoaded', () => {
       fetchLedger();
-      fetchEmployees();
+      fetchEmployees(); // Pre-fetch for stat count
     });
   </script>
 </body>
