@@ -1,10 +1,10 @@
 """
 db.py — Multi-platform database abstraction for the Moor Water Ledger app.
-
+ 
 This module lets the rest of the codebase write ordinary SQLite-style
 queries (using '?' placeholders and dict-like rows) while transparently
 supporting three deployment targets:
-
+ 
   1. PostgreSQL   — set DATABASE_URL (e.g. Render/Railway/Vercel Postgres,
                      Supabase, Neon, etc.) Recommended for Render & Vercel,
                      since both platforms use ephemeral/serverless
@@ -19,17 +19,17 @@ supporting three deployment targets:
                      PythonAnywhere — the same file the app has always used.
                      Override with the DB_PATH env var if you need to point
                      somewhere else.
-
+ 
 Resolution order: DATABASE_URL > DB_HOST > SQLite fallback.
 """
-
+ 
 import os
 import sqlite3
-
+ 
 # ─────────────────────────────────────────────
 #  Connection resolution
 # ─────────────────────────────────────────────
-
+ 
 # The project root — the directory this file (db.py) lives in. On
 # PythonAnywhere this is /home/<username>/<project>/, so BASE_DIR/database.db
 # resolves to the exact same file the app has always read/written, with no
@@ -37,8 +37,8 @@ import sqlite3
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 _DEFAULT_SQLITE_PATH = os.path.join(BASE_DIR, 'database.db')
 _sqlite_path_logged = {}
-
-
+ 
+ 
 def _resolve_sqlite_path():
     """
     Pick the SQLite path. Always prefers an explicit DB_PATH override;
@@ -50,18 +50,18 @@ def _resolve_sqlite_path():
     if explicit:
         return explicit
     return _DEFAULT_SQLITE_PATH
-
-
+ 
+ 
 class DBConnection:
     """
     Thin wrapper so the rest of the app can call conn.execute('... ? ...', params)
     regardless of the underlying engine, and get back dict-like rows.
     """
-
+ 
     def __init__(self, raw_conn, engine):
         self._conn = raw_conn
         self.engine = engine  # 'sqlite' | 'mysql' | 'postgres'
-
+ 
     def execute(self, query, params=None):
         cur = self._conn.cursor()
         q = query
@@ -69,17 +69,17 @@ class DBConnection:
             q = q.replace('?', '%s')
         cur.execute(q, params if params is not None else ())
         return cur
-
+ 
     def commit(self):
         self._conn.commit()
-
+ 
     def rollback(self):
         self._conn.rollback()
-
+ 
     def close(self):
         self._conn.close()
-
-
+ 
+ 
 def get_db_connection():
     """
     Returns a DBConnection. Resolution order:
@@ -89,7 +89,7 @@ def get_db_connection():
     """
     database_url = os.environ.get('DATABASE_URL')
     db_host = os.environ.get('DB_HOST')
-
+ 
     if database_url:
         import psycopg2
         import psycopg2.extras
@@ -98,7 +98,7 @@ def get_db_connection():
             cursor_factory=psycopg2.extras.RealDictCursor
         )
         return DBConnection(conn, 'postgres')
-
+ 
     if db_host:
         import pymysql
         import pymysql.cursors
@@ -107,11 +107,11 @@ def get_db_connection():
         db_name = os.environ.get('DB_NAME')
         db_port = int(os.environ.get('DB_PORT', 4000))
         db_ssl_ca = os.environ.get('DB_SSL_CA')
-
+ 
         ssl_config = {'ssl': {}}
         if db_ssl_ca:
             ssl_config = {'ssl': {'ca': db_ssl_ca}}
-
+ 
         conn = pymysql.connect(
             host=db_host,
             user=db_user,
@@ -123,7 +123,7 @@ def get_db_connection():
             autocommit=False,
         )
         return DBConnection(conn, 'mysql')
-
+ 
     db_path = _resolve_sqlite_path()
     if not _sqlite_path_logged.get('done'):
         exists = os.path.isfile(db_path)
@@ -136,8 +136,8 @@ def get_db_connection():
     conn.execute("PRAGMA journal_mode=WAL")
     conn.execute("PRAGMA foreign_keys=ON")
     return DBConnection(conn, 'sqlite')
-
-
+ 
+ 
 def is_integrity_error(exc):
     """
     Detect a duplicate/unique-constraint violation regardless of which
@@ -152,8 +152,8 @@ def is_integrity_error(exc):
     return any(s in msg for s in (
         'unique constraint', 'duplicate entry', 'duplicate key', 'unique violation'
     ))
-
-
+ 
+ 
 def current_engine():
     """Report which engine get_db_connection() would currently use, without opening one."""
     if os.environ.get('DATABASE_URL'):
@@ -161,12 +161,12 @@ def current_engine():
     if os.environ.get('DB_HOST'):
         return 'mysql'
     return 'sqlite'
-
-
+ 
+ 
 # ─────────────────────────────────────────────
 #  DDL — per-engine table definitions
 # ─────────────────────────────────────────────
-
+ 
 def users_ddl(engine):
     if engine == 'postgres':
         return '''
@@ -197,8 +197,8 @@ def users_ddl(engine):
         role          TEXT NOT NULL CHECK(role IN ('admin', 'employee'))
     )
     '''
-
-
+ 
+ 
 def ledger_ddl(engine):
     if engine == 'postgres':
         return '''
@@ -274,45 +274,45 @@ def ledger_ddl(engine):
         created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
     '''
-
-
+ 
+ 
 # ─────────────────────────────────────────────
 #  Admin whitelist (shared by app.py + init_db.py)
 # ─────────────────────────────────────────────
-
+ 
 def get_admin_emails():
     emails = {'quayen010@gmail.com', os.environ.get('ADMIN_EMAIL_2', '').strip().lower()}
     return {e for e in emails if e}
-
-
+ 
+ 
 def get_role_for_email(email: str) -> str:
     return 'admin' if email.strip().lower() in get_admin_emails() else 'employee'
-
-
+ 
+ 
 def init_db(verbose=True):
     """Idempotent: creates tables if missing, seeds default users if the
     users table is empty, and re-syncs admin roles against the whitelist.
     Safe to call on every app startup (Render/Railway/Vercel cold start,
     PythonAnywhere reload, or manually via `python init_db.py`)."""
     from werkzeug.security import generate_password_hash
-
+ 
     conn = get_db_connection()
     engine = conn.engine
-
+ 
     def log(msg):
         if verbose:
             print(msg)
-
+ 
     log(f"[db] Initializing '{engine}' database...")
-
+ 
     conn.execute(users_ddl(engine))
     conn.execute(ledger_ddl(engine))
     conn.commit()
-
+ 
     cur = conn.execute("SELECT COUNT(*) AS c FROM users")
     row = cur.fetchone()
     count = row['c'] if isinstance(row, dict) or hasattr(row, 'keys') else row[0]
-
+ 
     if count == 0:
         log("[db] Seeding default users...")
         seed_users = [
@@ -333,10 +333,10 @@ def init_db(verbose=True):
         for email in get_admin_emails():
             conn.execute("UPDATE users SET role = 'admin' WHERE email = ?", (email,))
         conn.commit()
-
+ 
     conn.close()
     log("[db] Initialization complete.")
-
-
+ 
+ 
 if __name__ == '__main__':
     init_db()
