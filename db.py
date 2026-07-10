@@ -13,8 +13,12 @@ supporting three deployment targets:
                      optionally DB_SSL_CA). Good for TiDB Serverless.
   3. SQLite (default) — zero setup, file-based. Works great on a VPS or on
                      PythonAnywhere, where the filesystem is persistent.
-                     Falls back to DB_PATH env var, or a sensible default
-                     for PythonAnywhere-style paths.
+                     Defaults to `database.db` sitting right next to this
+                     file (i.e. the project root), which is exactly
+                     `/home/<username>/<project>/database.db` on
+                     PythonAnywhere — the same file the app has always used.
+                     Override with the DB_PATH env var if you need to point
+                     somewhere else.
 
 Resolution order: DATABASE_URL > DB_HOST > SQLite fallback.
 """
@@ -26,31 +30,26 @@ import sqlite3
 #  Connection resolution
 # ─────────────────────────────────────────────
 
-# PythonAnywhere convention: /home/<username>/<project>/<db file>.
-# Override any of these via env vars in real deployments.
-_PYTHONANYWHERE_DEFAULT_DB_PATH = os.environ.get(
-    'PYTHONANYWHERE_DB_PATH',
-    os.path.join(
-        os.path.expanduser('~'), 'moore_water', 'moore_water.db'
-    )
-)
+# The project root — the directory this file (db.py) lives in. On
+# PythonAnywhere this is /home/<username>/<project>/, so BASE_DIR/database.db
+# resolves to the exact same file the app has always read/written, with no
+# username hardcoded.
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+_DEFAULT_SQLITE_PATH = os.path.join(BASE_DIR, 'database.db')
+_sqlite_path_logged = {}
 
 
 def _resolve_sqlite_path():
-    """Pick a sensible SQLite path across local dev / PythonAnywhere / VPS."""
+    """
+    Pick the SQLite path. Always prefers an explicit DB_PATH override;
+    otherwise always resolves to the existing `database.db` sitting next to
+    app.py/db.py, so it seamlessly attaches to whatever database is already
+    there instead of ever silently creating a new, differently-named file.
+    """
     explicit = os.environ.get('DB_PATH')
     if explicit:
         return explicit
-
-    # On PythonAnywhere the app is typically deployed under
-    # /home/<username>/<project_dir>. If that directory structure exists,
-    # prefer it so the DB survives across web app reloads.
-    if os.path.isdir(os.path.dirname(_PYTHONANYWHERE_DEFAULT_DB_PATH)):
-        return _PYTHONANYWHERE_DEFAULT_DB_PATH
-
-    # Local dev / Render+Disk / Railway+Volume / VPS: DB lives alongside the app.
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-    return os.path.join(base_dir, 'database.db')
+    return _DEFAULT_SQLITE_PATH
 
 
 class DBConnection:
@@ -126,6 +125,11 @@ def get_db_connection():
         return DBConnection(conn, 'mysql')
 
     db_path = _resolve_sqlite_path()
+    if not _sqlite_path_logged.get('done'):
+        exists = os.path.isfile(db_path)
+        print(f"[db] Using SQLite file: {db_path} "
+              f"({'found existing data' if exists else 'no existing file — a new one will be created here'})")
+        _sqlite_path_logged['done'] = True
     os.makedirs(os.path.dirname(db_path) or '.', exist_ok=True)
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
