@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Moor Water — Secure Login</title>
+  <meta name="description" content="Secure login for Moor Natural Mineral Water Daily Ledger System">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0A3894">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/svg+xml" href="/static/icon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+  <style>
+    html, body {
+      height: auto;
+      min-height: 100%;
+    }
+    body {
+      background: linear-gradient(135deg, #002270 0%, #0A3894 50%, #1A4EB5 100%);
+      justify-content: center;
+      align-items: center;
+      display: flex;
+      min-height: 100vh;
+      min-height: 100dvh;
+      padding: 20px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* On short/mobile viewports let the card sit at the top and scroll
+       naturally instead of being vertically centered and clipped. */
+    @media (max-height: 700px), (max-width: 480px) {
+      body {
+        align-items: flex-start;
+        padding-top: max(20px, var(--safe-top, 20px));
+      }
+    }
+
+    .login-wrap {
+      width: 100%;
+      max-width: 440px;
+    }
+
+    .login-card {
+      background: rgba(255, 255, 255, 0.97);
+      backdrop-filter: blur(20px);
+      border-radius: 24px;
+      padding: 36px 28px 28px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+    }
+
+    .login-logo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    .login-logo svg { width: 80px; height: 80px; }
+
+    /* Role selector tabs */
+    .role-selector {
+      display: flex;
+      background: #F1F5F9;
+      border-radius: 10px;
+      padding: 4px;
+      margin-bottom: 24px;
+      gap: 4px;
+      border: 1px solid #E2E8F0;
+    }
+    .role-btn {
+      flex: 1;
+      padding: 10px 8px;
+      border: none;
+      background: transparent;
+      border-radius: 7px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      font-family: 'Outfit', sans-serif;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: #64748B;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .role-btn svg {
+      width: 15px;
+      height: 15px;
+      fill: currentColor;
+    }
+    .role-btn.active {
+      background: white;
+      color: #0A3894;
+      box-shadow: 0 2px 8px rgba(10, 56, 148, 0.12);
+    }
+    .role-btn.active.admin-active {
+      color: #B45309;
+      background: #FFFBEB;
+    }
+
+    /* Role info banner */
+    .role-info {
+      background: rgba(10, 56, 148, 0.07);
+      border: 1px solid rgba(10, 56, 148, 0.15);
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin-bottom: 18px;
+      font-size: 0.78rem;
+      color: #334155;
+      font-weight: 500;
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      transition: all 0.3s ease;
+    }
+    .role-info.admin-info {
+      background: rgba(180, 83, 9, 0.07);
+      border-color: rgba(180, 83, 9, 0.2);
+      color: #78350F;
+    }
+    .role-info svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* Prefill hint */
+    .prefill-hint {
+      font-size: 0.72rem;
+      color: #64748B;
+      text-align: right;
+      margin-top: -10px;
+      margin-bottom: 14px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .prefill-hint:hover { color: #0A3894; text-decoration: underline; }
+
+    /* Error and rate limit */
+    #loginError {
+      color: #DC2626;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-align: center;
+      margin-top: 12px;
+      padding: 8px 12px;
+      background: rgba(220, 38, 38, 0.08);
+      border-radius: 8px;
+      border: 1px solid rgba(220, 38, 38, 0.2);
+      display: none;
+    }
+
+    .divider {
+      height: 1px;
+      background: #E2E8F0;
+      margin: 24px 0 16px;
+    }
+
+    .security-note {
+      text-align: center;
+      font-size: 0.7rem;
+      color: #94A3B8;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+    .security-note svg {
+      width: 11px;
+      height: 11px;
+      fill: #94A3B8;
+    }
+
+    /* Animated loading spinner on button */
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: none;
+    }
+    .btn-primary.loading .spinner { display: inline-block; }
+    .btn-primary.loading .btn-text { display: none; }
+
+    /* Floating bubbles bg effect */
+    .bg-bubble {
+      position: fixed;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.04);
+      pointer-events: none;
+    }
+    .bg-bubble:nth-child(1) { width: 300px; height: 300px; top: -80px; right: -80px; }
+    .bg-bubble:nth-child(2) { width: 200px; height: 200px; bottom: 40px; left: -60px; }
+    .bg-bubble:nth-child(3) { width: 120px; height: 120px; top: 40%; right: 10%; }
+  </style>
+</head>
+<body>
+  <!-- Decorative background bubbles -->
+  <div class="bg-bubble"></div>
+  <div class="bg-bubble"></div>
+  <div class="bg-bubble"></div>
+
+  <div class="login-wrap">
+    <div class="login-card">
+
+      <!-- Logo & Brand -->
+      <div class="login-logo">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <path id="circlePathLogin" d="M 50 14 A 36 36 0 1 1 49.9 14" fill="none"/>
+          <text fill="#E30613" font-size="8.8" font-weight="900" letter-spacing="4.5">
+            <textPath href="#circlePathLogin" startOffset="0%">• MOOR • MOOR • MOOR • MOOR </textPath>
+          </text>
+          <circle cx="50" cy="53" r="23" fill="none" stroke="#00B5EF" stroke-width="1.5" opacity="0.4"/>
+          <path d="M 50 67 C 32 67, 26 50, 41 48 C 40 57, 45 63, 50 67 Z" fill="#00B5EF"/>
+          <path d="M 50 67 C 68 67, 74 50, 59 48 C 60 57, 55 63, 50 67 Z" fill="#0A3894"/>
+          <path d="M 50 25 C 62 42, 65 58, 50 67 C 35 58, 38 42, 50 25 Z" fill="url(#dropletGradLogin)"/>
+          <defs>
+            <linearGradient id="dropletGradLogin" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#00B5EF"/>
+              <stop offset="100%" stop-color="#0A3894"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <div>
+          <h1 class="brand-title" style="font-size: 1.35rem; color: #0A3894;">Moor Natural Mineral Water</h1>
+          <p class="brand-subtitle" style="font-size: 0.72rem;">Daily Ledger Management System</p>
+        </div>
+      </div>
+
+      <!-- ── Who are you logging in as? ── -->
+      <div class="role-selector">
+        <button class="role-btn active" id="btnRoleEmployee" onclick="setRole('employee')">
+          <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+          Employee Login
+        </button>
+        <button class="role-btn" id="btnRoleAdmin" onclick="setRole('admin')">
+          <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 4l5 2.18V11c0 3.5-2.33 6.79-5 7.93-2.67-1.14-5-4.43-5-7.93V7.18L12 5z"/></svg>
+          Admin Login
+        </button>
+      </div>
+
+      <!-- Role context banner (changes dynamically) -->
+      <div class="role-info" id="roleInfoBanner">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+        <span id="roleInfoText">Enter your employee credentials to access the daily data entry form.</span>
+      </div>
+
+      <!-- Login Form -->
+      <form id="loginForm" autocomplete="on" novalidate>
+        <div class="form-group">
+          <label for="loginEmail">Email Address</label>
+          <div class="input-wrapper">
+            <span class="input-icon">
+              <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+            </span>
+            <input type="email" id="loginEmail" name="email"
+                   placeholder="name@moorwater.com"
+                   autocomplete="email" required>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 20px;">
+          <label for="loginPassword">Password</label>
+          <div class="input-wrapper">
+            <span class="input-icon">
+              <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+            </span>
+            <input type="password" id="loginPassword" name="password"
+                   placeholder="Enter your password"
+                   autocomplete="current-password" required>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="btnSubmit">
+          <div class="spinner" id="btnSpinner"></div>
+          <span class="btn-text" id="btnText">Sign In</span>
+        </button>
+
+        <div id="loginError"></div>
+      </form>
+
+      <div class="divider"></div>
+      <div class="security-note">
+        <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+        Secured session · Encrypted passwords · Role-based access
+      </div>
+
+      <!-- New user options -->
+      <div style="margin-top: 18px; display: flex; flex-direction: column; gap: 8px;">
+        <a href="/register" class="btn btn-secondary" style="text-decoration: none; font-size: 0.85rem;">
+          <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:currentColor;"><path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+          New here? Create an Account
+        </a>
+        <a href="/preview" class="btn" style="text-decoration: none; font-size: 0.82rem; background: rgba(0,181,239,0.1); color: #0076A8; border: 1px solid rgba(0,181,239,0.3);">
+          <svg viewBox="0 0 24 24" style="width:15px;height:15px;fill:currentColor;"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+          Preview App Without Account
+        </a>
+      </div>
+    </div>
+
+    <!-- Company footer outside card -->
+    <div style="text-align: center; margin-top: 20px; color: rgba(255,255,255,0.5); font-size: 0.72rem; font-weight: 500;">
+      © 2026 Kenamos Big Brothers Ltd. · Yamfo, Ahafo Region
+    </div>
+  </div>
+
+  <script>
+    let currentRole = 'employee';
+
+    function setRole(role) {
+      currentRole = role;
+      const empBtn   = document.getElementById('btnRoleEmployee');
+      const adminBtn = document.getElementById('btnRoleAdmin');
+      const banner   = document.getElementById('roleInfoBanner');
+      const infoText = document.getElementById('roleInfoText');
+      const emailInput = document.getElementById('loginEmail');
+
+      if (role === 'admin') {
+        empBtn.classList.remove('active');
+        adminBtn.classList.add('active', 'admin-active');
+        banner.classList.add('admin-info');
+        infoText.textContent = 'Admin login grants access to the Admin Dashboard — Employee Directory, Master Ledger, and Export tools. Employees cannot access this area.';
+        emailInput.placeholder = 'admin@moorwater.com';
+      } else {
+        adminBtn.classList.remove('active', 'admin-active');
+        empBtn.classList.add('active');
+        banner.classList.remove('admin-info');
+        infoText.textContent = 'Enter your employee credentials to access the daily data entry form.';
+        emailInput.placeholder = 'name@moorwater.com';
+      }
+
+      // Clear any previous errors
+      const errDiv = document.getElementById('loginError');
+      errDiv.style.display = 'none';
+      errDiv.textContent = '';
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const email    = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+      const btnSubmit = document.getElementById('btnSubmit');
+      const errDiv   = document.getElementById('loginError');
+
+      // Client-side validation
+      if (!email || !password) {
+        showError('Please enter both email and password.');
+        return;
+      }
+
+      // Show loading state
+      btnSubmit.classList.add('loading');
+      btnSubmit.disabled = true;
+      errDiv.style.display = 'none';
+
+      try {
+        const response = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin',
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          // Successful login — route based on actual server role
+          if (data.role === 'admin') {
+            window.location.href = '/admin';
+          } else {
+            window.location.href = '/';
+          }
+        } else if (response.status === 429) {
+          showError(data.error || 'Too many failed attempts. Please wait 5 minutes.');
+        } else {
+          showError(data.error || 'Invalid credentials. Please try again.');
+          btnSubmit.classList.remove('loading');
+          btnSubmit.disabled = false;
+        }
+
+      } catch (err) {
+        showError('Network error. Check your connection and try again.');
+        btnSubmit.classList.remove('loading');
+        btnSubmit.disabled = false;
+      }
+    });
+
+    function showError(msg) {
+      const errDiv = document.getElementById('loginError');
+      errDiv.textContent = msg;
+      errDiv.style.display = 'block';
+    }
+  </script>
+</body>
+</html>
