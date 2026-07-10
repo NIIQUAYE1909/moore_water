@@ -1236,6 +1236,13 @@ footer {
 }
 .topnav-admin-badge svg { width: 10px; height: 10px; fill: #FCD34D; }
 
+/* ── Mobile: hide center badge & user chip to prevent overflow ─── */
+@media (max-width: 639px) {
+  .topnav-center { display: none; }
+  .topnav-user-chip { display: none; }
+}
+
+
 /* ═══════════════════════════════════════════════
    MOBILE NAV DRAWER
    ═══════════════════════════════════════════════ */

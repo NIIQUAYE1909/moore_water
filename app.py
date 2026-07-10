@@ -1,23 +1,16 @@
 from flask import Flask, request, jsonify, render_template, redirect, url_for, session, make_response, send_from_directory
-import sqlite3
 import os
 import time
 from collections import defaultdict
 from functools import wraps
 from werkzeug.security import check_password_hash, generate_password_hash
 
+import db as dbmod
+
 # ─────────────────────────────────────────────
 #  App Initialization
 # ─────────────────────────────────────────────
 app = Flask(__name__, template_folder='templates', static_folder='static')
-
-# ── Auto-initialize database on startup ─────────────────────
-from init_db import init_db
-try:
-    init_db()
-except Exception as e:
-    import sys
-    print(f"[DATABASE ERROR] Failed to auto-initialize SQLite database: {e}", file=sys.stderr)
 
 SECRET_KEY = os.environ.get('SECRET_KEY', None)
 if not SECRET_KEY:
@@ -37,24 +30,14 @@ app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SECURE'] = IS_PRODUCTION
 app.config['SESSION_COOKIE_SAMESITE'] = 'None' if IS_PRODUCTION else 'Lax'
 app.config['PERMANENT_SESSION_LIFETIME'] = 43200  # 12 hours
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.environ.get('DB_PATH', os.path.join(BASE_DIR, 'database.db'))
 
 # ─────────────────────────────────────────────
 #  ADMIN EMAIL WHITELIST
 #  Only these emails can have admin role.
 #  Add ADMIN_EMAIL_2 via environment variable when ready.
+#  (Shared with db.py so init_db.py stays in sync automatically.)
 # ─────────────────────────────────────────────
-ADMIN_EMAILS = {
-    'quayen010@gmail.com',
-    os.environ.get('ADMIN_EMAIL_2', '').strip().lower(),
-}
-ADMIN_EMAILS = {e for e in ADMIN_EMAILS if e}  # Remove empty strings
-
-
-def get_role_for_email(email: str) -> str:
-    """Return 'admin' if email is whitelisted, else 'employee'."""
-    return 'admin' if email.strip().lower() in ADMIN_EMAILS else 'employee'
+get_role_for_email = dbmod.get_role_for_email
 
 
 # ─────────────────────────────────────────────
@@ -95,99 +78,22 @@ def add_security_headers(response):
 
 
 # ─────────────────────────────────────────────
-#  Database Helper & Wrappers for MySQL/TiDB
+#  Database Helper
+#  Transparently targets PostgreSQL (DATABASE_URL), MySQL/TiDB (DB_HOST),
+#  or SQLite (fallback — PythonAnywhere / VPS). See db.py for details.
 # ─────────────────────────────────────────────
-class TiDBMySQLCursorWrapper:
-    def __init__(self, cursor):
-        self.cursor = cursor
-
-    def execute(self, query, params=None):
-        # Convert sqlite parameter placeholder '?' to MySQL/TiDB '%s'
-        mysql_query = query.replace('?', '%s')
-        if params is not None:
-            self.cursor.execute(mysql_query, params)
-        else:
-            self.cursor.execute(mysql_query)
-        return self
-
-    def executemany(self, query, params_list):
-        mysql_query = query.replace('?', '%s')
-        self.cursor.executemany(mysql_query, params_list)
-        return self
-
-    def fetchone(self):
-        return self.cursor.fetchone()
-
-    def fetchall(self):
-        return self.cursor.fetchall()
-
-    @property
-    def rowcount(self):
-        return self.cursor.rowcount
-
-    def close(self):
-        self.cursor.close()
-
-
-class TiDBMySQLConnectionWrapper:
-    def __init__(self, conn):
-        self.conn = conn
-
-    def cursor(self):
-        return TiDBMySQLCursorWrapper(self.conn.cursor())
-
-    def execute(self, query, params=None):
-        cursor = self.cursor()
-        cursor.execute(query, params)
-        return cursor
-
-    def executemany(self, query, params_list):
-        cursor = self.cursor()
-        cursor.executemany(query, params_list)
-        return cursor
-
-    def commit(self):
-        self.conn.commit()
-
-    def rollback(self):
-        self.conn.rollback()
-
-    def close(self):
-        self.conn.close()
-
-
 def get_db_connection():
-    db_host = os.environ.get('DB_HOST')
-    if db_host:
-        import pymysql
-        import pymysql.cursors
-        db_user = os.environ.get('DB_USER')
-        db_password = os.environ.get('DB_PASSWORD')
-        db_name = os.environ.get('DB_NAME')
-        db_port = int(os.environ.get('DB_PORT', 4000))
-        db_ssl_ca = os.environ.get('DB_SSL_CA')
-        
-        ssl_config = {'ssl': {}}
-        if db_ssl_ca:
-            ssl_config = {'ssl': {'ca': db_ssl_ca}}
-            
-        conn = pymysql.connect(
-            host=db_host,
-            user=db_user,
-            password=db_password,
-            database=db_name,
-            port=db_port,
-            cursorclass=pymysql.cursors.DictCursor,
-            ssl=ssl_config
-        )
-        return TiDBMySQLConnectionWrapper(conn)
-    else:
-        db_path = app.config.get('DB_PATH', DB_PATH)
-        conn = sqlite3.connect(db_path)
-        conn.row_factory = sqlite3.Row
-        conn.execute("PRAGMA journal_mode=WAL")
-        conn.execute("PRAGMA foreign_keys=ON")
-        return conn
+    return dbmod.get_db_connection()
+
+
+# Auto-create tables (and seed default users) on cold start. This is what
+# makes Render/Railway/Vercel deployments work without a manual SSH step,
+# and it's a harmless no-op on repeat calls (CREATE TABLE IF NOT EXISTS).
+try:
+    dbmod.init_db(verbose=True)
+except Exception as _db_init_err:
+    import warnings
+    warnings.warn(f"[db] Auto-initialization failed: {_db_init_err}", stacklevel=2)
 
 
 # ─────────────────────────────────────────────
@@ -326,9 +232,10 @@ def api_register():
             'name': name
         })
 
-    except sqlite3.IntegrityError:
-        return jsonify({'error': 'That email address is already registered. Please log in instead.'}), 400
     except Exception as e:
+        conn.rollback()
+        if dbmod.is_integrity_error(e):
+            return jsonify({'error': 'That email address is already registered. Please log in instead.'}), 400
         return jsonify({'error': f'Registration failed: {str(e)}'}), 500
     finally:
         conn.close()
@@ -541,9 +448,10 @@ def api_admin_employees():
         )
         conn.commit()
         return jsonify({'success': f'Account for "{name}" created successfully.'})
-    except sqlite3.IntegrityError:
-        return jsonify({'error': 'That email is already registered.'}), 400
     except Exception as e:
+        conn.rollback()
+        if dbmod.is_integrity_error(e):
+            return jsonify({'error': 'That email is already registered.'}), 400
         return jsonify({'error': f'Database error: {str(e)}'}), 500
     finally:
         conn.close()
@@ -556,7 +464,7 @@ def api_delete_employee(emp_id):
         return jsonify({'error': 'You cannot delete your own account.'}), 400
     conn = get_db_connection()
     try:
-        result = conn.execute('DELETE FROM users WHERE id = ? AND role = "employee"', (emp_id,))
+        result = conn.execute("DELETE FROM users WHERE id = ? AND role = 'employee'", (emp_id,))
         conn.commit()
         if result.rowcount == 0:
             return jsonify({'error': 'Employee not found.'}), 404

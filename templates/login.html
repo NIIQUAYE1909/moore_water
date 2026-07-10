@@ -17,11 +17,13 @@
       background: none;
       min-height: 100vh;
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: center;
       padding: 24px;
       position: relative;
-      overflow: hidden;
+      overflow-x: hidden;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
     body::before { display: none; }
 
@@ -71,14 +73,15 @@
       position: relative;
       z-index: 2;
       animation: slideUp 0.6s cubic-bezier(0, 0, 0.2, 1) both;
+      /* Vertical centering that still allows scroll on short screens */
+      margin: auto;
     }
 
-    /* ── Mobile: allow card to scroll if viewport is very short ── */
+    /* ── Short viewports: card scrolls naturally via body ── */
     @media (max-height: 680px) {
       .login-card {
-        max-height: calc(100vh - 48px);
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
+        /* No max-height restriction — body overflow-y:auto handles scroll */
+        overflow-y: visible;
       }
     }
 
