@@ -487,6 +487,29 @@ def api_admin_ledger():
     return jsonify([dict(r) for r in rows])
 
 
+@app.route('/api/admin/db-diagnostics', methods=['GET'])
+@login_required(role='admin')
+def api_db_diagnostics():
+    """Read-only sanity check: which DB engine/file is actually being used
+    right now, and how many rows each core table has. Handy for confirming
+    the app is attached to the database you expect, without SSH access."""
+    conn = get_db_connection()
+    info = {'engine': conn.engine}
+    if conn.engine == 'sqlite':
+        info['sqlite_path'] = dbmod._resolve_sqlite_path()
+        info['file_exists'] = os.path.isfile(info['sqlite_path'])
+    try:
+        info['users_count'] = conn.execute('SELECT COUNT(*) AS c FROM users').fetchone()['c']
+    except Exception as e:
+        info['users_count_error'] = str(e)
+    try:
+        info['ledger_count'] = conn.execute('SELECT COUNT(*) AS c FROM ledger').fetchone()['c']
+    except Exception as e:
+        info['ledger_count_error'] = str(e)
+    conn.close()
+    return jsonify(info)
+
+
 @app.route('/api/admin/ledger/<int:entry_id>', methods=['DELETE'])
 @login_required(role='admin')
 def api_delete_ledger(entry_id):
