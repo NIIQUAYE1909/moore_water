@@ -7,7 +7,7 @@ let db;
 
 // IS_GUEST is injected by the Jinja template before this script loads
 // Default to false if not set (normal logged-in mode)
-if (typeof IS_GUEST === 'undefined') { var IS_GUEST = false; }
+// if (typeof IS_GUEST === 'undefined') { var IS_GUEST = false; }
 
 // Form Elements
 const elDate          = document.getElementById('ledgerDate');
