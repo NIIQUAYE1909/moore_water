@@ -6,16 +6,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex">
   <link rel="icon" type="image/svg+xml" href="/static/icon.svg">
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Outfit', sans-serif; }
+    html, body { height: auto; min-height: 100%; }
     body {
-      background: linear-gradient(135deg, #002270 0%, #0A3894 100%);
+      background: linear-gradient(135deg, #051C42 0%, #0B2E6B 100%);
       min-height: 100vh;
+      min-height: 100dvh;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 20px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
     .card {
       background: white;
@@ -25,23 +29,53 @@
       max-width: 400px;
       width: 100%;
       box-shadow: 0 25px 60px rgba(0,0,0,0.2);
+      position: relative;
+      z-index: 1;
+    }
+    .bubble-field {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .bubble-field span {
+      position: absolute;
+      bottom: -10vh;
+      border-radius: 50%;
+      background: radial-gradient(circle at 32% 28%,
+        rgba(255, 255, 255, 0.75) 0%,
+        rgba(79, 214, 232, 0.28) 45%,
+        rgba(11, 46, 107, 0.05) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      animation: bubble-rise linear infinite;
+      will-change: transform, opacity;
+    }
+    @keyframes bubble-rise {
+      0%   { transform: translate(0, 0) scale(0.9); opacity: 0; }
+      10%  { opacity: 0.8; }
+      85%  { opacity: 0.5; }
+      100% { transform: translate(var(--drift, 20px), -115vh) scale(1.05); opacity: 0; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .bubble-field { display: none; }
     }
     .icon {
       width: 72px;
       height: 72px;
-      background: rgba(227, 6, 19, 0.08);
+      background: rgba(220, 38, 38, 0.08);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       margin: 0 auto 20px;
     }
-    .icon svg { width: 36px; height: 36px; fill: #E30613; }
-    h1 { font-size: 1.6rem; font-weight: 800; color: #0F172A; margin-bottom: 8px; }
+    .icon svg { width: 36px; height: 36px; fill: #DC2626; }
+    h1 { font-family: 'Fraunces', serif; font-size: 1.7rem; font-weight: 600; color: #0E1B33; margin-bottom: 8px; }
     p { font-size: 0.9rem; color: #64748B; line-height: 1.5; margin-bottom: 28px; }
     a {
       display: inline-block;
-      background: #0A3894;
+      background: #0B2E6B;
       color: white;
       padding: 12px 28px;
       border-radius: 8px;
@@ -50,10 +84,24 @@
       font-size: 0.9rem;
       transition: background 0.2s;
     }
-    a:hover { background: #1A4EB5; }
+    a:hover { background: #1B4FA0; }
   </style>
 </head>
 <body>
+  <div class="bubble-field" aria-hidden="true">
+    <span style="left:32.4%; width:12.0px; height:12.0px; animation-duration:21.8s; animation-delay:-18.6s; --drift:2.0px;"></span>
+    <span style="left:36.4%; width:10.0px; height:10.0px; animation-duration:20.1s; animation-delay:-19.3s; --drift:-4.0px;"></span>
+    <span style="left:8.6%; width:10.0px; height:10.0px; animation-duration:19.1s; animation-delay:-3.5s; --drift:-23.0px;"></span>
+    <span style="left:23.0%; width:24.0px; height:24.0px; animation-duration:25.4s; animation-delay:-8.5s; --drift:-6.0px;"></span>
+    <span style="left:93.8%; width:9.0px; height:9.0px; animation-duration:24.3s; animation-delay:-14.2s; --drift:-21.0px;"></span>
+    <span style="left:13.1%; width:16.0px; height:16.0px; animation-duration:23.8s; animation-delay:-16.4s; --drift:5.0px;"></span>
+    <span style="left:62.1%; width:18.0px; height:18.0px; animation-duration:20.6s; animation-delay:-18.7s; --drift:-26.0px;"></span>
+    <span style="left:21.4%; width:26.0px; height:26.0px; animation-duration:19.1s; animation-delay:-13.7s; --drift:5.0px;"></span>
+    <span style="left:44.6%; width:16.0px; height:16.0px; animation-duration:23.5s; animation-delay:-6.0s; --drift:-15.0px;"></span>
+    <span style="left:56.0%; width:22.0px; height:22.0px; animation-duration:24.5s; animation-delay:-5.4s; --drift:-13.0px;"></span>
+    <span style="left:94.1%; width:11.0px; height:11.0px; animation-duration:19.0s; animation-delay:-4.9s; --drift:-21.0px;"></span>
+    <span style="left:48.0%; width:9.0px; height:9.0px; animation-duration:22.0s; animation-delay:-4.7s; --drift:4.0px;"></span>
+  </div>
   <div class="card">
     <div class="icon">
       <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 11.9l-3.5-3.5 1.41-1.41L12 10.08l5.09-5.09 1.41 1.41L12 12.9z"/></svg>

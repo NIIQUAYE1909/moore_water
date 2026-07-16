@@ -5,13 +5,14 @@
   <title>Moor Water — Admin Dashboard</title>
   <meta name="description" content="Restricted Admin Portal — Moor Natural Mineral Water">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="theme-color" content="#0A3894">
+  <meta name="theme-color" content="#0B2E6B">
   <meta name="robots" content="noindex, nofollow">
   <link rel="icon" type="image/svg+xml" href="/static/icon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/css/style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js" defer></script>
   <style>
     main { max-width: 1100px; }
 
@@ -31,35 +32,6 @@
       letter-spacing: 0.5px;
     }
     .admin-shield svg { width: 12px; height: 12px; fill: #92400E; }
-
-    /* Stats summary bar */
-    .stats-bar {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 14px;
-      margin-bottom: 20px;
-    }
-    .stat-card {
-      background: white;
-      border-radius: 14px;
-      padding: 16px;
-      text-align: center;
-      border: 1px solid #E2E8F0;
-      box-shadow: 0 4px 12px rgba(10, 56, 148, 0.06);
-    }
-    .stat-val {
-      font-size: 1.6rem;
-      font-weight: 800;
-      color: #0A3894;
-      display: block;
-    }
-    .stat-lbl {
-      font-size: 0.68rem;
-      font-weight: 600;
-      color: #64748B;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
 
     /* Delete button in table */
     .btn-del {
@@ -143,6 +115,20 @@
   </style>
 </head>
 <body>
+  <div class="bubble-field" aria-hidden="true">
+    <span style="left:32.4%; width:12.0px; height:12.0px; animation-duration:21.8s; animation-delay:-18.6s; --drift:2.0px;"></span>
+    <span style="left:36.4%; width:10.0px; height:10.0px; animation-duration:20.1s; animation-delay:-19.3s; --drift:-4.0px;"></span>
+    <span style="left:8.6%; width:10.0px; height:10.0px; animation-duration:19.1s; animation-delay:-3.5s; --drift:-23.0px;"></span>
+    <span style="left:23.0%; width:24.0px; height:24.0px; animation-duration:25.4s; animation-delay:-8.5s; --drift:-6.0px;"></span>
+    <span style="left:93.8%; width:9.0px; height:9.0px; animation-duration:24.3s; animation-delay:-14.2s; --drift:-21.0px;"></span>
+    <span style="left:13.1%; width:16.0px; height:16.0px; animation-duration:23.8s; animation-delay:-16.4s; --drift:5.0px;"></span>
+    <span style="left:62.1%; width:18.0px; height:18.0px; animation-duration:20.6s; animation-delay:-18.7s; --drift:-26.0px;"></span>
+    <span style="left:21.4%; width:26.0px; height:26.0px; animation-duration:19.1s; animation-delay:-13.7s; --drift:5.0px;"></span>
+    <span style="left:44.6%; width:16.0px; height:16.0px; animation-duration:23.5s; animation-delay:-6.0s; --drift:-15.0px;"></span>
+    <span style="left:56.0%; width:22.0px; height:22.0px; animation-duration:24.5s; animation-delay:-5.4s; --drift:-13.0px;"></span>
+    <span style="left:94.1%; width:11.0px; height:11.0px; animation-duration:19.0s; animation-delay:-4.9s; --drift:-21.0px;"></span>
+    <span style="left:48.0%; width:9.0px; height:9.0px; animation-duration:22.0s; animation-delay:-4.7s; --drift:4.0px;"></span>
+  </div>
 
   <!-- Admin session badge -->
   <div class="user-badge">
@@ -155,17 +141,17 @@
       <div class="logo-container">
         <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
           <path id="circlePathAdmin" d="M 50 14 A 36 36 0 1 1 49.9 14" fill="none"/>
-          <text fill="#E30613" font-size="8.8" font-weight="900" letter-spacing="4.5">
+          <text fill="#EDA13C" font-size="8.8" font-weight="900" letter-spacing="4.5">
             <textPath href="#circlePathAdmin" startOffset="0%">• MOOR • MOOR • MOOR • MOOR </textPath>
           </text>
-          <circle cx="50" cy="53" r="23" fill="none" stroke="#00B5EF" stroke-width="1.5" opacity="0.4"/>
-          <path d="M 50 67 C 32 67, 26 50, 41 48 C 40 57, 45 63, 50 67 Z" fill="#00B5EF"/>
-          <path d="M 50 67 C 68 67, 74 50, 59 48 C 60 57, 55 63, 50 67 Z" fill="#0A3894"/>
+          <circle cx="50" cy="53" r="23" fill="none" stroke="#0DAFC4" stroke-width="1.5" opacity="0.4"/>
+          <path d="M 50 67 C 32 67, 26 50, 41 48 C 40 57, 45 63, 50 67 Z" fill="#0DAFC4"/>
+          <path d="M 50 67 C 68 67, 74 50, 59 48 C 60 57, 55 63, 50 67 Z" fill="#0B2E6B"/>
           <path d="M 50 25 C 62 42, 65 58, 50 67 C 35 58, 38 42, 50 25 Z" fill="url(#dropletGradAdmin)"/>
           <defs>
             <linearGradient id="dropletGradAdmin" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stop-color="#00B5EF"/>
-              <stop offset="100%" stop-color="#0A3894"/>
+              <stop offset="0%" stop-color="#0DAFC4"/>
+              <stop offset="100%" stop-color="#0B2E6B"/>
             </linearGradient>
           </defs>
         </svg>
@@ -181,6 +167,9 @@
         </div>
       </div>
     </div>
+    <svg class="current-line" viewBox="0 0 1440 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M0,32 C240,58 480,4 720,20 C960,36 1200,54 1440,26 L1440,60 L0,60 Z" fill="#EEF3FC"></path>
+    </svg>
   </header>
 
   <main>
@@ -188,14 +177,23 @@
     <!-- Stats Summary -->
     <div class="stats-bar" id="statsBar" style="margin-top: 20px;">
       <div class="stat-card">
+        <div class="stat-card-icon">
+          <svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
+        </div>
         <span class="stat-val" id="statTotalEntries">—</span>
         <span class="stat-lbl">Ledger Entries</span>
       </div>
       <div class="stat-card">
+        <div class="stat-card-icon">
+          <svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
+        </div>
         <span class="stat-val" id="statTotalRevenue">—</span>
         <span class="stat-lbl">Total Revenue</span>
       </div>
       <div class="stat-card">
+        <div class="stat-card-icon">
+          <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+        </div>
         <span class="stat-val" id="statEmployees">—</span>
         <span class="stat-lbl">Active Employees</span>
       </div>
@@ -203,8 +201,11 @@
 
     <!-- Tab Navigation -->
     <div class="tabs-header">
-      <button class="tab-btn active" id="tabBtnLedger" onclick="switchTab('ledgerTab', this)">
-        📊 Master Ledger
+      <button class="tab-btn active" id="tabBtnDash" onclick="switchTab('dashboardTab', this)">
+        📈 Dashboard
+      </button>
+      <button class="tab-btn" id="tabBtnLedger" onclick="switchTab('ledgerTab', this)">
+        📊 Historical Records
       </button>
       <button class="tab-btn" id="tabBtnDir" onclick="switchTab('directoryTab', this)">
         👥 Employee Directory
@@ -212,9 +213,48 @@
     </div>
 
     <!-- ═══════════════════════════════════════
-         TAB 1 — MASTER LEDGER
+         TAB 1 — DASHBOARD (Power BI–style overview)
     ═══════════════════════════════════════ -->
-    <div id="ledgerTab" class="tab-content active">
+    <div id="dashboardTab" class="tab-content active">
+      <div class="charts-grid">
+        <div class="chart-card">
+          <div class="chart-card-title">
+            <span>📉 Production &amp; Revenue Trend</span>
+            <span style="font-size:0.7rem; color:#94A3B8; font-weight:600;">Last 14 entries</span>
+          </div>
+          <div class="chart-canvas-wrap">
+            <canvas id="trendChart"></canvas>
+          </div>
+          <p class="chart-empty-note" id="trendChartEmpty" style="display:none;">No ledger data yet to chart.</p>
+        </div>
+        <div class="chart-card">
+          <div class="chart-card-title">
+            <span>🥧 Sales Channel Distribution</span>
+          </div>
+          <div class="chart-canvas-wrap">
+            <canvas id="channelChart"></canvas>
+          </div>
+          <p class="chart-empty-note" id="channelChartEmpty" style="display:none;">No sales data yet to chart.</p>
+        </div>
+      </div>
+
+      <div class="card" style="text-align:center;">
+        <div class="card-title" style="justify-content:center; border:none; padding-bottom:0;">
+          Want to dig into the raw numbers?
+        </div>
+        <p style="color:#64748B; font-size:0.85rem; margin-bottom:14px;">
+          Every entry your team has ever submitted lives in Historical Records — searchable and filterable.
+        </p>
+        <button type="button" class="btn btn-primary" style="width:auto; padding:10px 22px; margin:0 auto;" onclick="switchTab('ledgerTab', document.getElementById('tabBtnLedger'))">
+          View Historical Records →
+        </button>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         TAB 2 — HISTORICAL RECORDS (search + accordion table)
+    ═══════════════════════════════════════ -->
+    <div id="ledgerTab" class="tab-content">
       <div class="card">
         <div class="card-title" style="justify-content: space-between; flex-wrap: wrap; gap: 10px; border: none; padding-bottom: 0;">
           <div style="display: flex; align-items: center; gap: 8px;">
@@ -226,49 +266,73 @@
               <svg viewBox="0 0 24 24"><path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2z"/></svg>
               Export CSV to Device
             </button>
-            <button type="button" class="btn btn-primary" id="btnRefreshLedger" style="background: rgba(10,56,148,0.1); color: #0A3894;">
+            <button type="button" class="btn btn-primary" id="btnRefreshLedger" style="background: rgba(10,56,148,0.1); color: #0B2E6B;">
               <svg viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
               Refresh
             </button>
           </div>
         </div>
 
-        <div class="table-responsive" style="margin-top: 15px;">
-          <table id="ledgerTable">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Date</th>
-                <th>Status</th>
-                <th>Produced</th>
-                <th>Storage</th>
-                <th>Truck Sent</th>
-                <th>Truck Sold</th>
-                <th>Leakages</th>
-                <th>Aboboya</th>
-                <th>Factory</th>
-                <th>Price</th>
-                <th>Revenue</th>
-                <th>Fuel Exp</th>
-                <th>Other Exp</th>
-                <th>Withdrawal</th>
-                <th>Cash Hand</th>
-                <th>Cash Bank</th>
-                <th>Worker</th>
-                <th>Comments</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody id="ledgerTableBody">
-              <tr><td colspan="20" style="text-align:center; color:#94A3B8; padding:30px;">Loading ledger records...</td></tr>
-            </tbody>
-          </table>
+        <!-- Live search & filter -->
+        <div class="filter-bar">
+          <div class="search-wrapper">
+            <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+            <input type="search" id="ledgerSearch" placeholder="Search by date, worker, or comments...">
+          </div>
+          <select id="ledgerStatusFilter">
+            <option value="">All Statuses</option>
+            <option value="Open">Open</option>
+            <option value="Closed">Closed</option>
+          </select>
+        </div>
+
+        <p class="result-count" id="ledgerResultCount"></p>
+
+        <!-- Accordion: table stays tucked away until explicitly opened,
+             so the dashboard landing view stays spacious and uncluttered. -->
+        <button type="button" class="accordion-toggle open" id="ledgerAccordionToggle" onclick="toggleLedgerAccordion()">
+          <span>📁 View Historical Records Table</span>
+          <svg class="chevron" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+        </button>
+
+        <div class="accordion-body open" id="ledgerAccordionBody">
+          <div class="table-responsive" style="margin-top: 15px;">
+            <table id="ledgerTable">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                  <th>Produced</th>
+                  <th>Storage</th>
+                  <th>Truck Sent</th>
+                  <th>Truck Sold</th>
+                  <th>Leakages</th>
+                  <th>Aboboya</th>
+                  <th>Factory</th>
+                  <th>Price</th>
+                  <th>Revenue</th>
+                  <th>Fuel Exp</th>
+                  <th>Other Exp</th>
+                  <th>Withdrawal</th>
+                  <th>Cash Hand</th>
+                  <th>Cash Bank</th>
+                  <th>Worker</th>
+                  <th>Comments</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="ledgerTableBody">
+                <tr><td colspan="20" style="text-align:center; color:#94A3B8; padding:30px;">Loading ledger records...</td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- ═══════════════════════════════════════
-         TAB 2 — EMPLOYEE DIRECTORY
+         TAB 3 — EMPLOYEE DIRECTORY
     ═══════════════════════════════════════ -->
     <div id="directoryTab" class="tab-content">
       <div style="display: grid; grid-template-columns: 1fr 1.3fr; gap: 20px;">
@@ -405,8 +469,9 @@
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.getElementById(tabId).classList.add('active');
       btn.classList.add('active');
-      if (tabId === 'ledgerTab')    fetchLedger();
-      if (tabId === 'directoryTab') fetchEmployees();
+      if (tabId === 'dashboardTab')  fetchLedger();
+      if (tabId === 'ledgerTab')     fetchLedger();
+      if (tabId === 'directoryTab')  fetchEmployees();
     }
 
     // ──────────────────────────────────────────
@@ -422,7 +487,7 @@
     }
 
     // ──────────────────────────────────────────
-    //  Fetch & Render Ledger
+    //  Fetch Ledger (source of truth for table + charts)
     // ──────────────────────────────────────────
     async function fetchLedger() {
       const tbody = document.getElementById('ledgerTableBody');
@@ -433,45 +498,198 @@
         if (!res.ok) throw new Error('Access denied');
         ledgerRecords = await res.json();
         updateStats(ledgerRecords);
-
-        if (ledgerRecords.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="20" style="text-align:center;color:#94A3B8;padding:30px;">No ledger records yet. Employees will submit data daily.</td></tr>`;
-          return;
-        }
-
-        tbody.innerHTML = '';
-        ledgerRecords.forEach((row, i) => {
-          const tr = document.createElement('tr');
-          const statusClass = row.factory_status === 'Open' ? 'status-open' : 'status-closed';
-          tr.innerHTML = `
-            <td style="color:#94A3B8; font-size:0.75rem;">${i + 1}</td>
-            <td style="font-weight:700; color:#0A3894; white-space:nowrap;">${row.date}</td>
-            <td><span class="status-badge-table ${statusClass}">${row.factory_status}</span></td>
-            <td>${(row.total_produced || 0).toLocaleString()}</td>
-            <td>${(row.bags_in_storage || 0).toLocaleString()}</td>
-            <td>${(row.truck_sent_out || 0).toLocaleString()}</td>
-            <td>${(row.truck_sold || 0).toLocaleString()}</td>
-            <td style="color:#DC2626; font-weight:700;">${row.leakages || 0}</td>
-            <td>${(row.aboboya_sold || 0).toLocaleString()}</td>
-            <td>${(row.factory_sold || 0).toLocaleString()}</td>
-            <td>GH₵ ${(row.price_per_bag || 0).toFixed(2)}</td>
-            <td style="font-weight:800; color:#128C7E;">GH₵ ${(row.total_amount || 0).toFixed(2)}</td>
-            <td>GH₵ ${(row.fuel_expenses || 0).toFixed(2)}</td>
-            <td>GH₵ ${(row.other_expenses || 0).toFixed(2)}</td>
-            <td>GH₵ ${(row.cash_withdrawn || 0).toFixed(2)}</td>
-            <td style="font-weight:700;">GH₵ ${(row.cash_at_hand || 0).toFixed(2)}</td>
-            <td>GH₵ ${(row.cash_at_bank || 0).toFixed(2)}</td>
-            <td style="font-style:italic; font-weight:600;">${escHtml(row.workers_name || '')}</td>
-            <td style="max-width:120px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${escHtml(row.comments || '')}">${escHtml(row.comments || '')}</td>
-            <td>
-              <button class="btn-del" onclick="confirmDeleteLedger(${row.id}, '${escHtml(row.date)}')">✕ Del</button>
-            </td>
-          `;
-          tbody.appendChild(tr);
-        });
-
+        renderCharts(ledgerRecords);
+        applyLedgerFilters();
       } catch (err) {
         tbody.innerHTML = `<tr><td colspan="20" style="text-align:center;color:#DC2626;padding:30px;font-weight:600;">Error loading ledger. Access may be restricted or session expired.</td></tr>`;
+      }
+    }
+
+    // ──────────────────────────────────────────
+    //  Render Ledger Table (accepts a pre-filtered array)
+    // ──────────────────────────────────────────
+    function renderLedgerTable(rows) {
+      const tbody = document.getElementById('ledgerTableBody');
+      const countEl = document.getElementById('ledgerResultCount');
+
+      if (ledgerRecords.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="20" style="text-align:center;color:#94A3B8;padding:30px;">No ledger records yet. Employees will submit data daily.</td></tr>`;
+        countEl.textContent = '';
+        return;
+      }
+
+      if (rows.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="20" style="text-align:center;color:#94A3B8;padding:30px;">No records match your search/filter.</td></tr>`;
+        countEl.textContent = `0 of ${ledgerRecords.length} records shown`;
+        return;
+      }
+
+      countEl.textContent = rows.length === ledgerRecords.length
+        ? `${ledgerRecords.length} records`
+        : `${rows.length} of ${ledgerRecords.length} records shown`;
+
+      tbody.innerHTML = '';
+      rows.forEach((row, i) => {
+        const tr = document.createElement('tr');
+        const statusClass = row.factory_status === 'Open' ? 'status-open' : 'status-closed';
+        tr.innerHTML = `
+          <td style="color:#94A3B8; font-size:0.75rem;">${i + 1}</td>
+          <td style="font-weight:700; color:#0B2E6B; white-space:nowrap;">${row.date}</td>
+          <td><span class="status-badge-table ${statusClass}">${row.factory_status}</span></td>
+          <td>${(row.total_produced || 0).toLocaleString()}</td>
+          <td>${(row.bags_in_storage || 0).toLocaleString()}</td>
+          <td>${(row.truck_sent_out || 0).toLocaleString()}</td>
+          <td>${(row.truck_sold || 0).toLocaleString()}</td>
+          <td style="color:#DC2626; font-weight:700;">${row.leakages || 0}</td>
+          <td>${(row.aboboya_sold || 0).toLocaleString()}</td>
+          <td>${(row.factory_sold || 0).toLocaleString()}</td>
+          <td>GH₵ ${(row.price_per_bag || 0).toFixed(2)}</td>
+          <td style="font-weight:800; color:#0E9F6E;">GH₵ ${(row.total_amount || 0).toFixed(2)}</td>
+          <td>GH₵ ${(row.fuel_expenses || 0).toFixed(2)}</td>
+          <td>GH₵ ${(row.other_expenses || 0).toFixed(2)}</td>
+          <td>GH₵ ${(row.cash_withdrawn || 0).toFixed(2)}</td>
+          <td style="font-weight:700;">GH₵ ${(row.cash_at_hand || 0).toFixed(2)}</td>
+          <td>GH₵ ${(row.cash_at_bank || 0).toFixed(2)}</td>
+          <td style="font-style:italic; font-weight:600;">${escHtml(row.workers_name || '')}</td>
+          <td style="max-width:120px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${escHtml(row.comments || '')}">${escHtml(row.comments || '')}</td>
+          <td>
+            <button class="btn-del" onclick="confirmDeleteLedger(${row.id}, '${escHtml(row.date)}')">✕ Del</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // ──────────────────────────────────────────
+    //  Live Search & Status Filter
+    // ──────────────────────────────────────────
+    function applyLedgerFilters() {
+      const q = (document.getElementById('ledgerSearch').value || '').trim().toLowerCase();
+      const status = document.getElementById('ledgerStatusFilter').value;
+
+      const filtered = ledgerRecords.filter(r => {
+        if (status && r.factory_status !== status) return false;
+        if (!q) return true;
+        const haystack = `${r.date} ${r.workers_name || ''} ${r.comments || ''}`.toLowerCase();
+        return haystack.includes(q);
+      });
+
+      renderLedgerTable(filtered);
+    }
+
+    document.getElementById('ledgerSearch').addEventListener('input', applyLedgerFilters);
+    document.getElementById('ledgerStatusFilter').addEventListener('change', applyLedgerFilters);
+
+    // ──────────────────────────────────────────
+    //  Accordion: tuck the heavy table away by default
+    // ──────────────────────────────────────────
+    function toggleLedgerAccordion() {
+      const toggle = document.getElementById('ledgerAccordionToggle');
+      const body   = document.getElementById('ledgerAccordionBody');
+      const isOpen = body.classList.toggle('open');
+      toggle.classList.toggle('open', isOpen);
+    }
+
+    // ──────────────────────────────────────────
+    //  Power BI–style Charts (Chart.js)
+    // ──────────────────────────────────────────
+    let trendChartInstance = null;
+    let channelChartInstance = null;
+
+    function renderCharts(records) {
+      if (typeof Chart === 'undefined') return; // CDN still loading / blocked
+
+      // Trend chart: last 14 entries by date, oldest → newest
+      const sorted = [...records].sort((a, b) => a.date.localeCompare(b.date));
+      const recent = sorted.slice(-14);
+
+      const trendCanvas = document.getElementById('trendChart');
+      const trendEmpty  = document.getElementById('trendChartEmpty');
+      if (recent.length === 0) {
+        trendCanvas.style.display = 'none';
+        trendEmpty.style.display = 'block';
+      } else {
+        trendCanvas.style.display = 'block';
+        trendEmpty.style.display = 'none';
+        const labels = recent.map(r => r.date);
+        const produced = recent.map(r => r.total_produced || 0);
+        const revenue = recent.map(r => r.total_amount || 0);
+
+        if (trendChartInstance) trendChartInstance.destroy();
+        trendChartInstance = new Chart(trendCanvas.getContext('2d'), {
+          type: 'line',
+          data: {
+            labels,
+            datasets: [
+              {
+                label: 'Bags Produced',
+                data: produced,
+                borderColor: '#0B2E6B',
+                backgroundColor: 'rgba(10,56,148,0.08)',
+                yAxisID: 'y',
+                tension: 0.3,
+                fill: true
+              },
+              {
+                label: 'Revenue (GH₵)',
+                data: revenue,
+                borderColor: '#0E9F6E',
+                backgroundColor: 'rgba(18,140,126,0.08)',
+                yAxisID: 'y1',
+                tension: 0.3,
+                fill: true
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            scales: {
+              y:  { type: 'linear', position: 'left',  title: { display: true, text: 'Bags' } },
+              y1: { type: 'linear', position: 'right', title: { display: true, text: 'GH₵' }, grid: { drawOnChartArea: false } }
+            },
+            plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } }
+          }
+        });
+      }
+
+      // Channel distribution chart: aggregate totals across all records
+      const totals = records.reduce((acc, r) => {
+        acc.truck += r.truck_sold || 0;
+        acc.aboboya += r.aboboya_sold || 0;
+        acc.factory += r.factory_sold || 0;
+        return acc;
+      }, { truck: 0, aboboya: 0, factory: 0 });
+
+      const channelCanvas = document.getElementById('channelChart');
+      const channelEmpty  = document.getElementById('channelChartEmpty');
+      const grandTotal = totals.truck + totals.aboboya + totals.factory;
+
+      if (grandTotal === 0) {
+        channelCanvas.style.display = 'none';
+        channelEmpty.style.display = 'block';
+      } else {
+        channelCanvas.style.display = 'block';
+        channelEmpty.style.display = 'none';
+
+        if (channelChartInstance) channelChartInstance.destroy();
+        channelChartInstance = new Chart(channelCanvas.getContext('2d'), {
+          type: 'doughnut',
+          data: {
+            labels: ['Truck Sold', 'Aboboya Sold', 'Factory Sold'],
+            datasets: [{
+              data: [totals.truck, totals.aboboya, totals.factory],
+              backgroundColor: ['#0B2E6B', '#0DAFC4', '#EDA13C'],
+              borderWidth: 0
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } }
+          }
+        });
       }
     }
 

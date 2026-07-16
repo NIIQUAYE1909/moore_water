@@ -1,29 +1,42 @@
 :root {
-  --primary: #0A3894;
-  --primary-light: #1A4EB5;
-  --primary-dark: #002270;
-  --accent: #00B5EF;
+  /* ── Palette: "Deep Current" ──────────────────────────
+     Indigo = trust & the ledger; teal = the water itself;
+     amber = the sachet/packaging warmth. */
+  --primary: #0B2E6B;
+  --primary-light: #1B4FA0;
+  --primary-dark: #051C42;
+  --accent: #0DAFC4;
+  --accent-light: #4FD6E8;
+  --amber: #EDA13C;
+  --amber-light: rgba(237, 161, 60, 0.12);
   --white: #FFFFFF;
-  --dark: #0F172A;
-  --dark-light: #1E293B;
-  --bg-gradient: linear-gradient(135deg, #F0F4FA 0%, #E6EFFD 100%);
-  --red: #E30613;
-  --red-light: rgba(227, 6, 19, 0.1);
-  --gold: #FFC20E;
-  --gold-light: rgba(255, 194, 14, 0.1);
-  --green: #128C7E;
-  --green-light: rgba(18, 140, 126, 0.1);
+  --dark: #0E1B33;
+  --dark-light: #29334A;
+  --bg-gradient: radial-gradient(120% 140% at 15% -10%, #E7F6F8 0%, #EEF3FC 45%, #F6F8FC 100%);
+  --red: #DC2626;
+  --red-light: rgba(220, 38, 38, 0.1);
+  --gold: #EDA13C;
+  --gold-light: rgba(237, 161, 60, 0.12);
+  --green: #0E9F6E;
+  --green-light: rgba(14, 159, 110, 0.1);
   --gray-50: #F8FAFC;
   --gray-100: #F1F5F9;
   --gray-200: #E2E8F0;
   --gray-300: #CBD5E1;
   --gray-500: #64748B;
-  
+
+  /* Type system: Fraunces carries the brand's voice on headings and
+     figures; Outfit stays the workhorse for forms/tables/UI chrome;
+     IBM Plex Mono gives money and quantities a ledger-book rhythm. */
+  --font-display: 'Fraunces', 'Georgia', serif;
+  --font-body: 'Outfit', sans-serif;
+  --font-mono: 'IBM Plex Mono', 'SFMono-Regular', monospace;
+
   --border-radius: 16px;
   --border-radius-sm: 8px;
-  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  --shadow: 0 10px 30px rgba(10, 56, 148, 0.05);
-  --shadow-hover: 0 15px 35px rgba(10, 56, 148, 0.1);
+  --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --shadow: 0 10px 30px rgba(11, 46, 107, 0.06);
+  --shadow-hover: 0 16px 38px rgba(11, 46, 107, 0.12);
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
@@ -32,32 +45,98 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: 'Outfit', sans-serif;
+  font-family: var(--font-body);
   -webkit-tap-highlight-color: transparent;
+}
+
+/* Numbers stay evenly spaced wherever they appear — a small,
+   deliberate nod to the ledger this app is standing in for. */
+.stat-val, .dash-val, td, .amount, input[type="number"] {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Never let the layout trap vertical scrolling — small screens, on-screen
+   keyboards, and short viewports must always be able to scroll to reach
+   content/buttons below the fold. */
+html {
+  height: 100%;
+  overflow-y: auto;
 }
 
 body {
   background: var(--bg-gradient);
   color: var(--dark);
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   padding-top: var(--safe-top);
   padding-bottom: calc(30px + var(--safe-bottom));
   overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+}
+
+/* ── Rising bubbles ──────────────────────────────────────
+   The page background reads as still water until this: a slow field
+   of bubbles drifting up from the bottom edge, behind every card and
+   header (z-index 0). Kept faint and slow so it never competes with
+   the ledger data — atmosphere, not decoration. */
+.bubble-field {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.bubble-field span {
+  position: absolute;
+  bottom: -10vh;
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 28%,
+    rgba(255, 255, 255, 0.75) 0%,
+    rgba(79, 214, 232, 0.28) 45%,
+    rgba(11, 46, 107, 0.05) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  animation: bubble-rise linear infinite;
+  will-change: transform, opacity;
+}
+
+@keyframes bubble-rise {
+  0%   { transform: translate(0, 0) scale(0.9); opacity: 0; }
+  10%  { opacity: 0.8; }
+  85%  { opacity: 0.5; }
+  100% { transform: translate(var(--drift, 20px), -115vh) scale(1.05); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bubble-field { display: none; }
 }
 
 /* Brand Header */
 header {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  background: linear-gradient(160deg, var(--primary) 0%, var(--primary-dark) 100%);
   color: var(--white);
-  padding: calc(20px + var(--safe-top)) 20px 25px 20px;
+  padding: calc(24px + var(--safe-top)) 20px 34px 20px;
   position: relative;
   overflow: hidden;
-  border-bottom-left-radius: 24px;
-  border-bottom-right-radius: 24px;
-  box-shadow: 0 8px 20px rgba(10, 56, 200, 0.12);
+  box-shadow: 0 8px 24px rgba(5, 28, 66, 0.18);
   text-align: center;
+}
+
+/* Signature: a single flowing current line along the header's lower
+   edge — the one recurring motif that ties every screen back to
+   "water" without leaning on literal wave clipart. Rendered as a real
+   inline <svg class="current-line"> at the bottom of each header. */
+header svg.current-line {
+  position: absolute;
+  left: 0; right: 0; bottom: -1px;
+  width: 100%;
+  height: 22px;
+  display: block;
+  z-index: 1;
 }
 
 .header-content {
@@ -87,31 +166,34 @@ header {
 }
 
 .brand-title {
-  font-size: 1.5rem;
-  font-weight: 800;
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 600;
+  font-style: normal;
   line-height: 1.2;
+  letter-spacing: 0.2px;
 }
 
 .brand-subtitle {
-  font-size: 0.85rem;
-  font-weight: 500;
-  letter-spacing: 2px;
-  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 2.5px;
+  color: var(--accent-light);
   text-transform: uppercase;
 }
 
 .slogan-red {
-  color: var(--red);
-  font-weight: 900;
+  color: var(--amber);
+  font-family: var(--font-display);
+  font-weight: 600;
   font-style: italic;
-  font-size: 1.1rem;
-  text-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+  font-size: 1.15rem;
 }
 
 .slogan-sub {
   font-size: 0.7rem;
   font-weight: 400;
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.75);
 }
 
 /* User Session Badge */
@@ -218,9 +300,11 @@ main {
 }
 
 .dash-val {
-  font-size: 1.25rem;
-  font-weight: 800;
+  font-family: var(--font-mono);
+  font-size: 1.2rem;
+  font-weight: 600;
   color: var(--primary);
+  font-variant-numeric: tabular-nums;
 }
 
 .dash-val.highlight {
@@ -243,15 +327,16 @@ main {
 }
 
 .card-title {
-  font-size: 1rem;
-  font-weight: 700;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 600;
   color: var(--primary);
   margin-bottom: 15px;
   display: flex;
   align-items: center;
   gap: 8px;
-  border-bottom: 1.5px solid rgba(10, 56, 148, 0.06);
-  padding-bottom: 6px;
+  border-bottom: 1.5px solid rgba(11, 46, 107, 0.08);
+  padding-bottom: 8px;
 }
 
 .card-title svg {
@@ -329,15 +414,15 @@ textarea {
 select {
   padding-left: 34px;
   appearance: none;
-  background-image: url("data:image/svg+xml;utf8,<svg fill='%230A3894' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
+  background-image: url("data:image/svg+xml;utf8,<svg fill='%230B2E6B' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
   background-repeat: no-repeat;
   background-position: right 10px center;
   background-size: 18px;
 }
 
 input:focus, select:focus, textarea:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(10, 56, 148, 0.1);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(13, 175, 196, 0.15);
 }
 
 .grid-2 {
@@ -371,6 +456,8 @@ input:focus, select:focus, textarea:focus {
   border: 1px solid rgba(255, 255, 255, 0.5);
   box-shadow: 0 15px 35px rgba(10, 56, 148, 0.1);
   padding: 30px 24px;
+  position: relative;
+  z-index: 1;
 }
 
 .login-logo {
@@ -404,14 +491,19 @@ input:focus, select:focus, textarea:focus {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
 }
 
+.btn:active {
+  transform: translateY(1px);
+}
+
 .btn-primary {
-  background: var(--primary);
+  background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
   color: var(--white);
 }
 
 .btn-primary:hover {
-  background-color: var(--primary-light);
-  box-shadow: 0 6px 15px rgba(10, 56, 148, 0.2);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  box-shadow: 0 8px 18px rgba(11, 46, 107, 0.25);
+  transform: translateY(-1px);
 }
 
 .btn-danger {
@@ -420,7 +512,8 @@ input:focus, select:focus, textarea:focus {
 }
 
 .btn-danger:hover {
-  background-color: #be050f;
+  background-color: #b91c1c;
+  transform: translateY(-1px);
 }
 
 .btn-secondary {
@@ -434,12 +527,13 @@ input:focus, select:focus, textarea:focus {
 }
 
 .btn-green {
-  background: var(--green);
+  background: linear-gradient(135deg, #12B38A 0%, var(--green) 100%);
   color: var(--white);
 }
 
 .btn-green:hover {
-  background-color: #0e6f64;
+  background-color: #0b7a58;
+  transform: translateY(-1px);
 }
 
 .btn svg {
@@ -679,4 +773,235 @@ footer {
   main {
     max-width: 850px;
   }
+}
+
+/* ─────────────────────────────────────────────
+   Mobile Header Fix
+   The session badges (worker/admin name pill, online
+   status, restricted-access pill) float on top of the
+   header on desktop. On small screens there isn't enough
+   room for that overlay to coexist with the centered
+   title, so we drop them out of the floating layer and
+   stack them as plain, full-width strips above the header
+   instead — nothing overlaps, everything wraps gracefully.
+────────────────────────────────────────────── */
+@media (max-width: 767px) {
+  .user-badge,
+  .status-badge {
+    position: static;
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+    border-radius: 0;
+    background: var(--primary-dark);
+    backdrop-filter: none;
+    border: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 8px 12px;
+    flex-wrap: wrap;
+  }
+
+  header {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+
+  .header-content {
+    flex-wrap: wrap;
+  }
+
+  .brand-title {
+    font-size: 1.25rem;
+  }
+
+  .admin-shield {
+    white-space: normal;
+    text-align: center;
+  }
+}
+
+/* ─────────────────────────────────────────────
+   Power BI–style Analytics Dashboard
+────────────────────────────────────────────── */
+.stats-bar {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  background: linear-gradient(160deg, var(--white) 0%, #F7FAFF 100%);
+  border-radius: 16px;
+  padding: 18px 14px;
+  text-align: center;
+  border: 1px solid var(--gray-200);
+  box-shadow: 0 6px 18px rgba(10, 56, 148, 0.07);
+  transition: var(--transition);
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(10, 56, 148, 0.12);
+}
+
+.stat-card-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 8px;
+  background: rgba(10, 56, 148, 0.08);
+}
+
+.stat-card-icon svg {
+  width: 18px;
+  height: 18px;
+  fill: var(--primary);
+}
+
+.stat-val {
+  font-family: var(--font-mono);
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--primary);
+  display: block;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-lbl {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--gray-500);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Chart cards */
+.charts-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+@media (min-width: 768px) {
+  .charts-grid {
+    grid-template-columns: 1.3fr 1fr;
+  }
+}
+
+.chart-card {
+  background: var(--white);
+  border-radius: var(--border-radius);
+  padding: 18px;
+  border: 1px solid var(--gray-200);
+  box-shadow: var(--shadow);
+}
+
+.chart-card-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--dark-light);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.chart-empty-note {
+  text-align: center;
+  color: var(--gray-500);
+  font-size: 0.8rem;
+  padding: 30px 10px;
+}
+
+.chart-canvas-wrap {
+  position: relative;
+  height: 240px;
+}
+
+/* Historical records: accordion toggle + search/filter bar */
+.accordion-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--border-radius-sm);
+  padding: 14px 16px;
+  font-weight: 700;
+  color: var(--primary);
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+}
+
+.accordion-toggle:hover {
+  box-shadow: var(--shadow-hover);
+}
+
+.accordion-toggle .chevron {
+  width: 18px;
+  height: 18px;
+  fill: var(--primary);
+  transition: transform 0.25s ease;
+}
+
+.accordion-toggle.open .chevron {
+  transform: rotate(180deg);
+}
+
+.accordion-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.accordion-body.open {
+  max-height: none;
+  overflow: visible;
+}
+
+.filter-bar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 16px 0;
+}
+
+.filter-bar .search-wrapper {
+  flex: 1 1 220px;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.filter-bar .search-wrapper svg {
+  position: absolute;
+  left: 12px;
+  width: 15px;
+  height: 15px;
+  fill: var(--gray-500);
+  pointer-events: none;
+}
+
+.filter-bar input[type="search"] {
+  padding-left: 34px;
+}
+
+.filter-bar select {
+  flex: 0 1 160px;
+}
+
+.result-count {
+  font-size: 0.75rem;
+  color: var(--gray-500);
+  font-weight: 600;
+  margin-bottom: 8px;
 }

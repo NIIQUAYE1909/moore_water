@@ -5,21 +5,37 @@
   <title>Moor Water — Secure Login</title>
   <meta name="description" content="Secure login for Moor Natural Mineral Water Daily Ledger System">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="theme-color" content="#0A3894">
+  <meta name="theme-color" content="#0B2E6B">
   <meta name="robots" content="noindex, nofollow">
   <link rel="icon" type="image/svg+xml" href="/static/icon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/css/style.css">
   <style>
+    html, body {
+      height: auto;
+      min-height: 100%;
+    }
     body {
-      background: linear-gradient(135deg, #002270 0%, #0A3894 50%, #1A4EB5 100%);
+      background: linear-gradient(135deg, #051C42 0%, #0B2E6B 50%, #1B4FA0 100%);
       justify-content: center;
       align-items: center;
       display: flex;
       min-height: 100vh;
+      min-height: 100dvh;
       padding: 20px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* On short/mobile viewports let the card sit at the top and scroll
+       naturally instead of being vertically centered and clipped. */
+    @media (max-height: 700px), (max-width: 480px) {
+      body {
+        align-items: flex-start;
+        padding-top: max(20px, var(--safe-top, 20px));
+      }
     }
 
     .login-wrap {
@@ -80,7 +96,7 @@
     }
     .role-btn.active {
       background: white;
-      color: #0A3894;
+      color: #0B2E6B;
       box-shadow: 0 2px 8px rgba(10, 56, 148, 0.12);
     }
     .role-btn.active.admin-active {
@@ -126,7 +142,7 @@
       cursor: pointer;
       font-weight: 600;
     }
-    .prefill-hint:hover { color: #0A3894; text-decoration: underline; }
+    .prefill-hint:hover { color: #0B2E6B; text-decoration: underline; }
 
     /* Error and rate limit */
     #loginError {
@@ -191,6 +207,20 @@
   </style>
 </head>
 <body>
+  <div class="bubble-field" aria-hidden="true">
+    <span style="left:32.4%; width:12.0px; height:12.0px; animation-duration:21.8s; animation-delay:-18.6s; --drift:2.0px;"></span>
+    <span style="left:36.4%; width:10.0px; height:10.0px; animation-duration:20.1s; animation-delay:-19.3s; --drift:-4.0px;"></span>
+    <span style="left:8.6%; width:10.0px; height:10.0px; animation-duration:19.1s; animation-delay:-3.5s; --drift:-23.0px;"></span>
+    <span style="left:23.0%; width:24.0px; height:24.0px; animation-duration:25.4s; animation-delay:-8.5s; --drift:-6.0px;"></span>
+    <span style="left:93.8%; width:9.0px; height:9.0px; animation-duration:24.3s; animation-delay:-14.2s; --drift:-21.0px;"></span>
+    <span style="left:13.1%; width:16.0px; height:16.0px; animation-duration:23.8s; animation-delay:-16.4s; --drift:5.0px;"></span>
+    <span style="left:62.1%; width:18.0px; height:18.0px; animation-duration:20.6s; animation-delay:-18.7s; --drift:-26.0px;"></span>
+    <span style="left:21.4%; width:26.0px; height:26.0px; animation-duration:19.1s; animation-delay:-13.7s; --drift:5.0px;"></span>
+    <span style="left:44.6%; width:16.0px; height:16.0px; animation-duration:23.5s; animation-delay:-6.0s; --drift:-15.0px;"></span>
+    <span style="left:56.0%; width:22.0px; height:22.0px; animation-duration:24.5s; animation-delay:-5.4s; --drift:-13.0px;"></span>
+    <span style="left:94.1%; width:11.0px; height:11.0px; animation-duration:19.0s; animation-delay:-4.9s; --drift:-21.0px;"></span>
+    <span style="left:48.0%; width:9.0px; height:9.0px; animation-duration:22.0s; animation-delay:-4.7s; --drift:4.0px;"></span>
+  </div>
   <!-- Decorative background bubbles -->
   <div class="bg-bubble"></div>
   <div class="bg-bubble"></div>
@@ -203,23 +233,23 @@
       <div class="login-logo">
         <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
           <path id="circlePathLogin" d="M 50 14 A 36 36 0 1 1 49.9 14" fill="none"/>
-          <text fill="#E30613" font-size="8.8" font-weight="900" letter-spacing="4.5">
+          <text fill="#EDA13C" font-size="8.8" font-weight="900" letter-spacing="4.5">
             <textPath href="#circlePathLogin" startOffset="0%">• MOOR • MOOR • MOOR • MOOR </textPath>
           </text>
-          <circle cx="50" cy="53" r="23" fill="none" stroke="#00B5EF" stroke-width="1.5" opacity="0.4"/>
-          <path d="M 50 67 C 32 67, 26 50, 41 48 C 40 57, 45 63, 50 67 Z" fill="#00B5EF"/>
-          <path d="M 50 67 C 68 67, 74 50, 59 48 C 60 57, 55 63, 50 67 Z" fill="#0A3894"/>
+          <circle cx="50" cy="53" r="23" fill="none" stroke="#0DAFC4" stroke-width="1.5" opacity="0.4"/>
+          <path d="M 50 67 C 32 67, 26 50, 41 48 C 40 57, 45 63, 50 67 Z" fill="#0DAFC4"/>
+          <path d="M 50 67 C 68 67, 74 50, 59 48 C 60 57, 55 63, 50 67 Z" fill="#0B2E6B"/>
           <path d="M 50 25 C 62 42, 65 58, 50 67 C 35 58, 38 42, 50 25 Z" fill="url(#dropletGradLogin)"/>
           <defs>
             <linearGradient id="dropletGradLogin" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stop-color="#00B5EF"/>
-              <stop offset="100%" stop-color="#0A3894"/>
+              <stop offset="0%" stop-color="#0DAFC4"/>
+              <stop offset="100%" stop-color="#0B2E6B"/>
             </linearGradient>
           </defs>
         </svg>
         <div>
-          <h1 class="brand-title" style="font-size: 1.35rem; color: #0A3894;">Moor Natural Mineral Water</h1>
-          <p class="brand-subtitle" style="font-size: 0.72rem;">Daily Ledger Management System</p>
+          <h1 class="brand-title" style="font-size: 1.4rem; color: #0B2E6B;">Moor Natural Mineral Water</h1>
+          <p class="brand-subtitle" style="font-size: 0.72rem; color: #0DAFC4;">Daily Ledger Management System</p>
         </div>
       </div>
 

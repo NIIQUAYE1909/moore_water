@@ -1,223 +1,139 @@
-# Hosting Guide: Moore Water Flask App
+# Hosting Guide: Moor Water Flask App
 
-Your application is **ready for hosting**! It has a WSGI entry point (`wsgi.py`), a production WSGI server package (`gunicorn` in `requirements.txt`), automatic database initialization (`init_db.py`), and supports both SQLite and MySQL/TiDB out of the box via environment variables.
+Your application is **ready for hosting** on PythonAnywhere, Render, Railway, a plain VPS, or Vercel. It has a WSGI entry point (`wsgi.py`), a production WSGI server package (`gunicorn` in `requirements.txt`), automatic database initialization on startup (`db.py`), and supports SQLite, MySQL/TiDB, and PostgreSQL out of the box via environment variables.
+
+---
+
+## 0. What changed in this audit
+
+- **SQLite path bug fixed** — an earlier revision of `db.py` guessed a PythonAnywhere path using the wrong filename (`moore_water.db`) and silently created a brand-new, empty database instead of attaching to your real `database.db`. `db.py` now always resolves the SQLite file to `database.db` sitting right next to `app.py`/`db.py` (i.e. your project root — `/home/<username>/<project>/database.db` on PythonAnywhere), unless you explicitly override it with `DB_PATH`. Both ledger submission (`/api/ledger`) and querying (`/api/admin/ledger`) go through the same `get_db_connection()`, so they always hit the same file. On startup, the server log prints exactly which file it opened and whether it found existing data, so you can confirm it's attached correctly.
+
+- **Mobile scroll-lock fixed** — the login and register cards can no longer get trapped above the fold on short/mobile viewports; the page now always scrolls.
+- **Mobile admin header overlap fixed** — the session badge ("Admin: Name" / online status) no longer floats on top of the "Admin Portal" title and "Restricted Access" pill on small screens. Below 768px they stack as clean, full-width strips above the header instead of overlapping it.
+- **New Power BI–style admin dashboard** — a dedicated Dashboard tab with enhanced stat cards and two Chart.js visualizations (production/revenue trend, sales-channel distribution). The heavy raw ledger table now lives under a **Historical Records** tab, tucked inside a collapsible accordion, with a live search box and status filter.
+- **Multi-database support** — `db.py` is a new shared module that transparently targets **PostgreSQL** (`DATABASE_URL`), **MySQL/TiDB** (`DB_HOST`), or **SQLite** (fallback), with automatic table creation + seeding on every app startup. This replaces the app's previous SQLite-only connection logic.
+- **`app` object confirmed exposed** at module level in `app.py` (`app = Flask(__name__)`), so `gunicorn wsgi:app` / `app:app` both work unchanged.
+- **Small SQL bug fixed**: a query used double-quoted `"employee"` as a string literal, which SQLite and MySQL tolerate but PostgreSQL treats as an identifier and rejects. Now uses standard single quotes everywhere.
+- **`vercel.json`** sample added for serverless deployment.
+
+All existing Flask routes, business logic, and ledger/employee behavior are unchanged.
 
 ---
 
 ## 1. Important Production Preparations
 
-Before hosting your application online, you need to configure these production settings to secure the application.
+Before hosting your application online, configure these environment variables:
 
-### Key Environment Variables to Set
 | Variable | Description | Recommended Value |
 | :--- | :--- | :--- |
-| `SECRET_KEY` | Used to sign session cookies and prevent tampering. | A long, random alphanumeric string. |
+| `SECRET_KEY` | Signs session cookies. | A long, random alphanumeric string. |
 | `FLASK_ENV` | Sets the Flask environment. | `production` (enables security headers and HTTPS session cookies) |
-| `ADMIN_EMAIL_2` | A secondary admin email address (in addition to `quayen010@gmail.com`). | An email address you own. |
-| `DB_PATH` | *(Optional)* Custom file path for the SQLite database. | Defaults to `database.db`. |
+| `ADMIN_EMAIL_2` | A secondary admin email (in addition to `quayen010@gmail.com`). | An email address you own. |
 
 ### Whitelisting Admins
-- The email `quayen010@gmail.com` is currently hardcoded as the primary admin in [app.py](file:///c:/Users/HP/Desktop/MOORE_WATER/app.py#L48-L51) and [init_db.py](file:///c:/Users/HP/Desktop/MOORE_WATER/init_db.py#L9-L13).
-- To add a second admin, set the `ADMIN_EMAIL_2` environment variable.
-- To change the primary admin, modify the email directly in those files.
+- The email `quayen010@gmail.com` is the hardcoded primary admin, defined once in `db.py` (`get_admin_emails()`), and shared by both `app.py` and `init_db.py`.
+- Add a second admin via the `ADMIN_EMAIL_2` environment variable.
+- To change the primary admin, edit `db.py`.
 
 ---
 
 ## 2. Choosing a Database for Hosting
 
-Your app is database-agnostic and supports two setups:
+`db.py` resolves your database backend automatically, in this order:
 
-### Option A: SQLite (Default)
-- **Pros**: Zero setup. The app automatically creates `database.db` and seeds default users.
-- **Cons**: File-based. If your host deletes/rebuilds files on deployment (like Render or Heroku standard tiers), your database resets daily unless you configure a **Persistent Volume / Disk**.
-- **Best For**: Direct VPS hosting, or hosting services with persistent disks (e.g., Render Web Service with a Disk, Railway with a volume).
+1. **`DATABASE_URL` set → PostgreSQL** (recommended for Render and required for Vercel)
+2. **`DB_HOST` set → MySQL / TiDB Serverless**
+3. **Neither set → SQLite** (recommended for PythonAnywhere or a VPS)
 
-### Option B: Cloud MySQL / TiDB Serverless (Recommended for Production)
-- **Pros**: Persistent, scalable, does not lose data on server restarts. TiDB Serverless has an excellent free tier.
-- **Cons**: Requires setting up a database server or account.
-- **Setup**: Provide the following environment variables, and the app will automatically switch from SQLite to MySQL:
-  - `DB_HOST` (e.g., `gateway01.us-east-1.prod.aws.tidbcloud.com`)
-  - `DB_USER` (e.g., `xxxxxx.root`)
-  - `DB_PASSWORD` (Your database password)
-  - `DB_NAME` (e.g., `moore_water`)
-  - `DB_PORT` (e.g., `4000` for TiDB)
-  - `DB_SSL_CA` (Optional path to SSL Certificate, if required by the cloud DB)
+### Option A: SQLite (Default — PythonAnywhere / VPS)
+- Zero setup. Tables are created and default users seeded automatically on first request.
+- **File-based** — if your host wipes the filesystem on redeploy (Render/Railway free web services, and *always* on Vercel), your data resets. Only use SQLite where the filesystem is persistent:
+  - PythonAnywhere (persistent by default)
+  - A VPS
+  - Render/Railway **with a persistent Disk/Volume attached**
+- On PythonAnywhere, `db.py` automatically looks for `~/moore_water/moore_water.db` if that folder exists; otherwise set `DB_PATH` explicitly to override.
+
+### Option B: MySQL / TiDB Serverless
+Set: `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `DB_PORT` (e.g. `4000` for TiDB), optionally `DB_SSL_CA`.
+
+### Option C: PostgreSQL (Recommended for Render & required for Vercel)
+Set `DATABASE_URL` to a full connection string, e.g.:
+```
+postgres://user:password@host:5432/dbname
+```
+Render, Railway, Neon, and Supabase all provide this out of the box when you provision a Postgres database — just copy their connection string into `DATABASE_URL`.
 
 ---
 
 ## 3. Deployment Options
 
-Here are step-by-step guides for the three best ways to host this app yourself.
-
-### Option 1: Render (Easiest and Highly Recommended)
-Render connects directly to your GitHub repository and automatically deploys whenever you push changes.
-
-#### Steps:
-1. **Push your code to GitHub**:
-   - Create a private GitHub repository.
-   - Run the following in your local terminal:
-     ```bash
-     git remote add origin <your-github-repo-url>
-     git branch -M main
-     git push -u origin main
-     ```
-2. **Create a Web Service on Render**:
-   - Sign up at [Render](https://render.com/).
-   - Click **New +** > **Web Service**.
-   - Connect your GitHub account and select your `MOORE_WATER` repository.
-3. **Configure the Service**:
-   - **Name**: `moore-water-ledger`
-   - **Region**: Select closest to your users.
-   - **Language**: `Python 3` (Render will auto-detect Python).
-   - **Branch**: `main`
-   - **Build Command**: `pip install -r requirements.txt`
-   - **Start Command**: `gunicorn wsgi:app --bind 0.0.0.0:$PORT`
-   - **Instance Type**: `Free` (or any tier).
-4. **Set Up Environment Variables**:
-   - In the **Environment** tab, click **Add Environment Variable** and add:
-     - `FLASK_ENV` = `production`
-     - `SECRET_KEY` = `generate-a-secure-random-key-here`
-     - `ADMIN_EMAIL_2` = `your-email@example.com`
-5. **(Crucial if using SQLite)** **Add a Persistent Disk**:
-   - Standard free instances on Render reset daily. To keep SQLite data:
-   - Go to the **Advanced** or **Disks** section in Render.
-   - Click **Add Disk**.
-   - **Name**: `moore-water-db`
-   - **Mount Path**: `/data`
-   - **Size**: `1 GB` (Plenty for SQLite ledger).
-   - Go back to **Environment Variables** and set `DB_PATH` = `/data/database.db`.
-6. **Deploy**:
-   - Click **Create Web Service**. Render will build and launch your application!
-
----
-
-### Option 2: Railway (Extremely Fast setup)
-Railway is another excellent PaaS that easily handles persistent volumes and lets you provision a MySQL database with one click.
-
-#### Steps:
-1. Push your code to GitHub.
-2. Sign up at [Railway.app](https://railway.app/).
-3. Click **New Project** > **Deploy from GitHub repo** and select your repository.
-4. Click **Variables** on the service and add:
-   - `FLASK_ENV` = `production`
-   - `SECRET_KEY` = `generate-a-secure-random-key-here`
-5. **If using SQLite (Persistent Volume)**:
-   - Go to **Settings** > **Volumes** > **Add Volume**.
-   - Mount it at `/data`.
-   - Set environment variable `DB_PATH` = `/data/database.db`.
-6. **If using MySQL/TiDB (Highly Recommended)**:
-   - In the same project, click **New** > **Database** > **Add MySQL**.
-   - Railway will provision a MySQL database.
-   - Go to your Flask service's **Variables** tab, click **Reference Variable**, and link the MySQL connection credentials directly to the environment variables your app expects (`DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `DB_PORT`).
-
----
-
-### Option 3: VPS Self-Hosting (DigitalOcean / Linode / AWS EC2)
-If you want complete control, you can host on a Linux VPS (Ubuntu server) using **Nginx**, **Gunicorn**, and **Systemd**.
-
-#### Steps:
-1. **SSH into your VPS**:
+### Option 1: PythonAnywhere
+1. Upload your project (or `git clone` it) to `/home/<your-username>/moore_water`.
+2. Open a Bash console and create a virtualenv:
    ```bash
-   ssh root@your_server_ip
-   ```
-2. **Update system & install dependencies**:
-   ```bash
-   sudo apt update && sudo apt upgrade -y
-   sudo apt install python3-pip python3-venv git nginx -y
-   ```
-3. **Clone the repository**:
-   ```bash
-   cd /var/www
-   git clone <your-github-repo-url> moore_water
-   cd moore_water
-   ```
-4. **Set up virtual environment**:
-   ```bash
+   cd ~/moore_water
    python3 -m venv venv
    source venv/bin/activate
    pip install -r requirements.txt
    ```
-5. **Test running with Gunicorn**:
-   ```bash
-   gunicorn --bind 0.0.0.0:8000 wsgi:app
+3. Go to the **Web** tab → **Add a new web app** → **Manual configuration** (Flask, matching Python version).
+4. Set the **Working directory** and **virtualenv path** to your project folder.
+5. Edit the generated WSGI file (`/var/www/<username>_pythonanywhere_com_wsgi.py`) so it imports your app:
+   ```python
+   import sys
+   path = '/home/<your-username>/moore_water'
+   if path not in sys.path:
+       sys.path.insert(0, path)
+   from wsgi import app as application
    ```
-   *Press Ctrl+C to stop.*
+6. In the **Web** tab, add environment variables under **Environment variables** (or set them in the WSGI file before the import): `SECRET_KEY`, `FLASK_ENV=production`, `ADMIN_EMAIL_2`.
+7. Click **Reload**. `db.py` will auto-create `~/moore_water/moore_water.db` and seed default users on first request.
 
-6. **Create a Systemd Service File**:
-   This runs Gunicorn in the background and restarts it if the server reboots.
-   ```bash
-   sudo nano /etc/systemd/system/moore_water.service
-   ```
-   Paste the following:
-   ```ini
-   [Unit]
-   Description=Gunicorn instance to serve Moore Water Flask app
-   After=network.target
+### Option 2: Render (Easiest, container-based)
+1. **Push your code to GitHub** and create a Web Service on [Render](https://render.com/) connected to your repo.
+2. **Configure the Service**:
+   - **Build Command**: `pip install -r requirements.txt`
+   - **Start Command**: `gunicorn wsgi:app --bind 0.0.0.0:$PORT`
+3. **Set Environment Variables**: `FLASK_ENV=production`, `SECRET_KEY=<random>`, `ADMIN_EMAIL_2=<email>`.
+4. **Database** — pick one:
+   - **Postgres (recommended)**: Render → **New +** → **PostgreSQL**, then copy the **Internal Database URL** into `DATABASE_URL` on your web service.
+   - **SQLite + Disk**: Add a Disk mounted at `/data`, set `DB_PATH=/data/database.db`.
+5. Click **Create Web Service**.
 
-   [Service]
-   User=www-data
-   Group=www-data
-   WorkingDirectory=/var/www/moore_water
-   Environment="PATH=/var/www/moore_water/venv/bin"
-   Environment="FLASK_ENV=production"
-   Environment="SECRET_KEY=your_secure_random_key_here"
-   Environment="ADMIN_EMAIL_2=your-email@example.com"
-   ExecStart=/var/www/moore_water/venv/bin/gunicorn --workers 3 --bind 127.0.0.1:8000 wsgi:app
+### Option 3: Railway
+1. Push to GitHub, then **New Project → Deploy from GitHub repo** on [Railway.app](https://railway.app/).
+2. Add variables: `FLASK_ENV=production`, `SECRET_KEY=<random>`.
+3. **Database** — pick one:
+   - **Postgres (recommended)**: **New → Database → Add PostgreSQL**, then **Reference Variable** its connection string into `DATABASE_URL` on your service.
+   - **MySQL**: **New → Database → Add MySQL**, then reference `DB_HOST`/`DB_USER`/`DB_PASSWORD`/`DB_NAME`/`DB_PORT`.
+   - **SQLite + Volume**: **Settings → Volumes → Add Volume** mounted at `/data`, set `DB_PATH=/data/database.db`.
 
-   [Install]
-   WantedBy=multi-user.target
-   ```
-   *Save and exit (Ctrl+O, Enter, Ctrl+X).*
+### Option 4: Vercel (Serverless)
+Vercel's filesystem is ephemeral and functions are stateless between invocations, so **`DATABASE_URL` (PostgreSQL) is required** — SQLite will not persist data here.
 
-7. **Start and enable the systemd service**:
-   ```bash
-   sudo systemctl start moore_water
-   sudo systemctl enable moore_water
-   ```
+1. Provision a Postgres database (Vercel Postgres, Neon, or Supabase all work) and copy its connection string.
+2. In your Vercel project settings, set `DATABASE_URL`, `SECRET_KEY`, `FLASK_ENV=production`.
+3. A starter `vercel.json` is included in this project. Vercel's Python runtime configuration changes fairly often — check [Vercel's current Python docs](https://vercel.com/docs) before deploying, since the exact `builds`/`functions` syntax may need adjusting for the Vercel CLI version you're using.
+4. Deploy with `vercel --prod` or via the Vercel dashboard's Git integration.
 
-8. **Configure Nginx as a Reverse Proxy**:
-   Nginx will handle SSL, serve static files, and forward web traffic to Gunicorn.
-   ```bash
-   sudo nano /etc/nginx/sites-available/moore_water
-   ```
-   Paste the following (replace `yourdomain.com` with your actual domain or IP address):
-   ```nginx
-   server {
-       listen 80;
-       server_name yourdomain.com www.yourdomain.com;
-
-       location / {
-           proxy_pass http://127.0.0.1:8000;
-           proxy_set_header Host $host;
-           proxy_set_header X-Real-IP $remote_addr;
-           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-           proxy_set_header X-Forwarded-Proto $scheme;
-       }
-
-       location /static {
-           alias /var/www/moore_water/static;
-       }
-   }
-   ```
-   Enable the site and restart Nginx:
-   ```bash
-   sudo ln -s /etc/nginx/sites-available/moore_water /etc/nginx/sites-enabled/
-   sudo nginx -t
-   sudo systemctl restart nginx
-   ```
-
-9. **Secure with HTTPS (SSL)** using free Let's Encrypt certificates:
-   ```bash
-   sudo apt install certbot python3-certbot-nginx -y
-   sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com
-   ```
-   Follow the prompts to enable auto-redirection to HTTPS.
+### Option 5: VPS Self-Hosting (DigitalOcean / Linode / AWS EC2)
+Use Nginx + Gunicorn + Systemd, same as before:
+```bash
+sudo apt update && sudo apt install python3-pip python3-venv git nginx -y
+cd /var/www && git clone <your-repo-url> moore_water && cd moore_water
+python3 -m venv venv && source venv/bin/activate
+pip install -r requirements.txt
+gunicorn --bind 0.0.0.0:8000 wsgi:app   # test run
+```
+Then create a systemd service (`/etc/systemd/system/moore_water.service`) running
+`gunicorn --workers 3 --bind 127.0.0.1:8000 wsgi:app`, enable it, and put Nginx in front with a reverse proxy + Let's Encrypt SSL, exactly as in a standard Flask+Gunicorn+Nginx setup.
 
 ---
 
 ## 4. Post-Hosting Verification
 
-Once hosted, navigate to your URL and verify the following:
-1. **Initial Seed User Login**: Use `employee@moorwater.com` with password `employee123` to log in, or register a new account.
-2. **Access Control**: Go to `/admin` and confirm it redirects you or shows a `403 Forbidden` if you are not logged in as the admin (`quayen010@gmail.com` or `ADMIN_EMAIL_2`).
-3. **PWA Support**: Inspect page in browser, open developer tools, and verify the Service Worker loads successfully (`sw.js`) and the app is installable.
+1. **Initial Seed User Login**: `employee@moorwater.com` / `employee123`, or register a new account.
+2. **Access Control**: Visit `/admin` while logged out — should redirect to login. Visit while logged in as a non-admin — should show a friendly 403 page.
+3. **PWA Support**: In DevTools, confirm the Service Worker (`/sw.js`) registers and the app is installable.
+4. **Admin Dashboard**: Log in as `quayen010@gmail.com` / `admin123`, confirm the Dashboard tab renders the two charts once you have ledger entries, and that Historical Records search/filter work.
+5. **Mobile check**: Open `/login` and `/admin` on a narrow/short viewport (or DevTools device mode) — the login card should scroll into view, and the admin header should not overlap the session badge.

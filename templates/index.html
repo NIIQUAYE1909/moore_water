@@ -9,7 +9,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Moor Ledger">
-  <meta name="theme-color" content="#0A3894">
+  <meta name="theme-color" content="#0B2E6B">
   <meta name="mobile-web-app-capable" content="yes">
   
   <link rel="manifest" href="/static/manifest.json">
@@ -19,10 +19,24 @@
   <!-- Typography & CSS -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
+  <div class="bubble-field" aria-hidden="true">
+    <span style="left:32.4%; width:12.0px; height:12.0px; animation-duration:21.8s; animation-delay:-18.6s; --drift:2.0px;"></span>
+    <span style="left:36.4%; width:10.0px; height:10.0px; animation-duration:20.1s; animation-delay:-19.3s; --drift:-4.0px;"></span>
+    <span style="left:8.6%; width:10.0px; height:10.0px; animation-duration:19.1s; animation-delay:-3.5s; --drift:-23.0px;"></span>
+    <span style="left:23.0%; width:24.0px; height:24.0px; animation-duration:25.4s; animation-delay:-8.5s; --drift:-6.0px;"></span>
+    <span style="left:93.8%; width:9.0px; height:9.0px; animation-duration:24.3s; animation-delay:-14.2s; --drift:-21.0px;"></span>
+    <span style="left:13.1%; width:16.0px; height:16.0px; animation-duration:23.8s; animation-delay:-16.4s; --drift:5.0px;"></span>
+    <span style="left:62.1%; width:18.0px; height:18.0px; animation-duration:20.6s; animation-delay:-18.7s; --drift:-26.0px;"></span>
+    <span style="left:21.4%; width:26.0px; height:26.0px; animation-duration:19.1s; animation-delay:-13.7s; --drift:5.0px;"></span>
+    <span style="left:44.6%; width:16.0px; height:16.0px; animation-duration:23.5s; animation-delay:-6.0s; --drift:-15.0px;"></span>
+    <span style="left:56.0%; width:22.0px; height:22.0px; animation-duration:24.5s; animation-delay:-5.4s; --drift:-13.0px;"></span>
+    <span style="left:94.1%; width:11.0px; height:11.0px; animation-duration:19.0s; animation-delay:-4.9s; --drift:-21.0px;"></span>
+    <span style="left:48.0%; width:9.0px; height:9.0px; animation-duration:22.0s; animation-delay:-4.7s; --drift:4.0px;"></span>
+  </div>
 
   <!-- Worker active session bar -->
   <div class="user-badge">
@@ -40,7 +54,7 @@
   {% if is_guest %}
   <!-- Guest Preview Banner -->
   <div id="guestBanner" style="
-    background: linear-gradient(135deg, #0A3894, #00B5EF);
+    background: linear-gradient(135deg, #0B2E6B, #0DAFC4);
     color: white;
     padding: 12px 16px;
     text-align: center;
@@ -59,7 +73,7 @@
     <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:white;flex-shrink:0;"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
     <span>👀 <strong>Preview Mode</strong> — You can explore the full app but records won\'t be saved.</span>
     <span style="display:flex;gap:6px;">
-      <a href="/register" style="background:white;color:#0A3894;padding:4px 12px;border-radius:6px;text-decoration:none;font-weight:800;font-size:0.78rem;">Create Account</a>
+      <a href="/register" style="background:white;color:#0B2E6B;padding:4px 12px;border-radius:6px;text-decoration:none;font-weight:800;font-size:0.78rem;">Create Account</a>
       <a href="/login" style="background:rgba(255,255,255,0.2);color:white;padding:4px 12px;border-radius:6px;text-decoration:none;font-weight:700;font-size:0.78rem;border:1px solid rgba(255,255,255,0.4);">Sign In</a>
     </span>
   </div>
@@ -70,17 +84,17 @@
       <div class="logo-container">
         <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
           <path id="circlePathIndex" d="M 50 14 A 36 36 0 1 1 49.9 14" fill="none" />
-          <text fill="#E30613" font-size="8.8" font-weight="900" letter-spacing="4.5">
+          <text fill="#EDA13C" font-size="8.8" font-weight="900" letter-spacing="4.5">
             <textPath href="#circlePathIndex" startOffset="0%">• MOOR • MOOR • MOOR • MOOR </textPath>
           </text>
-          <circle cx="50" cy="53" r="23" fill="none" stroke="#00B5EF" stroke-width="1.5" opacity="0.4"/>
-          <path d="M 50 67 C 32 67, 26 50, 41 48 C 40 57, 45 63, 50 67 Z" fill="#00B5EF" />
-          <path d="M 50 67 C 68 67, 74 50, 59 48 C 60 57, 55 63, 50 67 Z" fill="#0A3894" />
+          <circle cx="50" cy="53" r="23" fill="none" stroke="#0DAFC4" stroke-width="1.5" opacity="0.4"/>
+          <path d="M 50 67 C 32 67, 26 50, 41 48 C 40 57, 45 63, 50 67 Z" fill="#0DAFC4" />
+          <path d="M 50 67 C 68 67, 74 50, 59 48 C 60 57, 55 63, 50 67 Z" fill="#0B2E6B" />
           <path d="M 50 25 C 62 42, 65 58, 50 67 C 35 58, 38 42, 50 25 Z" fill="url(#dropletGradIndex)" />
           <defs>
             <linearGradient id="dropletGradIndex" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stop-color="#00B5EF" />
-              <stop offset="100%" stop-color="#0A3894" />
+              <stop offset="0%" stop-color="#0DAFC4" />
+              <stop offset="100%" stop-color="#0B2E6B" />
             </linearGradient>
           </defs>
         </svg>
@@ -93,6 +107,9 @@
         <span class="slogan-red">nom dodo!!!</span>
       </div>
     </div>
+    <svg class="current-line" viewBox="0 0 1440 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M0,32 C240,58 480,4 720,20 C960,36 1200,54 1440,26 L1440,60 L0,60 Z" fill="#EEF3FC"></path>
+    </svg>
   </header>
 
   <main>

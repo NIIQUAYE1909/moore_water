@@ -107,7 +107,7 @@ function showGuestPrompt() {
     modal.innerHTML = `
       <div style="background:white; border-radius:20px; padding:32px 24px; max-width:360px; width:100%;
                   text-align:center; box-shadow:0 25px 60px rgba(0,0,0,0.2);">
-        <div style="width:64px;height:64px;background:linear-gradient(135deg,#0A3894,#00B5EF);
+        <div style="width:64px;height:64px;background:linear-gradient(135deg,#0B2E6B,#0DAFC4);
                     border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
           <svg viewBox="0 0 24 24" style="width:30px;height:30px;fill:white;">
             <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
@@ -118,7 +118,7 @@ function showGuestPrompt() {
           You're in <strong>Preview Mode</strong>. Create a free account to save your daily records to the database and access them anytime.
         </p>
         <div style="display:flex;flex-direction:column;gap:10px;">
-          <a href="/register" style="display:block;background:#0A3894;color:white;padding:12px;border-radius:8px;
+          <a href="/register" style="display:block;background:#0B2E6B;color:white;padding:12px;border-radius:8px;
                               text-decoration:none;font-weight:700;font-size:0.9rem;">
             Create My Account — It's Free
           </a>

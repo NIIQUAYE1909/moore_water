@@ -1,10 +1,11 @@
 from flask import Flask, request, jsonify, render_template, redirect, url_for, session, make_response, send_from_directory
-import sqlite3
 import os
 import time
 from collections import defaultdict
 from functools import wraps
 from werkzeug.security import check_password_hash, generate_password_hash
+
+import db as dbmod
 
 # ─────────────────────────────────────────────
 #  App Initialization
@@ -30,23 +31,13 @@ app.config['SESSION_COOKIE_SECURE'] = IS_PRODUCTION
 app.config['SESSION_COOKIE_SAMESITE'] = 'None' if IS_PRODUCTION else 'Lax'
 app.config['PERMANENT_SESSION_LIFETIME'] = 43200  # 12 hours
 
-DB_PATH = os.environ.get('DB_PATH', 'database.db')
-
 # ─────────────────────────────────────────────
 #  ADMIN EMAIL WHITELIST
 #  Only these emails can have admin role.
 #  Add ADMIN_EMAIL_2 via environment variable when ready.
+#  (Shared with db.py so init_db.py stays in sync automatically.)
 # ─────────────────────────────────────────────
-ADMIN_EMAILS = {
-    'quayen010@gmail.com',
-    os.environ.get('ADMIN_EMAIL_2', '').strip().lower(),
-}
-ADMIN_EMAILS = {e for e in ADMIN_EMAILS if e}  # Remove empty strings
-
-
-def get_role_for_email(email: str) -> str:
-    """Return 'admin' if email is whitelisted, else 'employee'."""
-    return 'admin' if email.strip().lower() in ADMIN_EMAILS else 'employee'
+get_role_for_email = dbmod.get_role_for_email
 
 
 # ─────────────────────────────────────────────
@@ -88,14 +79,21 @@ def add_security_headers(response):
 
 # ─────────────────────────────────────────────
 #  Database Helper
+#  Transparently targets PostgreSQL (DATABASE_URL), MySQL/TiDB (DB_HOST),
+#  or SQLite (fallback — PythonAnywhere / VPS). See db.py for details.
 # ─────────────────────────────────────────────
 def get_db_connection():
-    db_path = app.config.get('DB_PATH', DB_PATH)
-    conn = sqlite3.connect(db_path)
-    conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA journal_mode=WAL")
-    conn.execute("PRAGMA foreign_keys=ON")
-    return conn
+    return dbmod.get_db_connection()
+
+
+# Auto-create tables (and seed default users) on cold start. This is what
+# makes Render/Railway/Vercel deployments work without a manual SSH step,
+# and it's a harmless no-op on repeat calls (CREATE TABLE IF NOT EXISTS).
+try:
+    dbmod.init_db(verbose=True)
+except Exception as _db_init_err:
+    import warnings
+    warnings.warn(f"[db] Auto-initialization failed: {_db_init_err}", stacklevel=2)
 
 
 # ─────────────────────────────────────────────
@@ -234,9 +232,10 @@ def api_register():
             'name': name
         })
 
-    except sqlite3.IntegrityError:
-        return jsonify({'error': 'That email address is already registered. Please log in instead.'}), 400
     except Exception as e:
+        conn.rollback()
+        if dbmod.is_integrity_error(e):
+            return jsonify({'error': 'That email address is already registered. Please log in instead.'}), 400
         return jsonify({'error': f'Registration failed: {str(e)}'}), 500
     finally:
         conn.close()
@@ -449,9 +448,10 @@ def api_admin_employees():
         )
         conn.commit()
         return jsonify({'success': f'Account for "{name}" created successfully.'})
-    except sqlite3.IntegrityError:
-        return jsonify({'error': 'That email is already registered.'}), 400
     except Exception as e:
+        conn.rollback()
+        if dbmod.is_integrity_error(e):
+            return jsonify({'error': 'That email is already registered.'}), 400
         return jsonify({'error': f'Database error: {str(e)}'}), 500
     finally:
         conn.close()
@@ -464,7 +464,7 @@ def api_delete_employee(emp_id):
         return jsonify({'error': 'You cannot delete your own account.'}), 400
     conn = get_db_connection()
     try:
-        result = conn.execute('DELETE FROM users WHERE id = ? AND role = "employee"', (emp_id,))
+        result = conn.execute("DELETE FROM users WHERE id = ? AND role = 'employee'", (emp_id,))
         conn.commit()
         if result.rowcount == 0:
             return jsonify({'error': 'Employee not found.'}), 404
@@ -485,6 +485,29 @@ def api_admin_ledger():
     rows = conn.execute('SELECT * FROM ledger ORDER BY date DESC').fetchall()
     conn.close()
     return jsonify([dict(r) for r in rows])
+
+
+@app.route('/api/admin/db-diagnostics', methods=['GET'])
+@login_required(role='admin')
+def api_db_diagnostics():
+    """Read-only sanity check: which DB engine/file is actually being used
+    right now, and how many rows each core table has. Handy for confirming
+    the app is attached to the database you expect, without SSH access."""
+    conn = get_db_connection()
+    info = {'engine': conn.engine}
+    if conn.engine == 'sqlite':
+        info['sqlite_path'] = dbmod._resolve_sqlite_path()
+        info['file_exists'] = os.path.isfile(info['sqlite_path'])
+    try:
+        info['users_count'] = conn.execute('SELECT COUNT(*) AS c FROM users').fetchone()['c']
+    except Exception as e:
+        info['users_count_error'] = str(e)
+    try:
+        info['ledger_count'] = conn.execute('SELECT COUNT(*) AS c FROM ledger').fetchone()['c']
+    except Exception as e:
+        info['ledger_count_error'] = str(e)
+    conn.close()
+    return jsonify(info)
 
 
 @app.route('/api/admin/ledger/<int:entry_id>', methods=['DELETE'])
