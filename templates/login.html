@@ -13,29 +13,13 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/css/style.css">
   <style>
-    html, body {
-      height: auto;
-      min-height: 100%;
-    }
     body {
       background: linear-gradient(135deg, #002270 0%, #0A3894 50%, #1A4EB5 100%);
       justify-content: center;
       align-items: center;
       display: flex;
       min-height: 100vh;
-      min-height: 100dvh;
       padding: 20px;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    /* On short/mobile viewports let the card sit at the top and scroll
-       naturally instead of being vertically centered and clipped. */
-    @media (max-height: 700px), (max-width: 480px) {
-      body {
-        align-items: flex-start;
-        padding-top: max(20px, var(--safe-top, 20px));
-      }
     }
 
     .login-wrap {
