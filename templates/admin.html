@@ -43,61 +43,237 @@
     /* ── Main container ─────────────────────────────────────────── */
     main { max-width: 1100px; padding: 0 20px; }
 
-    /* ── Stat Cards ─────────────────────────────────────────────── */
+    /* ══════════════════════════════════════════════════════════════
+       QUICK STATS HERO GRID — 3-column KPI cards
+       Electric Blue · Emerald Green · Deep Indigo/Amethyst
+    ══════════════════════════════════════════════════════════════ */
     .stats-bar {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-      margin-bottom: 24px;
+      gap: 20px;
+      margin-bottom: 28px;
     }
 
-    .stat-card {
-      background: var(--glass-bg);
-      backdrop-filter: blur(16px) saturate(180%);
-      -webkit-backdrop-filter: blur(16px) saturate(180%);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--r-card);
-      padding: 22px 18px;
-      text-align: center;
-      box-shadow: var(--glass-shadow);
-      transition: transform 0.3s var(--ease-spring), box-shadow 0.3s var(--ease-out);
+    /* ── Base KPI card ───────────────────────────────────────────── */
+    .kpi-card {
+      border-radius: 16px;
+      padding: 26px 22px 22px;
       position: relative;
       overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      transition: transform 0.35s var(--ease-spring), box-shadow 0.35s var(--ease-out);
+      cursor: default;
+      border: 1px solid transparent;
     }
-    /* Shimmer accent line on hover */
-    .stat-card::before {
+    .kpi-card:hover { transform: translateY(-6px) scale(1.015); }
+
+    /* Animated top accent bar */
+    .kpi-card::before {
       content: '';
       position: absolute;
       inset: 0 0 auto 0;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, rgba(13,175,196,0.7) 40%, rgba(11,46,107,0.4) 70%, transparent);
-      opacity: 0;
+      height: 3px;
+      border-radius: 16px 16px 0 0;
+      opacity: 0.85;
       transition: opacity 0.3s ease;
-      border-radius: var(--r-card) var(--r-card) 0 0;
     }
-    .stat-card:hover { transform: translateY(-5px) scale(1.01); box-shadow: var(--glass-hover); }
-    .stat-card:hover::before { opacity: 1; }
+    /* Soft radial orb glow inside card */
+    .kpi-card::after {
+      content: '';
+      position: absolute;
+      width: 160px; height: 160px;
+      top: -40px; right: -40px;
+      border-radius: 50%;
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+    }
 
-    .stat-card-icon {
-      width: 40px; height: 40px;
+    /* ── Card 1 — Electric Blue (Daily Production) ───────────────── */
+    .kpi-card--blue {
+      background: linear-gradient(145deg, rgba(255,255,255,0.82) 0%, rgba(224,242,255,0.70) 100%);
+      backdrop-filter: blur(20px) saturate(200%);
+      -webkit-backdrop-filter: blur(20px) saturate(200%);
+      border-color: rgba(56,189,248,0.28);
+      box-shadow:
+        0 10px 32px rgba(14,165,233,0.14),
+        0 2px 8px rgba(14,165,233,0.06),
+        inset 0 1px 0 rgba(255,255,255,0.75);
+    }
+    .kpi-card--blue:hover {
+      box-shadow:
+        0 22px 50px rgba(14,165,233,0.22),
+        0 4px 14px rgba(14,165,233,0.10),
+        inset 0 1px 0 rgba(255,255,255,0.80);
+    }
+    .kpi-card--blue::before {
+      background: linear-gradient(90deg, #38BDF8, #0EA5E9, #0284C7);
+    }
+    .kpi-card--blue::after {
+      background: radial-gradient(circle, rgba(14,165,233,0.12) 0%, transparent 70%);
+    }
+    .kpi-card--blue .kpi-icon-wrap {
+      background: linear-gradient(135deg, rgba(14,165,233,0.18), rgba(2,132,199,0.12));
+      border: 1px solid rgba(14,165,233,0.22);
+      box-shadow: 0 2px 10px rgba(14,165,233,0.15);
+    }
+    .kpi-card--blue .kpi-icon-wrap svg { fill: #0284C7; }
+    .kpi-card--blue .kpi-value { color: #0C4A6E; }
+    .kpi-card--blue .kpi-badge--up {
+      background: rgba(14,165,233,0.12);
+      color: #0284C7;
+      border: 1px solid rgba(14,165,233,0.22);
+    }
+
+    /* ── Card 2 — Emerald Green (Today's Revenue) ────────────────── */
+    .kpi-card--green {
+      background: linear-gradient(145deg, rgba(255,255,255,0.82) 0%, rgba(220,252,231,0.70) 100%);
+      backdrop-filter: blur(20px) saturate(200%);
+      -webkit-backdrop-filter: blur(20px) saturate(200%);
+      border-color: rgba(52,211,153,0.28);
+      box-shadow:
+        0 10px 32px rgba(16,185,129,0.12),
+        0 2px 8px rgba(16,185,129,0.06),
+        inset 0 1px 0 rgba(255,255,255,0.75);
+    }
+    .kpi-card--green:hover {
+      box-shadow:
+        0 22px 50px rgba(16,185,129,0.20),
+        0 4px 14px rgba(16,185,129,0.10),
+        inset 0 1px 0 rgba(255,255,255,0.80);
+    }
+    .kpi-card--green::before {
+      background: linear-gradient(90deg, #34D399, #10B981, #059669);
+    }
+    .kpi-card--green::after {
+      background: radial-gradient(circle, rgba(16,185,129,0.10) 0%, transparent 70%);
+    }
+    .kpi-card--green .kpi-icon-wrap {
+      background: linear-gradient(135deg, rgba(16,185,129,0.18), rgba(5,150,105,0.12));
+      border: 1px solid rgba(16,185,129,0.22);
+      box-shadow: 0 2px 10px rgba(16,185,129,0.15);
+    }
+    .kpi-card--green .kpi-icon-wrap svg { fill: #059669; }
+    .kpi-card--green .kpi-value { color: #064E3B; }
+    .kpi-card--green .kpi-badge--up {
+      background: rgba(16,185,129,0.12);
+      color: #059669;
+      border: 1px solid rgba(16,185,129,0.22);
+    }
+
+    /* ── Card 3 — Deep Indigo/Amethyst (Active Workers) ─────────── */
+    .kpi-card--indigo {
+      background: linear-gradient(145deg, rgba(255,255,255,0.82) 0%, rgba(237,233,254,0.72) 100%);
+      backdrop-filter: blur(20px) saturate(200%);
+      -webkit-backdrop-filter: blur(20px) saturate(200%);
+      border-color: rgba(139,92,246,0.25);
+      box-shadow:
+        0 10px 32px rgba(109,40,217,0.12),
+        0 2px 8px rgba(109,40,217,0.06),
+        inset 0 1px 0 rgba(255,255,255,0.75);
+    }
+    .kpi-card--indigo:hover {
+      box-shadow:
+        0 22px 50px rgba(109,40,217,0.20),
+        0 4px 14px rgba(109,40,217,0.10),
+        inset 0 1px 0 rgba(255,255,255,0.80);
+    }
+    .kpi-card--indigo::before {
+      background: linear-gradient(90deg, #A78BFA, #7C3AED, #6D28D9);
+    }
+    .kpi-card--indigo::after {
+      background: radial-gradient(circle, rgba(109,40,217,0.10) 0%, transparent 70%);
+    }
+    .kpi-card--indigo .kpi-icon-wrap {
+      background: linear-gradient(135deg, rgba(139,92,246,0.18), rgba(109,40,217,0.12));
+      border: 1px solid rgba(139,92,246,0.22);
+      box-shadow: 0 2px 10px rgba(139,92,246,0.18);
+    }
+    .kpi-card--indigo .kpi-icon-wrap svg { fill: #6D28D9; }
+    .kpi-card--indigo .kpi-value { color: #3B0764; }
+    .kpi-card--indigo .kpi-badge--stable {
+      background: rgba(139,92,246,0.10);
+      color: #7C3AED;
+      border: 1px solid rgba(139,92,246,0.20);
+    }
+
+    /* ── Inner KPI card elements ─────────────────────────────────── */
+    .kpi-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .kpi-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .kpi-label {
+      font-size: 0.65rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1.1px;
+      color: #94A3B8;
+      line-height: 1;
+    }
+    .kpi-sublabel {
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: #CBD5E1;
+      margin-top: 1px;
+    }
+    .kpi-icon-wrap {
+      width: 44px; height: 44px;
       border-radius: 12px;
-      display: flex; align-items: center; justify-content: center;
-      margin: 0 auto 10px;
-      background: linear-gradient(135deg, rgba(13,175,196,0.15), rgba(11,46,107,0.10));
-      box-shadow: 0 2px 8px rgba(11,46,107,0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
     }
-    .stat-card-icon svg { width: 20px; height: 20px; fill: #0B2E6B; }
+    .kpi-icon-wrap svg { width: 22px; height: 22px; }
 
-    .stat-val {
+    .kpi-value {
       font-family: 'IBM Plex Mono', monospace;
-      font-size: 1.65rem; font-weight: 600;
-      color: #0B2E6B; display: block; line-height: 1.15;
-      letter-spacing: -0.5px; font-variant-numeric: tabular-nums;
+      font-size: 1.85rem;
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -1px;
+      font-variant-numeric: tabular-nums;
+      margin-bottom: 12px;
+      display: block;
     }
-    .stat-lbl {
-      font-size: 0.67rem; font-weight: 700;
-      color: #94A3B8; text-transform: uppercase; letter-spacing: 0.8px; margin-top: 3px;
+
+    /* Trend / progress pill badges */
+    .kpi-footer {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
     }
+    .kpi-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.2px;
+      white-space: nowrap;
+    }
+    .kpi-badge svg { width: 10px; height: 10px; fill: currentColor; flex-shrink: 0; }
+    .kpi-trend-text {
+      font-size: 0.67rem;
+      color: #94A3B8;
+      font-weight: 600;
+    }
+
+    /* ── Legacy aliases (keep JS targets working) ────────────────── */
+    .stat-val { display: none; } /* hidden — values now rendered in .kpi-value */
+    .stat-lbl { display: none; }
 
     /* ── Tab Navigation ─────────────────────────────────────────── */
     .tabs-header {
@@ -416,12 +592,15 @@
       .tab-btn { font-size: 0.75rem; padding: 9px 8px; }
     }
     @media (max-width: 640px) {
-      .stats-bar { grid-template-columns: 1fr 1fr; }
-      .stats-bar .stat-card:last-child { grid-column: 1 / -1; }
+      .stats-bar { grid-template-columns: 1fr; }
       .export-bar { flex-direction: column; }
       .export-bar .btn { width: 100%; }
-      .stat-val { font-size: 1.35rem; }
+      .kpi-value { font-size: 1.55rem; }
       main { padding: 0 12px; }
+    }
+    @media (min-width: 641px) and (max-width: 900px) {
+      .stats-bar { grid-template-columns: 1fr 1fr; }
+      .stats-bar .kpi-card:last-child { grid-column: 1 / -1; }
     }
   </style>
 </head>
@@ -485,29 +664,96 @@
 
   <main>
 
-    <!-- Stats Summary -->
-    <div class="stats-bar" id="statsBar" style="margin-top: 20px;">
-      <div class="stat-card">
-        <div class="stat-card-icon">
-          <svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
+    <!-- ═══════════════════════════════════════════════════════════
+         QUICK STATS HERO GRID
+         Data is populated by updateStats() in JavaScript below.
+         · statTotalEntries  → today's bags produced (most recent entry for today)
+         · statTotalRevenue  → today's revenue (total_amount from today's entries)
+         · statEmployees     → active employee count (from /api/admin/employees)
+    ═══════════════════════════════════════════════════════════════ -->
+    <div class="stats-bar" id="statsBar" style="margin-top: 20px;" role="region" aria-label="Quick Stats">
+
+      <!-- KPI 1: Daily Production — Electric Blue -->
+      <div class="kpi-card kpi-card--blue" id="kpiProduction">
+        <div class="kpi-header">
+          <div class="kpi-meta">
+            <span class="kpi-label">Daily Production</span>
+            <span class="kpi-sublabel">Bags produced today</span>
+          </div>
+          <div class="kpi-icon-wrap" aria-hidden="true">
+            <!-- Factory / production icon -->
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M22 3H14L12 1H4C2.9 1 2 1.9 2 3V15C2 16.1 2.9 17 4 17H8V19H6V21H18V19H16V17H20C21.1 17 22 16.1 22 15V5C22 3.9 21.1 3 20 3H22ZM20 15H4V3H11.2L13.2 5H20V15ZM11 7H13V10H16V12H13V15H11V12H8V10H11V7Z"/>
+            </svg>
+          </div>
         </div>
-        <span class="stat-val" id="statTotalEntries">—</span>
-        <span class="stat-lbl">Ledger Entries</span>
-      </div>
-      <div class="stat-card">
-        <div class="stat-card-icon">
-          <svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
+        <!-- VALUE: populated by JS updateStats() from today's ledger total_produced -->
+        <span class="kpi-value" id="statTotalEntries">—</span>
+        <div class="kpi-footer">
+          <span class="kpi-badge kpi-badge--up" id="kpiBadgeProduction">
+            <svg viewBox="0 0 24 24"><path d="M7 14l5-5 5 5z"/></svg>
+            <span id="kpiBadgeProdText">Live</span>
+          </span>
+          <span class="kpi-trend-text" id="kpiProdSubtext">Loading...</span>
         </div>
-        <span class="stat-val" id="statTotalRevenue">—</span>
-        <span class="stat-lbl">Total Revenue</span>
+        <!-- Hidden legacy span (still targeted by old code paths) -->
+        <span class="stat-val" id="statTotalEntriesLegacy" style="display:none;"></span>
       </div>
-      <div class="stat-card">
-        <div class="stat-card-icon">
-          <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+
+      <!-- KPI 2: Today's Revenue — Emerald Green -->
+      <div class="kpi-card kpi-card--green" id="kpiRevenue">
+        <div class="kpi-header">
+          <div class="kpi-meta">
+            <span class="kpi-label">Today's Revenue</span>
+            <span class="kpi-sublabel">GH₵ earned today</span>
+          </div>
+          <div class="kpi-icon-wrap" aria-hidden="true">
+            <!-- Currency / trending-up icon -->
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/>
+            </svg>
+          </div>
         </div>
-        <span class="stat-val" id="statEmployees">—</span>
-        <span class="stat-lbl">Active Employees</span>
+        <!-- VALUE: populated by JS updateStats() from today's total_amount sum -->
+        <span class="kpi-value" id="statTotalRevenue">—</span>
+        <div class="kpi-footer">
+          <span class="kpi-badge kpi-badge--up" id="kpiBadgeRevenue">
+            <svg viewBox="0 0 24 24"><path d="M7 14l5-5 5 5z"/></svg>
+            <span id="kpiBadgeRevText">Today</span>
+          </span>
+          <span class="kpi-trend-text" id="kpiRevSubtext">Loading...</span>
+        </div>
+        <!-- Hidden legacy span -->
+        <span class="stat-val" id="statTotalRevenueLegacy" style="display:none;"></span>
       </div>
+
+      <!-- KPI 3: Active Workers — Deep Indigo/Amethyst -->
+      <div class="kpi-card kpi-card--indigo" id="kpiWorkers">
+        <div class="kpi-header">
+          <div class="kpi-meta">
+            <span class="kpi-label">Active Workers</span>
+            <span class="kpi-sublabel">Registered employees</span>
+          </div>
+          <div class="kpi-icon-wrap" aria-hidden="true">
+            <!-- Team / people icon -->
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+            </svg>
+          </div>
+        </div>
+        <!-- VALUE: populated by fetchEmployees() — count of role==='employee' users -->
+        <span class="kpi-value" id="statEmployees">—</span>
+        <div class="kpi-footer">
+          <span class="kpi-badge kpi-badge--stable" id="kpiBadgeWorkers">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+            Active
+          </span>
+          <span class="kpi-trend-text">System users</span>
+        </div>
+        <!-- Hidden legacy span -->
+        <span class="stat-val" id="statEmployeesLegacy" style="display:none;"></span>
+      </div>
+
     </div>
 
     <!-- Tab Navigation -->
@@ -786,15 +1032,59 @@
     }
 
     // ──────────────────────────────────────────
-    //  Stats Bar
+    //  Quick Stats Hero Grid — updateStats()
+    //  · Card 1 (Electric Blue)  → today's bags produced (total_produced from today's records)
+    //  · Card 2 (Emerald Green)  → today's revenue (total_amount from today's records)
+    //  · Card 3 (Deep Indigo)    → active employee count (set separately by fetchEmployees)
     // ──────────────────────────────────────────
     function updateStats(records, empCount) {
-      document.getElementById('statTotalEntries').textContent = records.length;
+      // Determine today's date string in YYYY-MM-DD (local)
+      const todayStr = new Date().toISOString().slice(0, 10);
+
+      // Filter to today's records
+      const todayRecords = records.filter(r => r.date === todayStr);
+
+      // ── Card 1: Daily Production ──
+      const todayProduced = todayRecords.reduce((s, r) => s + (r.total_produced || 0), 0);
+      document.getElementById('statTotalEntries').textContent =
+        todayProduced > 0
+          ? todayProduced.toLocaleString() + ' bags'
+          : records.length > 0 ? 'No entry yet' : '—';
+
+      // Trend badge: show total ledger entries as context
+      const prodBadgeText = document.getElementById('kpiBadgeProdText');
+      const prodSubtext   = document.getElementById('kpiProdSubtext');
+      if (todayRecords.length > 0) {
+        prodBadgeText.textContent = 'Today ✓';
+        prodSubtext.textContent   = records.length + ' total entries in ledger';
+      } else {
+        prodBadgeText.textContent = 'Pending';
+        prodSubtext.textContent   = records.length + ' historical entries';
+      }
+
+      // ── Card 2: Today's Revenue ──
+      const todayRev = todayRecords.reduce((s, r) => s + (r.total_amount || 0), 0);
       const totalRev = records.reduce((s, r) => s + (r.total_amount || 0), 0);
       document.getElementById('statTotalRevenue').textContent =
-        'GH₵ ' + totalRev.toLocaleString('en-GH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-      if (empCount !== undefined)
+        todayRev > 0
+          ? 'GH₵\u202F' + todayRev.toLocaleString('en-GH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+          : records.length > 0 ? 'No revenue yet' : '—';
+
+      // Trend badge: show cumulative total as context
+      const revBadgeText = document.getElementById('kpiBadgeRevText');
+      const revSubtext   = document.getElementById('kpiRevSubtext');
+      if (todayRev > 0) {
+        revBadgeText.textContent = '+Today';
+        revSubtext.textContent   = 'All-time: GH₵\u202F' + totalRev.toLocaleString('en-GH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      } else {
+        revBadgeText.textContent = 'All-time';
+        revSubtext.textContent   = 'GH₵\u202F' + totalRev.toLocaleString('en-GH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      }
+
+      // ── Card 3: Active Workers (set by fetchEmployees, but update if empCount passed) ──
+      if (empCount !== undefined) {
         document.getElementById('statEmployees').textContent = empCount;
+      }
     }
 
     // ──────────────────────────────────────────
@@ -1203,6 +1493,25 @@
     window.addEventListener('DOMContentLoaded', () => {
       fetchLedger();
       fetchEmployees(); // Pre-fetch for stat count
+    });
+
+    // ── BFCache back-button fix ────────────────────────────────────
+    // Fires whenever the page is shown — including when the browser
+    // restores it from BFCache after Alt+Left / the back button.
+    // `event.persisted === true` is the canonical BFCache signal;
+    // the Navigation Timing v2 check covers some Chromium edge cases.
+    // Either way we reload so the admin always sees live data, not a
+    // frozen snapshot from a previous session.
+    window.addEventListener('pageshow', function (event) {
+      const navEntries = performance && performance.getEntriesByType
+        ? performance.getEntriesByType('navigation')
+        : [];
+      const isBackForward =
+        event.persisted ||
+        (navEntries.length > 0 && navEntries[0].type === 'back_forward');
+      if (isBackForward) {
+        window.location.reload();
+      }
     });
   </script>
 </body>

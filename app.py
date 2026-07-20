@@ -63,7 +63,7 @@ def clear_attempts(ip: str):
 
 
 # ─────────────────────────────────────────────
-#  Security Headers
+#  Security Headers  +  Cache-Control (BFCache fix)
 # ─────────────────────────────────────────────
 @app.after_request
 def add_security_headers(response):
@@ -74,6 +74,21 @@ def add_security_headers(response):
     response.headers['Permissions-Policy']     = 'geolocation=(), microphone=(), camera=()'
     if IS_PRODUCTION:
         response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+
+    # ── Disable BFCache on all dynamic routes ──────────────────────
+    # Static assets (/static/*) are deliberately excluded so browsers
+    # can still cache CSS / JS / images normally.  Every other route
+    # (rendered HTML pages + JSON API endpoints) gets hard no-store
+    # headers so the browser never serves a frozen BFCache snapshot
+    # when the user hits the back button.
+    if not request.path.startswith('/static/'):
+        response.headers['Cache-Control'] = (
+            'no-store, no-cache, must-revalidate, '
+            'post-check=0, pre-check=0, max-age=0'
+        )
+        response.headers['Pragma']  = 'no-cache'
+        response.headers['Expires'] = '-1'
+
     return response
 
 

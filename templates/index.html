@@ -388,6 +388,24 @@
           .catch(err => console.warn('[PWA] Service worker registration failed:', err));
       });
     }
+
+    // ── BFCache back-button fix ────────────────────────────────────
+    // When the browser restores this page from the Back-Forward Cache
+    // (triggered by Alt+Left / the back button) it shows a frozen
+    // snapshot.  Detecting `event.persisted` or a "back_forward"
+    // navigation type and immediately reloading forces a fresh server
+    // round-trip, so the employee always sees live, current data.
+    window.addEventListener('pageshow', function (event) {
+      const navEntries = performance && performance.getEntriesByType
+        ? performance.getEntriesByType('navigation')
+        : [];
+      const isBackForward =
+        event.persisted ||
+        (navEntries.length > 0 && navEntries[0].type === 'back_forward');
+      if (isBackForward) {
+        window.location.reload();
+      }
+    });
   </script>
 </body>
 </html>
