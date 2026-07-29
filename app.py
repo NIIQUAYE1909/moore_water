@@ -95,15 +95,99 @@ def add_security_headers(response):
 
 
 # ─────────────────────────────────────────────
-#  Database Helper
+#  Database Helper & Wrappers for MySQL/TiDB
 # ─────────────────────────────────────────────
+class TiDBMySQLCursorWrapper:
+    def __init__(self, cursor):
+        self.cursor = cursor
+
+    def execute(self, query, params=None):
+        # Convert sqlite parameter placeholder '?' to MySQL/TiDB '%s'
+        mysql_query = query.replace('?', '%s')
+        if params is not None:
+            self.cursor.execute(mysql_query, params)
+        else:
+            self.cursor.execute(mysql_query)
+        return self
+
+    def executemany(self, query, params_list):
+        mysql_query = query.replace('?', '%s')
+        self.cursor.executemany(mysql_query, params_list)
+        return self
+
+    def fetchone(self):
+        return self.cursor.fetchone()
+
+    def fetchall(self):
+        return self.cursor.fetchall()
+
+    @property
+    def rowcount(self):
+        return self.cursor.rowcount
+
+    def close(self):
+        self.cursor.close()
+
+
+class TiDBMySQLConnectionWrapper:
+    def __init__(self, conn):
+        self.conn = conn
+
+    def cursor(self):
+        return TiDBMySQLCursorWrapper(self.conn.cursor())
+
+    def execute(self, query, params=None):
+        cursor = self.cursor()
+        cursor.execute(query, params)
+        return cursor
+
+    def executemany(self, query, params_list):
+        cursor = self.cursor()
+        cursor.executemany(query, params_list)
+        return cursor
+
+    def commit(self):
+        self.conn.commit()
+
+    def rollback(self):
+        self.conn.rollback()
+
+    def close(self):
+        self.conn.close()
+
+
 def get_db_connection():
-    db_path = app.config.get('DB_PATH', DB_PATH)
-    conn = sqlite3.connect(db_path)
-    conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA journal_mode=WAL")
-    conn.execute("PRAGMA foreign_keys=ON")
-    return conn
+    db_host = os.environ.get('DB_HOST')
+    if db_host:
+        import pymysql
+        import pymysql.cursors
+        db_user = os.environ.get('DB_USER')
+        db_password = os.environ.get('DB_PASSWORD')
+        db_name = os.environ.get('DB_NAME')
+        db_port = int(os.environ.get('DB_PORT', 4000))
+        db_ssl_ca = os.environ.get('DB_SSL_CA')
+        
+        ssl_config = {'ssl': {}}
+        if db_ssl_ca:
+            ssl_config = {'ssl': {'ca': db_ssl_ca}}
+            
+        conn = pymysql.connect(
+            host=db_host,
+            user=db_user,
+            password=db_password,
+            database=db_name,
+            port=db_port,
+            cursorclass=pymysql.cursors.DictCursor,
+            ssl=ssl_config
+        )
+        return TiDBMySQLConnectionWrapper(conn)
+    else:
+        db_path = app.config.get('DB_PATH', DB_PATH)
+        conn = sqlite3.connect(db_path)
+        conn.row_factory = sqlite3.Row
+        conn.execute("PRAGMA journal_mode=WAL")
+        conn.execute("PRAGMA foreign_keys=ON")
+        return conn
 
 
 # ─────────────────────────────────────────────
