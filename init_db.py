@@ -1,8 +1,8 @@
 import sqlite3
 import os
 from werkzeug.security import generate_password_hash
-
-DB_PATH = os.environ.get('DB_PATH', 'database.db')
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.environ.get('DB_PATH', os.path.join(BASE_DIR, 'database.db'))
 
 # ── Admin email whitelist (must match app.py) ──────────────
 # These emails are granted admin role automatically.

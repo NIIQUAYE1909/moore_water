@@ -37,8 +37,8 @@ app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SECURE'] = IS_PRODUCTION
 app.config['SESSION_COOKIE_SAMESITE'] = 'None' if IS_PRODUCTION else 'Lax'
 app.config['PERMANENT_SESSION_LIFETIME'] = 43200  # 12 hours
-
-DB_PATH = os.environ.get('DB_PATH', 'database.db')
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.environ.get('DB_PATH', os.path.join(BASE_DIR, 'database.db'))
 
 # ─────────────────────────────────────────────
 #  ADMIN EMAIL WHITELIST
