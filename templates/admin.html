@@ -13,60 +13,76 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/css/style.css">
   <style>
-    main { max-width: 1100px; }
+    main { max-width: 1140px; }
 
-    /* Admin-only badge in header */
+    /* Admin restricted badge */
     .admin-shield {
       display: inline-flex;
       align-items: center;
       gap: 5px;
-      background: rgba(180, 83, 9, 0.15);
-      border: 1px solid rgba(180, 83, 9, 0.3);
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid rgba(245, 158, 11, 0.30);
       color: #92400E;
-      padding: 3px 10px;
-      border-radius: 20px;
-      font-size: 0.7rem;
-      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 100px;
+      font-size: 0.68rem;
+      font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.8px;
     }
-    .admin-shield svg { width: 12px; height: 12px; fill: #92400E; }
+    .admin-shield svg { width: 11px; height: 11px; fill: #92400E; }
 
     /* Stats summary bar */
     .stats-bar {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 14px;
-      margin-bottom: 20px;
+      margin-bottom: 22px;
     }
     .stat-card {
       background: white;
-      border-radius: 14px;
-      padding: 16px;
+      border-radius: 18px;
+      padding: 20px 18px;
       text-align: center;
-      border: 1px solid #E2E8F0;
-      box-shadow: 0 4px 12px rgba(10, 56, 148, 0.06);
+      border: 1px solid rgba(10,56,148,0.07);
+      box-shadow: 0 4px 16px rgba(10,56,148,0.07);
+      transition: all 0.25s ease;
+      position: relative;
+      overflow: hidden;
     }
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #0A3894, #00B5EF);
+      border-radius: 3px 3px 0 0;
+    }
+    .stat-card:hover { box-shadow: 0 8px 28px rgba(10,56,148,0.12); transform: translateY(-2px); }
     .stat-val {
-      font-size: 1.6rem;
-      font-weight: 800;
+      font-size: 1.65rem;
+      font-weight: 900;
       color: #0A3894;
       display: block;
+      letter-spacing: -1px;
+      line-height: 1.1;
     }
     .stat-lbl {
-      font-size: 0.68rem;
-      font-weight: 600;
-      color: #64748B;
+      font-size: 0.66rem;
+      font-weight: 700;
+      color: #5E7898;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.7px;
+      margin-top: 4px;
+      display: block;
     }
 
-    /* Delete button in table */
+    /* Delete button */
     .btn-del {
-      background: rgba(220, 38, 38, 0.1);
-      border: 1px solid rgba(220, 38, 38, 0.2);
+      background: rgba(220, 38, 38, 0.08);
+      border: 1px solid rgba(220, 38, 38, 0.18);
       color: #DC2626;
-      padding: 4px 8px;
+      padding: 4px 10px;
       border-radius: 6px;
       font-size: 0.7rem;
       font-weight: 700;
@@ -75,71 +91,77 @@
       transition: all 0.2s;
       white-space: nowrap;
     }
-    .btn-del:hover {
-      background: #DC2626;
-      color: white;
-    }
+    .btn-del:hover { background: #DC2626; color: white; border-color: #DC2626; }
 
-    .table-responsive { max-height: 420px; }
+    .table-responsive { max-height: 440px; }
 
-    /* Employee card in directory */
+    /* Employee card */
     .employee-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: #F8FAFC;
-      padding: 12px 14px;
-      border-radius: 10px;
-      border: 1px solid #E2E8F0;
+      background: #F8FAFF;
+      padding: 13px 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(10,56,148,0.07);
       gap: 10px;
+      transition: all 0.22s;
     }
+    .employee-item:hover { background: white; box-shadow: 0 4px 14px rgba(10,56,148,0.08); transform: translateX(3px); }
     .emp-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 
-    /* Export section */
-    .export-bar {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-    .export-bar .btn {
-      width: auto;
-      padding: 8px 16px;
-      font-size: 0.82rem;
-    }
+    /* Export bar */
+    .export-bar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .export-bar .btn { width: auto; padding: 9px 18px; font-size: 0.82rem; }
 
-    /* Confirm modal overlay */
+    /* Confirm modal */
     .modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.5);
+      background: rgba(12, 26, 46, 0.60);
+      backdrop-filter: blur(4px);
       z-index: 900;
       display: none;
       align-items: center;
       justify-content: center;
       padding: 20px;
     }
-    .modal-overlay.show { display: flex; }
+    .modal-overlay.show { display: flex; animation: fadeIn 0.2s ease; }
     .modal-box {
       background: white;
-      border-radius: 16px;
-      padding: 28px 24px;
-      max-width: 360px;
+      border-radius: 22px;
+      padding: 32px 28px;
+      max-width: 380px;
       width: 100%;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+      box-shadow: 0 24px 64px rgba(0,0,0,0.22);
       text-align: center;
+      animation: slideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
-    .modal-box h3 { font-size: 1.1rem; font-weight: 800; color: #0F172A; margin-bottom: 8px; }
-    .modal-box p { font-size: 0.85rem; color: #64748B; margin-bottom: 20px; line-height: 1.5; }
-    .modal-btns { display: flex; gap: 10px; }
+    .modal-icon {
+      width: 56px; height: 56px;
+      background: rgba(220,38,38,0.09);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 16px;
+    }
+    .modal-icon svg { width: 26px; height: 26px; fill: #DC2626; }
+    .modal-box h3 { font-size: 1.15rem; font-weight: 800; color: #0C1A2E; margin-bottom: 8px; }
+    .modal-box p  { font-size: 0.84rem; color: #5E7898; margin-bottom: 22px; line-height: 1.55; }
+    .modal-btns   { display: flex; gap: 10px; }
     .modal-btns button { flex: 1; }
 
-    @media (max-width: 640px) {
+    /* Register form card */
+    .admin-grid { display: grid; grid-template-columns: 1fr 1.4fr; gap: 20px; }
+
+    @media (max-width: 720px) {
       .stats-bar { grid-template-columns: 1fr 1fr; }
       .stats-bar .stat-card:last-child { grid-column: 1 / -1; }
       .export-bar { flex-direction: column; }
       .export-bar .btn { width: 100%; }
+      .admin-grid { grid-template-columns: 1fr; }
     }
+    @keyframes fadeIn  { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
   </style>
 </head>
 <body>
@@ -173,7 +195,7 @@
       <div>
         <h1 class="brand-title">Moor Natural Mineral Water</h1>
         <p class="brand-subtitle">Administrator Dashboard</p>
-        <div style="margin-top: 6px;">
+        <div style="margin-top: 8px;">
           <span class="admin-shield">
             <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
             Restricted Admin Access
@@ -186,13 +208,13 @@
   <main>
 
     <!-- Stats Summary -->
-    <div class="stats-bar" id="statsBar" style="margin-top: 20px;">
+    <div class="stats-bar" id="statsBar" style="margin-top: 24px;">
       <div class="stat-card">
         <span class="stat-val" id="statTotalEntries">—</span>
         <span class="stat-lbl">Ledger Entries</span>
       </div>
       <div class="stat-card">
-        <span class="stat-val" id="statTotalRevenue">—</span>
+        <span class="stat-val" id="statTotalRevenue" style="font-size:1.2rem;">—</span>
         <span class="stat-lbl">Total Revenue</span>
       </div>
       <div class="stat-card">
@@ -204,74 +226,58 @@
     <!-- Tab Navigation -->
     <div class="tabs-header">
       <button class="tab-btn active" id="tabBtnLedger" onclick="switchTab('ledgerTab', this)">
-        📊 Master Ledger
+        <svg viewBox="0 0 24 24" style="width:15px;height:15px;fill:currentColor;"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
+        Master Ledger
       </button>
       <button class="tab-btn" id="tabBtnDir" onclick="switchTab('directoryTab', this)">
-        👥 Employee Directory
+        <svg viewBox="0 0 24 24" style="width:15px;height:15px;fill:currentColor;"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+        Employee Directory
       </button>
     </div>
 
-    <!-- ═══════════════════════════════════════
-         TAB 1 — MASTER LEDGER
-    ═══════════════════════════════════════ -->
+    <!-- ═══ TAB 1 — MASTER LEDGER ═══ -->
     <div id="ledgerTab" class="tab-content active">
       <div class="card">
         <div class="card-title" style="justify-content: space-between; flex-wrap: wrap; gap: 10px; border: none; padding-bottom: 0;">
-          <div style="display: flex; align-items: center; gap: 8px;">
+          <div style="display:flex; align-items:center; gap:9px;">
             <svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
             Historical Ledger Records
           </div>
           <div class="export-bar">
             <button type="button" class="btn btn-green" id="btnExportCSV">
               <svg viewBox="0 0 24 24"><path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2z"/></svg>
-              Export CSV to Device
+              Export CSV
             </button>
-            <button type="button" class="btn btn-primary" id="btnRefreshLedger" style="background: rgba(10,56,148,0.1); color: #0A3894;">
+            <button type="button" class="btn btn-secondary" id="btnRefreshLedger">
               <svg viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
               Refresh
             </button>
           </div>
         </div>
 
-        <div class="table-responsive" style="margin-top: 15px;">
+        <div class="table-responsive" style="margin-top: 16px;">
           <table id="ledgerTable">
             <thead>
               <tr>
-                <th>#</th>
-                <th>Date</th>
-                <th>Status</th>
-                <th>Produced</th>
-                <th>Storage</th>
-                <th>Truck Sent</th>
-                <th>Truck Sold</th>
-                <th>Leakages</th>
-                <th>Aboboya</th>
-                <th>Factory</th>
-                <th>Price</th>
-                <th>Revenue</th>
-                <th>Fuel Exp</th>
-                <th>Other Exp</th>
-                <th>Withdrawal</th>
-                <th>Cash Hand</th>
-                <th>Cash Bank</th>
-                <th>Worker</th>
-                <th>Comments</th>
-                <th>Action</th>
+                <th>#</th><th>Date</th><th>Status</th><th>Produced</th>
+                <th>Storage</th><th>Truck Sent</th><th>Truck Sold</th>
+                <th>Leakages</th><th>Aboboya</th><th>Factory</th>
+                <th>Price</th><th>Revenue</th><th>Fuel Exp</th>
+                <th>Other Exp</th><th>Withdrawal</th><th>Cash Hand</th>
+                <th>Cash Bank</th><th>Worker</th><th>Comments</th><th>Action</th>
               </tr>
             </thead>
             <tbody id="ledgerTableBody">
-              <tr><td colspan="20" style="text-align:center; color:#94A3B8; padding:30px;">Loading ledger records...</td></tr>
+              <tr><td colspan="20" style="text-align:center;color:#94A3B8;padding:40px;">Loading ledger records...</td></tr>
             </tbody>
           </table>
         </div>
       </div>
     </div>
 
-    <!-- ═══════════════════════════════════════
-         TAB 2 — EMPLOYEE DIRECTORY
-    ═══════════════════════════════════════ -->
+    <!-- ═══ TAB 2 — EMPLOYEE DIRECTORY ═══ -->
     <div id="directoryTab" class="tab-content">
-      <div style="display: grid; grid-template-columns: 1fr 1.3fr; gap: 20px;">
+      <div class="admin-grid">
 
         <!-- Register Employee Form -->
         <div class="card">
@@ -294,14 +300,17 @@
                 <input type="email" id="empEmail" placeholder="ama@moorwater.com" required>
               </div>
             </div>
-            <div class="form-group" style="margin-bottom: 20px;">
-              <label for="empPassword">Password <small style="color:#94A3B8; font-weight:500;">(min. 6 chars)</small></label>
+            <div class="form-group" style="margin-bottom: 22px;">
+              <label for="empPassword">Password <small style="color:#94A3B8;font-weight:500;">(min. 6 chars)</small></label>
               <div class="input-wrapper">
                 <span class="input-icon"><svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg></span>
                 <input type="password" id="empPassword" placeholder="Minimum 6 characters" required minlength="6">
               </div>
             </div>
-            <button type="submit" class="btn btn-primary" id="btnRegEmployee">Register Worker</button>
+            <button type="submit" class="btn btn-primary" id="btnRegEmployee">
+              <svg viewBox="0 0 24 24"><path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+              Register Worker
+            </button>
           </form>
         </div>
 
@@ -312,25 +321,27 @@
             All System Users
           </div>
           <div class="employee-list" id="employeeList">
-            <div style="text-align:center; color:#94A3B8; padding:20px;">Loading directory...</div>
+            <div style="text-align:center;color:#94A3B8;padding:24px;">Loading directory...</div>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Action Footer -->
-    <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
-      <a href="/" class="btn btn-secondary" style="text-decoration: none; width: auto; padding: 10px 20px;">
-        ← Back to Ledger Form
+    <div style="margin-top: 22px; display: flex; gap: 10px; flex-wrap: wrap;">
+      <a href="/" class="btn btn-secondary" style="text-decoration:none; width:auto; padding:11px 22px;">
+        <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        Back to Ledger Form
       </a>
-      <a href="/api/logout" class="btn btn-danger" style="text-decoration: none; width: auto; padding: 10px 20px;">
+      <a href="/api/logout" class="btn btn-danger" style="text-decoration:none; width:auto; padding:11px 22px;">
+        <svg viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
         Sign Out
       </a>
     </div>
 
   </main>
 
-  <!-- Toast Notification -->
+  <!-- Toast -->
   <div id="toast">
     <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
     <span id="toastMsg">Action complete.</span>
@@ -339,6 +350,9 @@
   <!-- Confirm Delete Modal -->
   <div class="modal-overlay" id="confirmModal">
     <div class="modal-box">
+      <div class="modal-icon">
+        <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+      </div>
       <h3 id="modalTitle">Confirm Delete</h3>
       <p id="modalMessage">Are you sure? This action cannot be undone.</p>
       <div class="modal-btns">
@@ -356,29 +370,22 @@
   </footer>
 
   <script>
-    // ──────────────────────────────────────────
-    //  State
-    // ──────────────────────────────────────────
     let ledgerRecords = [];
     let pendingDeleteFn = null;
 
-    // ──────────────────────────────────────────
-    //  Toast
-    // ──────────────────────────────────────────
+    // ── Toast ──────────────────────────────────────
     let toastTimer;
     function showToast(msg, ok = true) {
       clearTimeout(toastTimer);
       const el = document.getElementById('toast');
       const svg = el.querySelector('svg');
       document.getElementById('toastMsg').textContent = msg;
-      if (svg) svg.style.fill = ok ? '#4ADE80' : '#F87171';
+      if (svg) svg.style.fill = ok ? '#34D399' : '#F87171';
       el.classList.add('show');
       toastTimer = setTimeout(() => el.classList.remove('show'), 4000);
     }
 
-    // ──────────────────────────────────────────
-    //  Confirm Modal
-    // ──────────────────────────────────────────
+    // ── Modal ──────────────────────────────────────
     function showModal(title, message, onConfirm) {
       document.getElementById('modalTitle').textContent = title;
       document.getElementById('modalMessage').textContent = message;
@@ -397,9 +404,7 @@
       if (e.target === e.currentTarget) closeModal();
     });
 
-    // ──────────────────────────────────────────
-    //  Tab Switching
-    // ──────────────────────────────────────────
+    // ── Tab Switching ──────────────────────────────
     function switchTab(tabId, btn) {
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -409,9 +414,7 @@
       if (tabId === 'directoryTab') fetchEmployees();
     }
 
-    // ──────────────────────────────────────────
-    //  Stats Bar
-    // ──────────────────────────────────────────
+    // ── Stats ──────────────────────────────────────
     function updateStats(records, empCount) {
       document.getElementById('statTotalEntries').textContent = records.length;
       const totalRev = records.reduce((s, r) => s + (r.total_amount || 0), 0);
@@ -421,12 +424,13 @@
         document.getElementById('statEmployees').textContent = empCount;
     }
 
-    // ──────────────────────────────────────────
-    //  Fetch & Render Ledger
-    // ──────────────────────────────────────────
+    // ── Ledger Fetch ───────────────────────────────
     async function fetchLedger() {
       const tbody = document.getElementById('ledgerTableBody');
-      tbody.innerHTML = `<tr><td colspan="20" style="text-align:center;color:#94A3B8;padding:30px;">Loading...</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="20" style="text-align:center;color:#94A3B8;padding:40px;">
+        <svg viewBox="0 0 24 24" style="width:24px;height:24px;fill:#C4D2E8;animation:spin 1s linear infinite;display:inline-block;"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>
+        <br><span style="font-size:0.82rem;margin-top:8px;display:inline-block;">Loading records...</span>
+      </td></tr>`;
 
       try {
         const res = await fetch('/api/admin/ledger', { credentials: 'same-origin' });
@@ -435,7 +439,7 @@
         updateStats(ledgerRecords);
 
         if (ledgerRecords.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="20" style="text-align:center;color:#94A3B8;padding:30px;">No ledger records yet. Employees will submit data daily.</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="20" style="text-align:center;color:#94A3B8;padding:40px;font-size:0.85rem;">No ledger records yet. Employees will submit data daily.</td></tr>`;
           return;
         }
 
@@ -444,70 +448,51 @@
           const tr = document.createElement('tr');
           const statusClass = row.factory_status === 'Open' ? 'status-open' : 'status-closed';
           tr.innerHTML = `
-            <td style="color:#94A3B8; font-size:0.75rem;">${i + 1}</td>
-            <td style="font-weight:700; color:#0A3894; white-space:nowrap;">${row.date}</td>
+            <td style="color:#94A3B8;font-size:0.75rem;">${i + 1}</td>
+            <td style="font-weight:800;color:#0A3894;white-space:nowrap;">${row.date}</td>
             <td><span class="status-badge-table ${statusClass}">${row.factory_status}</span></td>
             <td>${(row.total_produced || 0).toLocaleString()}</td>
             <td>${(row.bags_in_storage || 0).toLocaleString()}</td>
             <td>${(row.truck_sent_out || 0).toLocaleString()}</td>
             <td>${(row.truck_sold || 0).toLocaleString()}</td>
-            <td style="color:#DC2626; font-weight:700;">${row.leakages || 0}</td>
+            <td style="color:#DC2626;font-weight:700;">${row.leakages || 0}</td>
             <td>${(row.aboboya_sold || 0).toLocaleString()}</td>
             <td>${(row.factory_sold || 0).toLocaleString()}</td>
             <td>GH₵ ${(row.price_per_bag || 0).toFixed(2)}</td>
-            <td style="font-weight:800; color:#128C7E;">GH₵ ${(row.total_amount || 0).toFixed(2)}</td>
+            <td style="font-weight:800;color:#059669;">GH₵ ${(row.total_amount || 0).toFixed(2)}</td>
             <td>GH₵ ${(row.fuel_expenses || 0).toFixed(2)}</td>
             <td>GH₵ ${(row.other_expenses || 0).toFixed(2)}</td>
             <td>GH₵ ${(row.cash_withdrawn || 0).toFixed(2)}</td>
             <td style="font-weight:700;">GH₵ ${(row.cash_at_hand || 0).toFixed(2)}</td>
             <td>GH₵ ${(row.cash_at_bank || 0).toFixed(2)}</td>
-            <td style="font-style:italic; font-weight:600;">${escHtml(row.workers_name || '')}</td>
-            <td style="max-width:120px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${escHtml(row.comments || '')}">${escHtml(row.comments || '')}</td>
-            <td>
-              <button class="btn-del" onclick="confirmDeleteLedger(${row.id}, '${escHtml(row.date)}')">✕ Del</button>
-            </td>
+            <td style="font-style:italic;font-weight:600;">${escHtml(row.workers_name || '')}</td>
+            <td style="max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${escHtml(row.comments || '')}">${escHtml(row.comments || '')}</td>
+            <td><button class="btn-del" onclick="confirmDeleteLedger(${row.id}, '${escHtml(row.date)}')">✕ Del</button></td>
           `;
           tbody.appendChild(tr);
         });
 
       } catch (err) {
-        tbody.innerHTML = `<tr><td colspan="20" style="text-align:center;color:#DC2626;padding:30px;font-weight:600;">Error loading ledger. Access may be restricted or session expired.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="20" style="text-align:center;color:#DC2626;padding:30px;font-size:0.85rem;font-weight:600;">Error loading ledger. Access may be restricted or session expired.</td></tr>`;
       }
     }
 
-    // ──────────────────────────────────────────
-    //  Delete Ledger Entry
-    // ──────────────────────────────────────────
+    // ── Delete Ledger ──────────────────────────────
     function confirmDeleteLedger(id, date) {
-      showModal(
-        'Delete Ledger Entry',
-        `Are you sure you want to permanently delete the record for ${date}? This cannot be undone.`,
-        async () => {
-          try {
-            const res = await fetch(`/api/admin/ledger/${id}`, {
-              method: 'DELETE',
-              credentials: 'same-origin'
-            });
-            const data = await res.json();
-            if (res.ok) {
-              showToast(`Record for ${date} deleted.`);
-              fetchLedger();
-            } else {
-              showToast(data.error || 'Delete failed.', false);
-            }
-          } catch {
-            showToast('Network error. Could not delete.', false);
-          }
-        }
-      );
+      showModal('Delete Ledger Entry', `Permanently delete the record for ${date}? This cannot be undone.`, async () => {
+        try {
+          const res = await fetch(`/api/admin/ledger/${id}`, { method: 'DELETE', credentials: 'same-origin' });
+          const data = await res.json();
+          if (res.ok) { showToast(`Record for ${date} deleted.`); fetchLedger(); }
+          else { showToast(data.error || 'Delete failed.', false); }
+        } catch { showToast('Network error.', false); }
+      });
     }
 
-    // ──────────────────────────────────────────
-    //  Fetch & Render Employee Directory
-    // ──────────────────────────────────────────
+    // ── Employees Fetch ────────────────────────────
     async function fetchEmployees() {
       const listDiv = document.getElementById('employeeList');
-      listDiv.innerHTML = `<div style="text-align:center;color:#94A3B8;padding:20px;">Loading...</div>`;
+      listDiv.innerHTML = `<div style="text-align:center;color:#94A3B8;padding:24px;font-size:0.85rem;">Loading...</div>`;
 
       try {
         const res = await fetch('/api/admin/employees', { credentials: 'same-origin' });
@@ -518,7 +503,7 @@
           users.filter(u => u.role === 'employee').length;
 
         if (users.length === 0) {
-          listDiv.innerHTML = `<div style="text-align:center;color:#94A3B8;padding:20px;">No users in the system.</div>`;
+          listDiv.innerHTML = `<div style="text-align:center;color:#94A3B8;padding:24px;">No users in the system.</div>`;
           return;
         }
 
@@ -533,7 +518,7 @@
               <span class="emp-email">${escHtml(u.email)}</span>
             </div>
             <div class="emp-actions">
-              <span class="emp-role" style="${isAdmin ? 'background:rgba(180,83,9,0.12); color:#B45309;' : ''}">${u.role}</span>
+              <span class="emp-role" style="${isAdmin ? 'background:rgba(245,158,11,0.12);color:#92400E;' : ''}">${u.role}</span>
               ${!isAdmin ? `<button class="btn-del" onclick="confirmDeleteEmployee(${u.id}, '${escHtml(u.name)}')">✕</button>` : ''}
             </div>
           `;
@@ -541,40 +526,23 @@
         });
 
       } catch {
-        listDiv.innerHTML = `<div style="text-align:center;color:#DC2626;padding:20px;font-weight:600;">Access Denied.</div>`;
+        listDiv.innerHTML = `<div style="text-align:center;color:#DC2626;padding:24px;font-weight:600;">Access Denied.</div>`;
       }
     }
 
-    // ──────────────────────────────────────────
-    //  Delete Employee
-    // ──────────────────────────────────────────
+    // ── Delete Employee ────────────────────────────
     function confirmDeleteEmployee(id, name) {
-      showModal(
-        'Remove Employee',
-        `Remove "${name}" from the system? They will no longer be able to log in. This cannot be undone.`,
-        async () => {
-          try {
-            const res = await fetch(`/api/admin/employees/${id}`, {
-              method: 'DELETE',
-              credentials: 'same-origin'
-            });
-            const data = await res.json();
-            if (res.ok) {
-              showToast(`${name} removed successfully.`);
-              fetchEmployees();
-            } else {
-              showToast(data.error || 'Could not remove employee.', false);
-            }
-          } catch {
-            showToast('Network error. Could not remove.', false);
-          }
-        }
-      );
+      showModal('Remove Employee', `Remove "${name}" from the system? They will no longer be able to log in.`, async () => {
+        try {
+          const res = await fetch(`/api/admin/employees/${id}`, { method: 'DELETE', credentials: 'same-origin' });
+          const data = await res.json();
+          if (res.ok) { showToast(`${name} removed successfully.`); fetchEmployees(); }
+          else { showToast(data.error || 'Could not remove employee.', false); }
+        } catch { showToast('Network error.', false); }
+      });
     }
 
-    // ──────────────────────────────────────────
-    //  Register New Employee
-    // ──────────────────────────────────────────
+    // ── Register Employee ──────────────────────────
     document.getElementById('employeeForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const btn = document.getElementById('btnRegEmployee');
@@ -604,26 +572,21 @@
         showToast('Network error. Registration failed.', false);
       } finally {
         btn.disabled = false;
-        btn.textContent = 'Register Worker';
+        btn.innerHTML = `<svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:currentColor;"><path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg> Register Worker`;
       }
     });
 
-    // ──────────────────────────────────────────
-    //  CSV Export (triggers browser download)
-    // ──────────────────────────────────────────
+    // ── CSV Export ─────────────────────────────────
     document.getElementById('btnExportCSV').addEventListener('click', () => {
-      if (ledgerRecords.length === 0) {
-        showToast('No records to export yet.', false);
-        return;
-      }
+      if (ledgerRecords.length === 0) { showToast('No records to export yet.', false); return; }
 
       const headers = [
-        'Date', 'Factory Status', 'Total Bags Produced', 'Bags in Storage',
-        'Bags Sent by Truck', 'Bags Sold by Truck', 'Bags Leakage',
-        'Aboboya Sold', 'Factory Sold', 'Price Per Bag (GH₵)',
-        'Total Revenue (GH₵)', 'Fuel Expenses (GH₵)', 'Other Expenses (GH₵)',
-        'Cash Withdrawal (GH₵)', 'Cash at Hand (GH₵)', 'Cash at Bank (GH₵)',
-        'Names of Workers', 'Comments', 'Recorded At'
+        'Date','Factory Status','Total Bags Produced','Bags in Storage',
+        'Bags Sent by Truck','Bags Sold by Truck','Bags Leakage',
+        'Aboboya Sold','Factory Sold','Price Per Bag (GH₵)',
+        'Total Revenue (GH₵)','Fuel Expenses (GH₵)','Other Expenses (GH₵)',
+        'Cash Withdrawal (GH₵)','Cash at Hand (GH₵)','Cash at Bank (GH₵)',
+        'Names of Workers','Comments','Recorded At'
       ];
 
       const rows = ledgerRecords.map(r => [
@@ -638,42 +601,34 @@
         r.created_at || ''
       ].join(','));
 
-      const csv = '\uFEFF' + [headers.join(','), ...rows].join('\n'); // BOM for Excel compatibility
+      const csv = '\uFEFF' + [headers.join(','), ...rows].join('\n');
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const url  = URL.createObjectURL(blob);
       const a    = document.createElement('a');
       const date = new Date().toISOString().slice(0, 10);
-
       a.href = url;
       a.download = `moor_water_ledger_${date}.csv`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      showToast(`✓ Ledger exported — ${ledgerRecords.length} records saved to your device.`);
+      showToast(`✓ Ledger exported — ${ledgerRecords.length} records saved.`);
     });
 
-    // Refresh button
     document.getElementById('btnRefreshLedger').addEventListener('click', fetchLedger);
 
-    // ──────────────────────────────────────────
-    //  Utility: escape HTML to prevent XSS
-    // ──────────────────────────────────────────
+    // ── Utility ────────────────────────────────────
     function escHtml(str) {
       return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;').replace(/"/g, '&quot;')
         .replace(/'/g, '&#39;');
     }
 
-    // ──────────────────────────────────────────
-    //  Initial Load
-    // ──────────────────────────────────────────
+    // ── Initial Load ───────────────────────────────
     window.addEventListener('DOMContentLoaded', () => {
       fetchLedger();
-      fetchEmployees(); // Pre-fetch for stat count
+      fetchEmployees();
     });
   </script>
 </body>

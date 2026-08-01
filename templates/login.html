@@ -14,162 +14,213 @@
   <link rel="stylesheet" href="/static/css/style.css">
   <style>
     body {
-      background: linear-gradient(135deg, #002270 0%, #0A3894 50%, #1A4EB5 100%);
-      justify-content: center;
-      align-items: center;
-      display: flex;
+      background: none;
       min-height: 100vh;
-      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    body::before { display: none; }
+
+    /* Animated background */
+    .bg-scene {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(145deg, #061F5C 0%, #0A3894 45%, #0E52C1 75%, #0076A8 100%);
+      z-index: 0;
+    }
+    .bg-scene::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 70% 50% at 15% 20%, rgba(0, 181, 239, 0.18) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 85% 80%, rgba(10, 56, 148, 0.25) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 30% at 60% 10%, rgba(255, 255, 255, 0.04) 0%, transparent 50%);
+    }
+
+    /* Floating bubbles */
+    .bubble {
+      position: fixed;
+      border-radius: 50%;
+      pointer-events: none;
+      animation: floatUp linear infinite;
+      opacity: 0;
+    }
+    .bubble:nth-child(1)  { width: 8px;   height: 8px;   left: 8%;   animation-duration: 9s;  animation-delay: 0s;   background: rgba(255,255,255,0.15); }
+    .bubble:nth-child(2)  { width: 14px;  height: 14px;  left: 18%;  animation-duration: 12s; animation-delay: 1.5s; background: rgba(0,181,239,0.20); }
+    .bubble:nth-child(3)  { width: 6px;   height: 6px;   left: 35%;  animation-duration: 8s;  animation-delay: 3s;   background: rgba(255,255,255,0.12); }
+    .bubble:nth-child(4)  { width: 18px;  height: 18px;  left: 55%;  animation-duration: 14s; animation-delay: 0.5s; background: rgba(0,181,239,0.15); }
+    .bubble:nth-child(5)  { width: 10px;  height: 10px;  left: 72%;  animation-duration: 10s; animation-delay: 2s;   background: rgba(255,255,255,0.10); }
+    .bubble:nth-child(6)  { width: 5px;   height: 5px;   left: 85%;  animation-duration: 7s;  animation-delay: 4s;   background: rgba(0,181,239,0.18); }
+    .bubble:nth-child(7)  { width: 12px;  height: 12px;  left: 92%;  animation-duration: 11s; animation-delay: 1s;   background: rgba(255,255,255,0.08); }
+
+    @keyframes floatUp {
+      0%   { transform: translateY(100vh) scale(1);   opacity: 0; }
+      10%  { opacity: 1; }
+      90%  { opacity: 0.8; }
+      100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
     }
 
     .login-wrap {
       width: 100%;
-      max-width: 440px;
+      max-width: 450px;
+      position: relative;
+      z-index: 2;
+      animation: slideUp 0.6s cubic-bezier(0, 0, 0.2, 1) both;
     }
 
     .login-card {
-      background: rgba(255, 255, 255, 0.97);
-      backdrop-filter: blur(20px);
-      border-radius: 24px;
-      padding: 36px 28px 28px;
-      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25);
-      border: 1px solid rgba(255, 255, 255, 0.6);
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(32px);
+      -webkit-backdrop-filter: blur(32px);
+      border-radius: 28px;
+      padding: 40px 32px 32px;
+      box-shadow:
+        0 32px 80px rgba(0, 0, 0, 0.30),
+        0 0 0 1px rgba(255, 255, 255, 0.60),
+        inset 0 1px 0 rgba(255, 255, 255, 0.80);
+      border: 1px solid rgba(255, 255, 255, 0.50);
     }
 
     .login-logo {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 10px;
-      margin-bottom: 10px;
+      gap: 12px;
+      margin-bottom: 28px;
       text-align: center;
     }
-    .login-logo svg { width: 80px; height: 80px; }
+    .login-logo svg {
+      width: 86px; height: 86px;
+      filter: drop-shadow(0 8px 16px rgba(10, 56, 148, 0.20));
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .login-logo:hover svg { transform: scale(1.06) rotate(3deg); }
 
-    /* Role selector tabs */
+    .brand-title-login {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #0A3894;
+      letter-spacing: -0.3px;
+    }
+    .brand-sub-login {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 2px;
+      color: #5E7898;
+      text-transform: uppercase;
+    }
+
+    /* Role selector */
     .role-selector {
       display: flex;
-      background: #F1F5F9;
-      border-radius: 10px;
-      padding: 4px;
-      margin-bottom: 24px;
-      gap: 4px;
-      border: 1px solid #E2E8F0;
+      background: #F0F5FF;
+      border-radius: 12px;
+      padding: 5px;
+      margin-bottom: 22px;
+      gap: 5px;
+      border: 1px solid #DDE6F5;
     }
     .role-btn {
       flex: 1;
       padding: 10px 8px;
       border: none;
       background: transparent;
-      border-radius: 7px;
+      border-radius: 9px;
       font-size: 0.82rem;
       font-weight: 700;
       font-family: 'Outfit', sans-serif;
       cursor: pointer;
-      transition: all 0.2s ease;
-      color: #64748B;
+      transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+      color: #5E7898;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
+      gap: 7px;
     }
-    .role-btn svg {
-      width: 15px;
-      height: 15px;
-      fill: currentColor;
-    }
+    .role-btn svg { width: 15px; height: 15px; fill: currentColor; }
     .role-btn.active {
       background: white;
       color: #0A3894;
-      box-shadow: 0 2px 8px rgba(10, 56, 148, 0.12);
+      box-shadow: 0 3px 12px rgba(10, 56, 148, 0.14);
     }
     .role-btn.active.admin-active {
-      color: #B45309;
+      color: #92400E;
       background: #FFFBEB;
+      box-shadow: 0 3px 12px rgba(180, 83, 9, 0.14);
     }
 
     /* Role info banner */
     .role-info {
-      background: rgba(10, 56, 148, 0.07);
-      border: 1px solid rgba(10, 56, 148, 0.15);
-      border-radius: 10px;
-      padding: 10px 14px;
-      margin-bottom: 18px;
+      background: rgba(10, 56, 148, 0.06);
+      border: 1px solid rgba(10, 56, 148, 0.12);
+      border-radius: 12px;
+      padding: 11px 14px;
+      margin-bottom: 20px;
       font-size: 0.78rem;
       color: #334155;
       font-weight: 500;
       display: flex;
-      gap: 8px;
+      gap: 9px;
       align-items: flex-start;
-      transition: all 0.3s ease;
+      transition: all 0.3s;
     }
     .role-info.admin-info {
-      background: rgba(180, 83, 9, 0.07);
-      border-color: rgba(180, 83, 9, 0.2);
+      background: rgba(180, 83, 9, 0.06);
+      border-color: rgba(180, 83, 9, 0.18);
       color: #78350F;
     }
-    .role-info svg {
-      width: 16px;
-      height: 16px;
-      fill: currentColor;
-      flex-shrink: 0;
-      margin-top: 1px;
-    }
+    .role-info svg { width: 15px; height: 15px; fill: currentColor; flex-shrink: 0; margin-top: 1px; }
 
-    /* Prefill hint */
-    .prefill-hint {
-      font-size: 0.72rem;
-      color: #64748B;
-      text-align: right;
-      margin-top: -10px;
-      margin-bottom: 14px;
-      cursor: pointer;
-      font-weight: 600;
-    }
-    .prefill-hint:hover { color: #0A3894; text-decoration: underline; }
-
-    /* Error and rate limit */
+    /* Error box */
     #loginError {
-      color: #DC2626;
+      color: #B91C1C;
       font-size: 0.8rem;
       font-weight: 600;
       text-align: center;
-      margin-top: 12px;
-      padding: 8px 12px;
-      background: rgba(220, 38, 38, 0.08);
-      border-radius: 8px;
-      border: 1px solid rgba(220, 38, 38, 0.2);
+      margin-top: 14px;
+      padding: 10px 14px;
+      background: rgba(220, 38, 38, 0.07);
+      border-radius: 10px;
+      border: 1px solid rgba(220, 38, 38, 0.18);
       display: none;
     }
 
     .divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 22px 0 18px;
+      color: #C4D2E8;
+      font-size: 0.72rem;
+      font-weight: 600;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
       height: 1px;
-      background: #E2E8F0;
-      margin: 24px 0 16px;
+      background: #DDE6F5;
     }
 
     .security-note {
       text-align: center;
-      font-size: 0.7rem;
+      font-size: 0.69rem;
       color: #94A3B8;
       font-weight: 500;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 4px;
+      gap: 5px;
     }
-    .security-note svg {
-      width: 11px;
-      height: 11px;
-      fill: #94A3B8;
-    }
+    .security-note svg { width: 11px; height: 11px; fill: #94A3B8; }
 
-    /* Animated loading spinner on button */
-    @keyframes spin { to { transform: rotate(360deg); } }
     .spinner {
-      width: 16px;
-      height: 16px;
-      border: 2px solid rgba(255,255,255,0.4);
+      width: 16px; height: 16px;
+      border: 2.5px solid rgba(255,255,255,0.35);
       border-top-color: white;
       border-radius: 50%;
       animation: spin 0.7s linear infinite;
@@ -178,23 +229,24 @@
     .btn-primary.loading .spinner { display: inline-block; }
     .btn-primary.loading .btn-text { display: none; }
 
-    /* Floating bubbles bg effect */
-    .bg-bubble {
-      position: fixed;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.04);
-      pointer-events: none;
+    .footer-outer {
+      text-align: center;
+      margin-top: 22px;
+      color: rgba(255, 255, 255, 0.45);
+      font-size: 0.7rem;
+      font-weight: 500;
     }
-    .bg-bubble:nth-child(1) { width: 300px; height: 300px; top: -80px; right: -80px; }
-    .bg-bubble:nth-child(2) { width: 200px; height: 200px; bottom: 40px; left: -60px; }
-    .bg-bubble:nth-child(3) { width: 120px; height: 120px; top: 40%; right: 10%; }
   </style>
 </head>
 <body>
-  <!-- Decorative background bubbles -->
-  <div class="bg-bubble"></div>
-  <div class="bg-bubble"></div>
-  <div class="bg-bubble"></div>
+  <div class="bg-scene"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
 
   <div class="login-wrap">
     <div class="login-card">
@@ -218,12 +270,12 @@
           </defs>
         </svg>
         <div>
-          <h1 class="brand-title" style="font-size: 1.35rem; color: #0A3894;">Moor Natural Mineral Water</h1>
-          <p class="brand-subtitle" style="font-size: 0.72rem;">Daily Ledger Management System</p>
+          <div class="brand-title-login">Moor Natural Mineral Water</div>
+          <div class="brand-sub-login">Daily Ledger System</div>
         </div>
       </div>
 
-      <!-- ── Who are you logging in as? ── -->
+      <!-- Role Selector -->
       <div class="role-selector">
         <button class="role-btn active" id="btnRoleEmployee" onclick="setRole('employee')">
           <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
@@ -235,7 +287,7 @@
         </button>
       </div>
 
-      <!-- Role context banner (changes dynamically) -->
+      <!-- Role Context Banner -->
       <div class="role-info" id="roleInfoBanner">
         <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
         <span id="roleInfoText">Enter your employee credentials to access the daily data entry form.</span>
@@ -255,7 +307,7 @@
           </div>
         </div>
 
-        <div class="form-group" style="margin-bottom: 20px;">
+        <div class="form-group" style="margin-bottom: 22px;">
           <label for="loginPassword">Password</label>
           <div class="input-wrapper">
             <span class="input-icon">
@@ -267,35 +319,34 @@
           </div>
         </div>
 
-        <button type="submit" class="btn btn-primary" id="btnSubmit">
+        <button type="submit" class="btn btn-primary" id="btnSubmit" style="padding: 14px;">
           <div class="spinner" id="btnSpinner"></div>
-          <span class="btn-text" id="btnText">Sign In</span>
+          <span class="btn-text" id="btnText">Sign In to Ledger</span>
         </button>
 
         <div id="loginError"></div>
       </form>
 
-      <div class="divider"></div>
+      <div class="divider">or</div>
       <div class="security-note">
         <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
         Secured session · Encrypted passwords · Role-based access
       </div>
 
-      <!-- New user options -->
-      <div style="margin-top: 18px; display: flex; flex-direction: column; gap: 8px;">
+      <!-- Registration Links -->
+      <div style="margin-top: 18px; display: flex; flex-direction: column; gap: 9px;">
         <a href="/register" class="btn btn-secondary" style="text-decoration: none; font-size: 0.85rem;">
           <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:currentColor;"><path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
           New here? Create an Account
         </a>
-        <a href="/preview" class="btn" style="text-decoration: none; font-size: 0.82rem; background: rgba(0,181,239,0.1); color: #0076A8; border: 1px solid rgba(0,181,239,0.3);">
+        <a href="/preview" class="btn" style="text-decoration: none; font-size: 0.82rem; background: rgba(0,181,239,0.08); color: #0A3894; border: 1.5px solid rgba(0,181,239,0.25);">
           <svg viewBox="0 0 24 24" style="width:15px;height:15px;fill:currentColor;"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
           Preview App Without Account
         </a>
       </div>
     </div>
 
-    <!-- Company footer outside card -->
-    <div style="text-align: center; margin-top: 20px; color: rgba(255,255,255,0.5); font-size: 0.72rem; font-weight: 500;">
+    <div class="footer-outer">
       © 2026 Kenamos Big Brothers Ltd. · Yamfo, Ahafo Region
     </div>
   </div>
@@ -315,7 +366,7 @@
         empBtn.classList.remove('active');
         adminBtn.classList.add('active', 'admin-active');
         banner.classList.add('admin-info');
-        infoText.textContent = 'Admin login grants access to the Admin Dashboard — Employee Directory, Master Ledger, and Export tools. Employees cannot access this area.';
+        infoText.textContent = 'Admin login grants access to the Admin Dashboard — Employee Directory, Master Ledger, and Export tools.';
         emailInput.placeholder = 'admin@moorwater.com';
       } else {
         adminBtn.classList.remove('active', 'admin-active');
@@ -324,28 +375,18 @@
         infoText.textContent = 'Enter your employee credentials to access the daily data entry form.';
         emailInput.placeholder = 'name@moorwater.com';
       }
-
-      // Clear any previous errors
-      const errDiv = document.getElementById('loginError');
-      errDiv.style.display = 'none';
-      errDiv.textContent = '';
+      document.getElementById('loginError').style.display = 'none';
     }
 
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-
-      const email    = document.getElementById('loginEmail').value.trim();
-      const password = document.getElementById('loginPassword').value;
+      const email     = document.getElementById('loginEmail').value.trim();
+      const password  = document.getElementById('loginPassword').value;
       const btnSubmit = document.getElementById('btnSubmit');
-      const errDiv   = document.getElementById('loginError');
+      const errDiv    = document.getElementById('loginError');
 
-      // Client-side validation
-      if (!email || !password) {
-        showError('Please enter both email and password.');
-        return;
-      }
+      if (!email || !password) { showError('Please enter both email and password.'); return; }
 
-      // Show loading state
       btnSubmit.classList.add('loading');
       btnSubmit.disabled = true;
       errDiv.style.display = 'none';
@@ -357,24 +398,19 @@
           credentials: 'same-origin',
           body: JSON.stringify({ email, password })
         });
-
         const data = await response.json();
 
         if (response.ok) {
-          // Successful login — route based on actual server role
-          if (data.role === 'admin') {
-            window.location.href = '/admin';
-          } else {
-            window.location.href = '/';
-          }
+          window.location.href = data.role === 'admin' ? '/admin' : '/';
         } else if (response.status === 429) {
           showError(data.error || 'Too many failed attempts. Please wait 5 minutes.');
+          btnSubmit.classList.remove('loading');
+          btnSubmit.disabled = false;
         } else {
           showError(data.error || 'Invalid credentials. Please try again.');
           btnSubmit.classList.remove('loading');
           btnSubmit.disabled = false;
         }
-
       } catch (err) {
         showError('Network error. Check your connection and try again.');
         btnSubmit.classList.remove('loading');
@@ -383,9 +419,9 @@
     });
 
     function showError(msg) {
-      const errDiv = document.getElementById('loginError');
-      errDiv.textContent = msg;
-      errDiv.style.display = 'block';
+      const el = document.getElementById('loginError');
+      el.textContent = msg;
+      el.style.display = 'block';
     }
   </script>
 </body>
