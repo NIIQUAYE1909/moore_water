@@ -73,17 +73,29 @@
       animation: slideUp 0.6s cubic-bezier(0, 0, 0.2, 1) both;
     }
 
+    /* ── Mobile: allow card to scroll if viewport is very short ── */
+    @media (max-height: 680px) {
+      .login-card {
+        max-height: calc(100vh - 48px);
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+    }
+
     .login-card {
       background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(32px);
       -webkit-backdrop-filter: blur(32px);
       border-radius: 28px;
-      padding: 40px 32px 32px;
+      padding: 36px 24px 28px;
       box-shadow:
         0 32px 80px rgba(0, 0, 0, 0.30),
         0 0 0 1px rgba(255, 255, 255, 0.60),
         inset 0 1px 0 rgba(255, 255, 255, 0.80);
       border: 1px solid rgba(255, 255, 255, 0.50);
+    }
+    @media (min-width: 480px) {
+      .login-card { padding: 40px 32px 32px; }
     }
 
     .login-logo {
@@ -98,8 +110,21 @@
       width: 86px; height: 86px;
       filter: drop-shadow(0 8px 16px rgba(10, 56, 148, 0.20));
       transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      animation: logoSpin 30s linear infinite;
     }
-    .login-logo:hover svg { transform: scale(1.06) rotate(3deg); }
+    .login-logo:hover svg { transform: scale(1.06) rotate(3deg); animation-play-state: paused; }
+    @keyframes logoSpin {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+    /* Subtle pulse on sign-in button */
+    @keyframes btnPulse {
+      0%, 100% { box-shadow: 0 4px 16px rgba(10,56,148,0.30); }
+      50%       { box-shadow: 0 8px 28px rgba(10,56,148,0.50); }
+    }
+    #btnSubmit:not(.loading) {
+      animation: btnPulse 3s ease infinite;
+    }
 
     .brand-title-login {
       font-size: 1.35rem;
@@ -128,6 +153,7 @@
     .role-btn {
       flex: 1;
       padding: 10px 8px;
+      min-height: 44px;
       border: none;
       background: transparent;
       border-radius: 9px;
@@ -141,7 +167,11 @@
       align-items: center;
       justify-content: center;
       gap: 7px;
+      touch-action: manipulation;
+      -webkit-user-select: none;
+      user-select: none;
     }
+    .role-btn:active { transform: scale(0.96); }
     .role-btn svg { width: 15px; height: 15px; fill: currentColor; }
     .role-btn.active {
       background: white;
@@ -218,16 +248,26 @@
     }
     .security-note svg { width: 11px; height: 11px; fill: #94A3B8; }
 
+    /* Animated loading spinner on button */
+    @keyframes spin { to { transform: rotate(360deg); } }
     .spinner {
-      width: 16px; height: 16px;
+      width: 16px;
+      height: 16px;
       border: 2.5px solid rgba(255,255,255,0.35);
       border-top-color: white;
       border-radius: 50%;
       animation: spin 0.7s linear infinite;
       display: none;
+      flex-shrink: 0;
     }
     .btn-primary.loading .spinner { display: inline-block; }
     .btn-primary.loading .btn-text { display: none; }
+
+    /* Ensure 16px on mobile to prevent iOS auto-zoom */
+    input, select { font-size: 16px !important; }
+    @media (min-width: 768px) {
+      input, select { font-size: 0.93rem !important; }
+    }
 
     .footer-outer {
       text-align: center;

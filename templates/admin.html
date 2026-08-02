@@ -15,23 +15,6 @@
   <style>
     main { max-width: 1140px; }
 
-    /* Admin restricted badge */
-    .admin-shield {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      background: rgba(245, 158, 11, 0.15);
-      border: 1px solid rgba(245, 158, 11, 0.30);
-      color: #92400E;
-      padding: 4px 12px;
-      border-radius: 100px;
-      font-size: 0.68rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-    }
-    .admin-shield svg { width: 11px; height: 11px; fill: #92400E; }
-
     /* Stats summary bar */
     .stats-bar {
       display: grid;
@@ -42,7 +25,7 @@
     .stat-card {
       background: white;
       border-radius: 18px;
-      padding: 20px 18px;
+      padding: 22px 18px 18px;
       text-align: center;
       border: 1px solid rgba(10,56,148,0.07);
       box-shadow: 0 4px 16px rgba(10,56,148,0.07);
@@ -58,9 +41,9 @@
       background: linear-gradient(90deg, #0A3894, #00B5EF);
       border-radius: 3px 3px 0 0;
     }
-    .stat-card:hover { box-shadow: 0 8px 28px rgba(10,56,148,0.12); transform: translateY(-2px); }
+    .stat-card:hover { box-shadow: 0 10px 32px rgba(10,56,148,0.13); transform: translateY(-3px); }
     .stat-val {
-      font-size: 1.65rem;
+      font-size: 1.70rem;
       font-weight: 900;
       color: #0A3894;
       display: block;
@@ -84,7 +67,7 @@
       color: #DC2626;
       padding: 4px 10px;
       border-radius: 6px;
-      font-size: 0.7rem;
+      font-size: 0.70rem;
       font-weight: 700;
       cursor: pointer;
       font-family: 'Outfit', sans-serif;
@@ -93,7 +76,7 @@
     }
     .btn-del:hover { background: #DC2626; color: white; border-color: #DC2626; }
 
-    .table-responsive { max-height: 440px; }
+    .table-responsive { max-height: 460px; }
 
     /* Employee card */
     .employee-item {
@@ -106,8 +89,9 @@
       border: 1px solid rgba(10,56,148,0.07);
       gap: 10px;
       transition: all 0.22s;
+      min-height: var(--touch-target);
     }
-    .employee-item:hover { background: white; box-shadow: 0 4px 14px rgba(10,56,148,0.08); transform: translateX(3px); }
+    .employee-item:hover { background: white; box-shadow: 0 4px 16px rgba(10,56,148,0.09); transform: translateX(3px); }
     .emp-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 
     /* Export bar */
@@ -119,7 +103,8 @@
       position: fixed;
       inset: 0;
       background: rgba(12, 26, 46, 0.60);
-      backdrop-filter: blur(4px);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
       z-index: 900;
       display: none;
       align-items: center;
@@ -129,28 +114,28 @@
     .modal-overlay.show { display: flex; animation: fadeIn 0.2s ease; }
     .modal-box {
       background: white;
-      border-radius: 22px;
+      border-radius: 24px;
       padding: 32px 28px;
       max-width: 380px;
       width: 100%;
-      box-shadow: 0 24px 64px rgba(0,0,0,0.22);
+      box-shadow: 0 28px 70px rgba(0,0,0,0.22);
       text-align: center;
       animation: slideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
     .modal-icon {
-      width: 56px; height: 56px;
+      width: 60px; height: 60px;
       background: rgba(220,38,38,0.09);
       border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      margin: 0 auto 16px;
+      margin: 0 auto 18px;
     }
-    .modal-icon svg { width: 26px; height: 26px; fill: #DC2626; }
-    .modal-box h3 { font-size: 1.15rem; font-weight: 800; color: #0C1A2E; margin-bottom: 8px; }
-    .modal-box p  { font-size: 0.84rem; color: #5E7898; margin-bottom: 22px; line-height: 1.55; }
+    .modal-icon svg { width: 28px; height: 28px; fill: #DC2626; }
+    .modal-box h3 { font-size: 1.18rem; font-weight: 800; color: #0C1A2E; margin-bottom: 8px; }
+    .modal-box p  { font-size: 0.84rem; color: #5E7898; margin-bottom: 24px; line-height: 1.58; }
     .modal-btns   { display: flex; gap: 10px; }
     .modal-btns button { flex: 1; }
 
-    /* Register form card */
+    /* Register form / employee directory grid */
     .admin-grid { display: grid; grid-template-columns: 1fr 1.4fr; gap: 20px; }
 
     @media (max-width: 720px) {
@@ -160,18 +145,105 @@
       .export-bar .btn { width: 100%; }
       .admin-grid { grid-template-columns: 1fr; }
     }
+
     @keyframes fadeIn  { from { opacity: 0; } to { opacity: 1; } }
     @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes spin    { to { transform: rotate(360deg); } }
   </style>
 </head>
-<body>
+<body class="has-topnav">
 
-  <!-- Admin session badge -->
-  <div class="user-badge">
-    <svg viewBox="0 0 24 24" style="width:12px;height:12px;fill:white;"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
-    <span>Admin: {{ user_name }}</span>
+  <!-- ══════════════════════════════════════
+       TOP NAVIGATION BAR (Admin)
+       ══════════════════════════════════════ -->
+  <nav class="topnav" id="topnav">
+    <div class="topnav-inner">
+
+      <!-- Brand -->
+      <a href="/admin" class="topnav-brand">
+        <div class="topnav-brand-icon">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" fill="#FCD34D"/>
+          </svg>
+        </div>
+        <div>
+          <div class="topnav-brand-text">Admin Portal</div>
+          <div class="topnav-brand-sub">Moor Water</div>
+        </div>
+      </a>
+
+      <!-- Center: admin badge -->
+      <div class="topnav-center">
+        <div class="topnav-admin-badge">
+          <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+          Restricted Access
+        </div>
+      </div>
+
+      <!-- Right: user chip + desktop links + hamburger -->
+      <div class="topnav-right">
+        <div class="topnav-user-chip">
+          <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+          Admin: {{ user_name }}
+        </div>
+
+        <!-- Desktop nav links -->
+        <div class="topnav-links">
+          <a href="/" class="topnav-link">
+            <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+            Ledger Form
+          </a>
+          <a href="/api/logout" class="topnav-link danger">
+            <svg viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
+            Sign Out
+          </a>
+        </div>
+
+        <!-- Hamburger (mobile only) -->
+        <button class="topnav-hamburger" id="hamburgerBtn" aria-label="Open menu" aria-expanded="false">
+          <div class="hamburger-lines">
+            <span></span><span></span><span></span>
+          </div>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ══════════════════════════════════════
+       MOBILE NAV DRAWER (Admin)
+       ══════════════════════════════════════ -->
+  <div class="nav-backdrop" id="navBackdrop"></div>
+  <div class="nav-drawer" id="navDrawer" aria-hidden="true">
+    <div class="drawer-header">
+      <button class="drawer-close" id="drawerClose" aria-label="Close menu">✕</button>
+      <div class="drawer-user-avatar">
+        <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+      </div>
+      <div class="drawer-user-name">{{ user_name }}</div>
+      <div class="drawer-user-role" style="color:#FCD34D;">🛡 Administrator</div>
+    </div>
+
+    <nav class="drawer-nav">
+      <a href="/admin" class="drawer-nav-item admin-item">
+        <svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
+        Master Ledger
+      </a>
+      <a href="/" class="drawer-nav-item">
+        <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        Ledger Form
+      </a>
+      <a href="/api/logout" class="drawer-nav-item danger-item">
+        <svg viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
+        Sign Out
+      </a>
+    </nav>
+
+    <div class="drawer-footer">© 2026 Kenamos Big Brothers Ltd. · Admin Portal</div>
   </div>
 
+  <!-- ══════════════════════════════════════
+       HEADER
+       ══════════════════════════════════════ -->
   <header>
     <div class="header-content">
       <div class="logo-container">
@@ -195,29 +267,32 @@
       <div>
         <h1 class="brand-title">Moor Natural Mineral Water</h1>
         <p class="brand-subtitle">Administrator Dashboard</p>
-        <div style="margin-top: 8px;">
-          <span class="admin-shield">
-            <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
-            Restricted Admin Access
-          </span>
-        </div>
       </div>
     </div>
   </header>
 
   <main>
 
-    <!-- Stats Summary -->
+    <!-- Stats Summary with Icon Rings -->
     <div class="stats-bar" id="statsBar" style="margin-top: 24px;">
       <div class="stat-card">
+        <div class="stat-icon-ring stat-icon-primary">
+          <svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
+        </div>
         <span class="stat-val" id="statTotalEntries">—</span>
         <span class="stat-lbl">Ledger Entries</span>
       </div>
       <div class="stat-card">
+        <div class="stat-icon-ring stat-icon-green">
+          <svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
+        </div>
         <span class="stat-val" id="statTotalRevenue" style="font-size:1.2rem;">—</span>
         <span class="stat-lbl">Total Revenue</span>
       </div>
       <div class="stat-card">
+        <div class="stat-icon-ring stat-icon-amber">
+          <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+        </div>
         <span class="stat-val" id="statEmployees">—</span>
         <span class="stat-lbl">Active Employees</span>
       </div>
@@ -240,37 +315,41 @@
       <div class="card">
         <div class="card-title" style="justify-content: space-between; flex-wrap: wrap; gap: 10px; border: none; padding-bottom: 0;">
           <div style="display:flex; align-items:center; gap:9px;">
-            <svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
+            <div class="card-title-icon">
+              <svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
+            </div>
             Historical Ledger Records
           </div>
           <div class="export-bar">
-            <button type="button" class="btn btn-green" id="btnExportCSV">
+            <button type="button" class="btn btn-green btn-sm" id="btnExportCSV">
               <svg viewBox="0 0 24 24"><path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2z"/></svg>
               Export CSV
             </button>
-            <button type="button" class="btn btn-secondary" id="btnRefreshLedger">
+            <button type="button" class="btn btn-secondary btn-sm" id="btnRefreshLedger">
               <svg viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
               Refresh
             </button>
           </div>
         </div>
 
-        <div class="table-responsive" style="margin-top: 16px;">
-          <table id="ledgerTable">
-            <thead>
-              <tr>
-                <th>#</th><th>Date</th><th>Status</th><th>Produced</th>
-                <th>Storage</th><th>Truck Sent</th><th>Truck Sold</th>
-                <th>Leakages</th><th>Aboboya</th><th>Factory</th>
-                <th>Price</th><th>Revenue</th><th>Fuel Exp</th>
-                <th>Other Exp</th><th>Withdrawal</th><th>Cash Hand</th>
-                <th>Cash Bank</th><th>Worker</th><th>Comments</th><th>Action</th>
-              </tr>
-            </thead>
-            <tbody id="ledgerTableBody">
-              <tr><td colspan="20" style="text-align:center;color:#94A3B8;padding:40px;">Loading ledger records...</td></tr>
-            </tbody>
-          </table>
+        <div class="table-scroll-wrap">
+          <div class="table-responsive" style="margin-top: 16px;">
+            <table id="ledgerTable">
+              <thead>
+                <tr>
+                  <th>#</th><th>Date</th><th>Status</th><th>Produced</th>
+                  <th>Storage</th><th>Truck Sent</th><th>Truck Sold</th>
+                  <th>Leakages</th><th>Aboboya</th><th>Factory</th>
+                  <th>Price</th><th>Revenue</th><th>Fuel Exp</th>
+                  <th>Other Exp</th><th>Withdrawal</th><th>Cash Hand</th>
+                  <th>Cash Bank</th><th>Worker</th><th>Comments</th><th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="ledgerTableBody">
+                <tr><td colspan="20" style="text-align:center;color:#94A3B8;padding:40px;">Loading ledger records...</td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
@@ -282,7 +361,9 @@
         <!-- Register Employee Form -->
         <div class="card">
           <div class="card-title">
-            <svg viewBox="0 0 24 24"><path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            <div class="card-title-icon">
+              <svg viewBox="0 0 24 24"><path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            </div>
             Register New Employee
           </div>
           <form id="employeeForm">
@@ -317,7 +398,9 @@
         <!-- Employee List -->
         <div class="card">
           <div class="card-title">
-            <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+            <div class="card-title-icon">
+              <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+            </div>
             All System Users
           </div>
           <div class="employee-list" id="employeeList">
@@ -329,11 +412,11 @@
 
     <!-- Action Footer -->
     <div style="margin-top: 22px; display: flex; gap: 10px; flex-wrap: wrap;">
-      <a href="/" class="btn btn-secondary" style="text-decoration:none; width:auto; padding:11px 22px;">
+      <a href="/" class="btn btn-secondary btn-sm" style="text-decoration:none;">
         <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
         Back to Ledger Form
       </a>
-      <a href="/api/logout" class="btn btn-danger" style="text-decoration:none; width:auto; padding:11px 22px;">
+      <a href="/api/logout" class="btn btn-danger btn-sm" style="text-decoration:none;">
         <svg viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
         Sign Out
       </a>
@@ -364,7 +447,12 @@
 
   <footer>
     <div class="footer-divider"></div>
-    <div class="footer-title">Kenamos Big Brothers Ltd. — Admin Portal</div>
+    <div style="text-align:center;margin-bottom:10px;">
+      <div class="footer-brand-badge">
+        <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" fill="#0A3894"/></svg>
+        <span>Kenamos Big Brothers Ltd. — Admin Portal</span>
+      </div>
+    </div>
     <div class="footer-desc">Yamfo, Ahafo Region • GPS: B2-2245-3345</div>
     <div class="copyright">© 2026 Kenamos Big Brothers Ltd. All rights reserved.</div>
   </footer>
@@ -372,6 +460,37 @@
   <script>
     let ledgerRecords = [];
     let pendingDeleteFn = null;
+
+    // ── Hamburger / Drawer ──────────────────────────
+    const hamburgerBtn = document.getElementById('hamburgerBtn');
+    const navDrawer    = document.getElementById('navDrawer');
+    const navBackdrop  = document.getElementById('navBackdrop');
+    const drawerClose  = document.getElementById('drawerClose');
+
+    function openDrawer() {
+      navDrawer.classList.add('open');
+      navBackdrop.classList.add('open');
+      hamburgerBtn.classList.add('open');
+      hamburgerBtn.setAttribute('aria-expanded', 'true');
+      navDrawer.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeDrawer() {
+      navDrawer.classList.remove('open');
+      navBackdrop.classList.remove('open');
+      hamburgerBtn.classList.remove('open');
+      hamburgerBtn.setAttribute('aria-expanded', 'false');
+      navDrawer.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+    hamburgerBtn.addEventListener('click', () => {
+      navDrawer.classList.contains('open') ? closeDrawer() : openDrawer();
+    });
+    drawerClose.addEventListener('click', closeDrawer);
+    navBackdrop.addEventListener('click', closeDrawer);
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && navDrawer.classList.contains('open')) closeDrawer();
+    });
 
     // ── Toast ──────────────────────────────────────
     let toastTimer;
@@ -545,7 +664,7 @@
     // ── Register Employee ──────────────────────────
     document.getElementById('employeeForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const btn = document.getElementById('btnRegEmployee');
+      const btn      = document.getElementById('btnRegEmployee');
       const name     = document.getElementById('empName').value.trim();
       const email    = document.getElementById('empEmail').value.trim();
       const password = document.getElementById('empPassword').value;
